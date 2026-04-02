@@ -1196,11 +1196,13 @@ function goToClientLanding(){
   document.getElementById('view-landing').style.display='none';
   const vc=document.getElementById('view-client');
   vc.classList.remove('hidden');
+  vc.style.display='block';
   // Make sure cp-landing is shown
   document.getElementById('cp-landing').style.display='flex';
   document.getElementById('cp-login').classList.add('hidden');
   document.getElementById('cp-onboard').classList.add('hidden');
   document.getElementById('cp-app').classList.add('hidden');
+  document.getElementById('cp-app').style.display='none';
 }
 
 function showSpecialistRegister(){
@@ -1482,7 +1484,7 @@ function shareWA(){const msg=encodeURIComponent('Bună! Te rog să completezi do
 
 // CLIENT PORTAL
 function showLanding(){
-  document.getElementById('cp-landing').style.display='';
+  document.getElementById('cp-landing').style.display='flex';
   document.getElementById('cp-login').classList.add('hidden');
   document.getElementById('cp-onboard').classList.add('hidden');
   const app=document.getElementById('cp-app');app.classList.add('hidden');app.style.display='none';
@@ -1567,6 +1569,8 @@ function doLogout(){
   document.getElementById('cp-app').classList.add('hidden');
   document.getElementById('cp-app').style.display='none';
   document.getElementById('cp-menu-overlay').classList.add('hidden');
+  // Go back to main landing
+  document.getElementById('view-client').style.display='none';
   showLanding();
 }
 
