@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cabinet Psihoterapie</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sage:#4a7c6f;--sage-light:#e8f0ee;--sage-dark:#2d5248;
+  --warm:#f7f3ef;--card:#fff;--border:rgba(74,124,111,0.18);
+  --text:#1a2620;--text-muted:#6b8f85;--accent:#c17b4a;
+  --success:#27ae60;--danger:#c0392b;--warn:#e67e22;
+  --ors:#3b82f6;--srs:#8b5cf6;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:var(--text);font-size:15px;min-height:100vh}
+
+/* ---- UTILS ---- */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-primary{background:var(--sage);color:#fff}.btn-primary:hover{background:var(--sage-dark)}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--sage-light)}
+.btn-danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-ors{background:var(--ors);color:#fff}
+.btn-srs{background:var(--srs);color:#fff}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500}
+.badge-active{background:#dcfce7;color:#15803d}
+.badge-waiting{background:#fef3c7;color:#92400e}
+.badge-inactive{background:#f3f4f6;color:#6b7280}
+.hidden{display:none!important}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:11px}
+.fg label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em}
+.fg input,.fg select,.fg textarea{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:var(--card);outline:none;width:100%;transition:border-color 0.15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sage)}
+.fg textarea{min-height:80px;resize:vertical;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-div{margin:14px 0 10px;font-size:10px;font-weight:600;color:var(--sage);text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:6px}
+.sec-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.notification{position:fixed;bottom:20px;right:20px;background:var(--sage-dark);color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;z-index:9999;animation:fi 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---- LOADING ---- */
+#app-loading{position:fixed;inset:0;background:var(--sage-dark);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px}
+.loading-logo{font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.03em}
+.loading-sub{font-size:13px;color:rgba(255,255,255,0.5)}
+.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- MODE BAR ---- */
+.mode-bar{background:var(--sage-dark);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.mode-bar-title{color:rgba(255,255,255,0.45);font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
+.mode-btns{display:flex;gap:4px}
+.mode-btn{padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.mode-btn.active{background:var(--accent);color:#fff}
+.mode-btn:not(.active){background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.65)}
+.mode-btn:not(.active):hover{background:rgba(255,255,255,0.15);color:#fff}
+.view{display:none}.view.active{display:block}
+
+/* ---- THERAPIST LAYOUT ---- */
+.app{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 44px)}
+.sidebar{background:var(--sage-dark);display:flex;flex-direction:column;position:sticky;top:44px;height:calc(100vh - 44px);overflow-y:auto}
+.logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.logo-title{font-size:16px;font-weight:600;color:#fff;letter-spacing:-0.02em;line-height:1.2}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px}
+.nav{padding:10px 0;flex:1}
+.nav-section{padding:7px 18px 3px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 18px;cursor:pointer;color:rgba(255,255,255,0.6);font-size:13px;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:var(--accent)}
+.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08)}
+.ua{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.main{overflow-y:auto;display:flex;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;flex-wrap:wrap}
+.page-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.02em}
+.content{padding:20px 22px;flex:1}
+.panel{display:none;flex-direction:column;min-height:calc(100vh - 44px)}
+.panel.active{display:flex}
+
+/* ---- STATS ---- */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.blue::before{background:var(--ors)}.stat-card.green::before{background:var(--success)}
+.stat-card.amber::before{background:var(--accent)}.stat-card.orange::before{background:var(--warn)}
+.stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.stat-value{font-size:22px;font-weight:300;color:var(--text)}
+.stat-delta{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* ---- TABLES ---- */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.tbl th{background:var(--sage-light);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.06em}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--sage-light);font-size:12px;color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafaf9;cursor:pointer}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--sage-dark);flex-shrink:0}
+
+/* ---- CLIENT DETAIL ---- */
+.back-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);cursor:pointer;margin-bottom:12px}
+.back-link:hover{color:var(--sage)}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 16px;cursor:pointer;font-size:12px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.tab.active{color:var(--sage);border-bottom-color:var(--sage);font-weight:600}
+.tab-content{display:none}.tab-content.active{display:block}
+.info-item{padding:11px;background:var(--sage-light);border-radius:8px}
+.info-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px}
+.info-value{font-size:12px;color:var(--text);line-height:1.5;white-space:pre-line}
+.doc-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:500;margin-right:5px;margin-bottom:4px}
+.doc-signed{background:#dcfce7;color:#15803d}
+.doc-unsigned{background:#fef3c7;color:#92400e}
+
+/* ---- CALENDAR ---- */
+.cal-grid{display:grid;grid-template-columns:1fr 280px;gap:18px}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.cal-day-name{text-align:center;font-size:10px;color:var(--text-muted);padding:5px 0;text-transform:uppercase;letter-spacing:0.06em}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text);position:relative;background:var(--card);border:1px solid var(--border)}
+.cal-day:hover{border-color:var(--sage);background:var(--sage-light)}
+.cal-day.today{background:var(--sage);color:#fff;border-color:var(--sage)}
+.cal-day.has-appt::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);position:absolute;bottom:3px}
+.cal-day.today.has-appt::after{background:#fff}
+.cal-day.other-month{color:rgba(74,124,111,0.2);background:transparent;border-color:transparent}
+.cal-panel{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px}
+.appt-block{background:var(--sage-light);border-radius:8px;padding:9px 11px;border-left:3px solid var(--sage);margin-bottom:8px}
+
+/* ---- NOTES ---- */
+.note-area{width:100%;min-height:260px;padding:14px;border:1px solid var(--border);border-radius:8px;font-size:14px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none}
+.note-area:focus{border-color:var(--sage)}
+.note-sel{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none}
+.note-sel:focus{border-color:var(--sage)}
+
+/* ---- INVITE BOX ---- */
+.invite-box{background:var(--sage-dark);border-radius:12px;padding:20px;margin-bottom:18px}
+.invite-link-display{flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:9px 13px;font-size:12px;color:rgba(255,255,255,0.85);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---- SCALE UI ---- */
+.scale-card-c{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:15px;margin-bottom:10px}
+.scale-domain-c{font-size:14px;font-weight:700;color:var(--text);text-align:center;margin-bottom:2px}
+.scale-domain-sub-c{font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:10px}
+.scale-labels-c{display:flex;justify-content:space-between;margin-bottom:4px}
+.scale-lbl{font-size:10px;color:var(--text-muted);max-width:130px;line-height:1.4}
+.scale-lbl.right{text-align:right}
+.vslider{width:100%;height:6px;-webkit-appearance:none;appearance:none;border-radius:3px;outline:none;cursor:pointer}
+.vslider.ors-s::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--ors);cursor:pointer;border:3px solid #fff;box-shadow:0 2px 8px rgba(59,130,246,0.4)}
+.vslider.srs-s::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--srs);cursor:pointer;border:3px solid #fff;box-shadow:0 2px 8px rgba(139,92,246,0.4)}
+.sticks{display:flex;justify-content:space-between;margin-top:4px}
+.stick{font-size:9px;color:var(--text-muted);min-width:16px;text-align:center}
+.sval{text-align:center;font-size:20px;font-weight:700;margin-top:6px}
+.sval.ors-v{color:var(--ors)}.sval.srs-v{color:var(--srs)}
+.total-box{border-radius:10px;padding:12px;text-align:center;margin-top:4px}
+.total-box.ors{background:#dbeafe}.total-box.srs{background:#ede9fe}
+.total-box-label{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px}
+.total-box.ors .total-box-label{color:#1d4ed8}.total-box.srs .total-box-label{color:#6d28d9}
+.total-box-val{font-size:24px;font-weight:300}
+.total-box.ors .total-box-val{color:#1d4ed8}.total-box.srs .total-box-val{color:#6d28d9}
+.total-box-interp{font-size:11px;font-weight:500;margin-top:3px}
+
+/* ---- CLIENT PORTAL ---- */
+.portal-shell{display:flex;flex-direction:column;height:calc(100vh - 44px);overflow:hidden}
+.portal-header{background:var(--sage-dark);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.portal-body{flex:1;overflow-y:auto}
+.portal-nav{display:flex;background:var(--card);border-top:1px solid var(--border);flex-shrink:0}
+.client-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;font-size:10px;color:var(--text-muted);gap:3px;transition:all 0.15s;border-top:2px solid transparent}
+.client-nav-item.active{color:var(--sage);border-top-color:var(--sage)}
+.client-nav-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.client-panel{display:none}.client-panel.active{display:block}
+.portal-content-pad{padding:16px}
+.client-greeting{background:var(--sage-dark);color:#fff;border-radius:12px;padding:18px;margin-bottom:14px}
+.scale-action-block{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--sage-light)}
+.status-row:last-child{border-bottom:none}
+
+/* ---- ONBOARDING ---- */
+.onboard-progress{display:flex;gap:0;margin-bottom:20px}
+.op-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.op-step:not(:last-child)::after{content:'';position:absolute;top:12px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.op-step.done::after{background:var(--sage)}
+.op-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text-muted);z-index:1;position:relative}
+.op-step.done .op-dot{background:var(--sage);border-color:var(--sage);color:#fff}
+.op-step.current .op-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.op-label{font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center}
+.op-step.current .op-label{color:var(--accent);font-weight:600}
+.op-step.done .op-label{color:var(--sage)}
+.onboard-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:12px}
+.gdpr-box{background:var(--sage-light);border-radius:8px;padding:13px;font-size:11px;color:var(--text);line-height:1.75;max-height:160px;overflow-y:auto;margin-bottom:12px;border:1px solid var(--border)}
+.cb-group{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.cb-group input[type=checkbox]{width:16px;height:16px;margin-top:2px;accent-color:var(--sage);flex-shrink:0}
+.cb-group label{font-size:12px;color:var(--text);line-height:1.5;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
+
+/* ---- AUTH ---- */
+.auth-wrap{max-width:440px;margin:0 auto;padding:28px 16px}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:12px}
+.invite-landing-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:12px}
+
+/* ---- MODAL ---- */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,38,32,0.5);align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:13px;padding:22px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;position:relative}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid .fg{margin-bottom:0}.form-grid .full{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:13px}
+.close-btn{position:absolute;top:11px;right:11px;width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted);display:flex;align-items:center;justify-content:center}
+.close-btn:hover{background:#dce8e5}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="app-loading">
+  <div class="loading-logo">Cabinet Psihoterapie</div>
+  <div class="spinner"></div>
+  <div class="loading-sub">Se conectează la baza de date...</div>
+</div>
+
+<div id="app-shell" class="hidden">
+<div class="mode-bar">
+  <div class="mode-bar-title">Cabinet Psihoterapie · Dr. Alina</div>
+  <div class="mode-btns">
+    <button class="mode-btn active" onclick="switchMode('therapist',this)">🩺 Terapeut</button>
+    <button class="mode-btn" onclick="switchMode('client',this)">👤 Portal Client</button>
+  </div>
+</div>
+
+<!-- ===== THERAPIST ===== -->
+<div id="view-therapist" class="view active">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo"><div class="logo-title">Cabinet<br>Psihoterapie</div><div class="logo-sub">Panou terapeut</div></div>
+      <nav class="nav">
+        <div class="nav-section">General</div>
+        <div class="nav-item active" onclick="tNav('dashboard',this)">◈ Panou principal</div>
+        <div class="nav-item" onclick="tNav('calendar',this)">◷ Calendar</div>
+        <div class="nav-section">Clinică</div>
+        <div class="nav-item" onclick="tNav('clients',this)">◉ Clienți</div>
+        <div class="nav-item" onclick="tNav('notes',this)">◎ Notițe ședință</div>
+        <div class="nav-section">Administrativ</div>
+        <div class="nav-item" onclick="tNav('contracts',this)">◧ Contracte & GDPR</div>
+        <div class="nav-item" onclick="tNav('invoices',this)">◈ Facturi</div>
+        <div class="nav-section">Configurare</div>
+        <div class="nav-item" onclick="tNav('invite',this)">🔗 Link invitație</div>
+      </nav>
+      <div class="sidebar-footer">
+        <div style="display:flex;align-items:center;gap:9px"><div class="ua">A</div><div><div style="font-size:12px;color:rgba(255,255,255,0.8)">Dr. Alina</div><div style="font-size:10px;color:rgba(255,255,255,0.35)">Psihoterapeut</div></div></div>
+      </div>
+    </aside>
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div id="t-dashboard" class="panel active">
+        <div class="topbar"><div class="page-title">Panou principal</div><button class="btn btn-primary" onclick="openModal('add-appt')">+ Programare</button></div>
+        <div class="content">
+          <div class="stats-grid">
+            <div class="stat-card blue"><div class="stat-label">Clienți activi</div><div class="stat-value" id="st-active">—</div><div class="stat-delta">în terapie</div></div>
+            <div class="stat-card orange"><div class="stat-label">În așteptare</div><div class="stat-value" id="st-waiting">—</div><div class="stat-delta">necesită confirmare</div></div>
+            <div class="stat-card green"><div class="stat-label">Ședințe luna aceasta</div><div class="stat-value" id="st-sessions">—</div><div class="stat-delta">programări</div></div>
+            <div class="stat-card amber"><div class="stat-label">Scale azi</div><div class="stat-value" id="st-scales">—</div><div class="stat-delta">ORS + SRS completate</div></div>
+          </div>
+          <div id="waiting-section" class="hidden" style="margin-bottom:14px">
+            <div style="font-size:11px;font-weight:600;color:var(--warn);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">⚠ Clienți noi — necesită confirmare</div>
+            <div id="waiting-list"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+              <div style="background:var(--sage-light);padding:10px 14px;font-size:11px;font-weight:600;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.06em">Programări azi</div>
+              <div id="dash-appts"><div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div></div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+              <div style="background:var(--sage-light);padding:10px 14px;font-size:11px;font-weight:600;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.06em">Scale completate recent</div>
+              <div id="dash-scales"><div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio scală completată.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div id="t-calendar" class="panel">
+        <div class="topbar"><div class="page-title">Calendar</div><button class="btn btn-primary" onclick="openModal('add-appt')">+ Programare nouă</button></div>
+        <div class="content">
+          <div class="cal-grid">
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                <div style="font-size:17px;font-weight:600;color:var(--text)" id="cal-label"></div>
+                <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="changeMonth(-1)">‹</button><button class="btn btn-ghost btn-sm" onclick="changeMonth(1)">›</button></div>
+              </div>
+              <div class="cal-days-header"><div class="cal-day-name">Lu</div><div class="cal-day-name">Ma</div><div class="cal-day-name">Mi</div><div class="cal-day-name">Jo</div><div class="cal-day-name">Vi</div><div class="cal-day-name">Sâ</div><div class="cal-day-name">Du</div></div>
+              <div class="cal-days" id="cal-days"></div>
+            </div>
+            <div><div class="cal-panel"><div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px" id="cal-day-label">Azi</div><div id="cal-day-appts"><div style="font-size:13px;color:var(--text-muted)">Nicio programare</div></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div id="t-clients" class="panel">
+        <div class="topbar"><div class="page-title">Clienți</div></div>
+        <div class="content">
+          <div id="clients-list-view">
+            <table class="tbl">
+              <thead><tr><th>Client</th><th>Înregistrat</th><th>GDPR</th><th>Fișă</th><th>ORS</th><th>SRS</th><th>Status</th></tr></thead>
+              <tbody id="client-tbody"><tr><td colspan="7" style="text-align:center;padding:22px;color:var(--text-muted)">Se încarcă...</td></tr></tbody>
+            </table>
+          </div>
+          <div id="client-detail-view" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div id="t-notes" class="panel">
+        <div class="topbar"><div class="page-title">Notițe ședință</div></div>
+        <div class="content">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:20px">
+            <div style="display:flex;gap:11px;flex-wrap:wrap;margin-bottom:16px">
+              <select class="note-sel" id="note-client" onchange="loadNote()" style="flex:1;min-width:150px"><option value="">— Selectează client —</option></select>
+              <input type="date" class="note-sel" id="note-date" style="width:150px" onchange="loadNote()">
+              <select class="note-sel" id="note-type" style="width:170px"><option>Ședință individuală</option><option>Evaluare inițială</option><option>Ședință de criză</option><option>Urmărire</option></select>
+            </div>
+            <textarea class="note-area" id="note-text" placeholder="Notițele ședinței... Salvare automată activă." oninput="autoSave()"></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)"><span style="width:6px;height:6px;border-radius:50%;display:inline-block" id="save-dot" style="background:var(--success)"></span><span id="save-label">Salvare automată activă</span></div>
+              <button class="btn btn-primary btn-sm" onclick="saveNote()">Salvează</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTRACTS -->
+      <div id="t-contracts" class="panel">
+        <div class="topbar"><div class="page-title">Contracte & GDPR</div></div>
+        <div class="content"><div id="contracts-content"><div style="padding:22px;text-align:center;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div></div>
+      </div>
+
+      <!-- INVOICES -->
+      <div id="t-invoices" class="panel">
+        <div class="topbar"><div class="page-title">Facturi</div><button class="btn btn-primary" onclick="openModal('add-invoice')">+ Factură nouă</button></div>
+        <div class="content">
+          <table class="tbl"><thead><tr><th>Nr.</th><th>Client</th><th>Perioadă</th><th>Sumă</th><th>Status</th><th></th></tr></thead><tbody id="invoices-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- INVITE -->
+      <div id="t-invite" class="panel">
+        <div class="topbar"><div class="page-title">Link invitație</div></div>
+        <div class="content">
+          <div class="invite-box">
+            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Linkul tău de invitație</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px;line-height:1.5">Trimite acest link oricărui client care s-a programat. Se înregistrează singur și apare automat la tine.</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <div class="invite-link-display" id="invite-url-display">—</div>
+              <button class="btn btn-sm" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2)" onclick="copyInviteLink()">📋 Copiază</button>
+            </div>
+            <div style="margin-top:10px">
+              <button style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="shareWA()">💬 Trimite pe WhatsApp</button>
+            </div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Cum funcționează</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              ${['Tu trimiți linkul prin WhatsApp sau email','Clientul creează cont, semnează GDPR și completează fișa','Apare automat în lista ta ca "În așteptare"','Tu apeși "Activează" și devine client activ'].map((s,i)=>`<div style="display:flex;align-items:flex-start;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div><div style="font-size:13px;color:var(--text)">${s}</div></div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== CLIENT PORTAL ===== -->
+<div id="view-client" class="view">
+
+  <!-- LANDING -->
+  <div id="cp-landing">
+    <div class="auth-wrap">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:40px;margin-bottom:10px">🏥</div>
+        <div style="font-size:20px;font-weight:700;color:var(--sage-dark)">Cabinet Dr. Alina</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Cabinet Individual de Psihologie</div>
+      </div>
+      <div class="invite-landing-card">
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Bine ai venit!</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px">Completează documentele necesare înainte de prima ședință. Durează aproximativ 5 minute.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px" onclick="goOnboard()">Sunt client nou — mă înregistrez</button>
+          <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showLogin()">Am deja cont — intru în aplicație</button>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--text-muted)">Datele tale sunt protejate conform GDPR.<br>Accesezi doar propriul tău dosar.</div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="cp-login" class="hidden">
+    <div class="auth-wrap">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:18px;font-weight:700;color:var(--sage-dark)">Intră în cont</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Cabinet Dr. Alina</div>
+      </div>
+      <div class="auth-card">
+        <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="email@exemplu.ro"></div>
+        <div class="fg"><label>Parolă</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px" onclick="doLogin()">Intru în cont</button>
+      </div>
+      <div style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="showLanding()">← Înapoi</button></div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div id="cp-onboard" class="hidden">
+    <div style="max-width:500px;margin:0 auto;padding:20px 16px">
+
+      <div id="ob-register">
+        <div class="onboard-progress">
+          <div class="op-step current"><div class="op-dot">1</div><div class="op-label">Cont</div></div>
+          <div class="op-step"><div class="op-dot">2</div><div class="op-label">GDPR</div></div>
+          <div class="op-step"><div class="op-dot">3</div><div class="op-label">Fișă</div></div>
+          <div class="op-step"><div class="op-dot">4</div><div class="op-label">Gata</div></div>
+        </div>
+        <div class="onboard-card">
+          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Creează-ți contul</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.6">Contul tău este privat — nimeni altcineva nu îți poate vedea datele.</div>
+          <div class="form-row">
+            <div class="fg"><label>Prenume</label><input type="text" id="ob-first" placeholder="Prenume"></div>
+            <div class="fg"><label>Nume</label><input type="text" id="ob-last" placeholder="Nume"></div>
+          </div>
+          <div class="fg"><label>Email</label><input type="email" id="ob-email" placeholder="email@exemplu.ro"></div>
+          <div class="fg"><label>Parolă</label><input type="password" id="ob-pass" placeholder="Minimum 6 caractere"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:4px">
+            <button class="btn btn-primary" onclick="obRegister()">Continuă → GDPR</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="ob-gdpr" class="hidden">
+        <div class="onboard-progress">
+          <div class="op-step done"><div class="op-dot">✓</div><div class="op-label">Cont</div></div>
+          <div class="op-step current"><div class="op-dot">2</div><div class="op-label">GDPR</div></div>
+          <div class="op-step"><div class="op-dot">3</div><div class="op-label">Fișă</div></div>
+          <div class="op-step"><div class="op-dot">4</div><div class="op-label">Gata</div></div>
+        </div>
+        <div class="onboard-card">
+          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Consimțământ GDPR</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Citește cu atenție informarea privind prelucrarea datelor.</div>
+          <div class="gdpr-box">
+            <strong>Informare GDPR — Cabinet Dr. Alina</strong><br><br>
+            Datele tale sunt prelucrate în scopul furnizării serviciilor terapeutice, conform Regulamentului (UE) 2016/679.<br><br>
+            <strong>Date colectate:</strong> nume, contact, date de sănătate (diagnostic, notițe terapeutice).<br><br>
+            <strong>Temei legal:</strong> consimțământul explicit (art. 9 GDPR).<br><br>
+            <strong>Stocare:</strong> pe durata terapiei + 5 ani conform obligațiilor profesionale.<br><br>
+            <strong>Drepturi:</strong> acces, rectificare, ștergere, portabilitate. Poți retrage consimțământul oricând.<br><br>
+            <strong>Confidențialitate:</strong> datele nu se divulgă terților, cu excepția obligațiilor legale.
+          </div>
+          <div class="cb-group"><input type="checkbox" id="gdpr1"><label for="gdpr1">Am citit și înțeleg informarea privind prelucrarea datelor cu caracter personal.</label></div>
+          <div class="cb-group"><input type="checkbox" id="gdpr2"><label for="gdpr2">Îmi exprim consimțământul pentru prelucrarea datelor de sănătate în scop terapeutic.</label></div>
+          <div class="cb-group"><input type="checkbox" id="gdpr3"><label for="gdpr3">Înțeleg că pot retrage consimțământul oricând, contactând terapeutul.</label></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:4px">
+            <button class="btn btn-primary" onclick="obGdpr()">Confirm și continuă →</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="ob-fisa" class="hidden">
+        <div class="onboard-progress">
+          <div class="op-step done"><div class="op-dot">✓</div><div class="op-label">Cont</div></div>
+          <div class="op-step done"><div class="op-dot">✓</div><div class="op-label">GDPR</div></div>
+          <div class="op-step current"><div class="op-dot">3</div><div class="op-label">Fișă</div></div>
+          <div class="op-step"><div class="op-dot">4</div><div class="op-label">Gata</div></div>
+        </div>
+        <div class="onboard-card">
+          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Fișă personală</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Aceste date ajută terapeutul să te cunoască înaintea primei ședințe.</div>
+          <div class="sec-div">Date personale</div>
+          <div class="form-row">
+            <div class="fg"><label>Data nașterii</label><input type="date" id="ob-dob"></div>
+            <div class="fg"><label>Telefon</label><input type="tel" id="ob-phone" placeholder="07xx xxx xxx"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label>Ocupație</label><input type="text" id="ob-job" placeholder="Ex: Contabil, student..."></div>
+            <div class="fg"><label>Stare civilă</label>
+              <select id="ob-civil"><option value="">— Selectează —</option><option>Necăsătorit/ă</option><option>Căsătorit/ă</option><option>Divorțat/ă</option><option>Văduv/ă</option><option>Uniune liberă</option></select>
+            </div>
+          </div>
+          <div class="sec-div">Situație medicală</div>
+          <div class="fg"><label>Diagnostic medical (dacă există)</label><input type="text" id="ob-diag" placeholder="Ex: Hipertensiune, sau 'Niciun diagnostic'"></div>
+          <div class="fg"><label>Medicație actuală</label><textarea id="ob-meds" placeholder="Listează medicamentele sau 'Nu iau nicio medicație'"></textarea></div>
+          <div class="fg"><label>Terapii anterioare</label><textarea id="ob-prev" placeholder="Ai mai urmat terapie? Cu ce tip de terapeut?"></textarea></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:4px">
+            <button class="btn btn-primary" onclick="obFisa()">Finalizează →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APP (după login) -->
+  <div id="cp-app" class="hidden portal-shell">
+    <div class="portal-header">
+      <div><div id="cp-name" style="font-size:14px;font-weight:600;color:#fff"></div><div style="font-size:11px;color:rgba(255,255,255,0.5)">Cabinet Dr. Alina</div></div>
+      <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2)" onclick="doLogout()">Ieșire</button>
+    </div>
+    <div class="portal-body">
+      <div id="cp-home" class="client-panel active">
+        <div class="portal-content-pad">
+          <div class="client-greeting">
+            <div style="font-size:17px;font-weight:600;margin-bottom:3px" id="cp-greeting">Bună ziua!</div>
+            <div style="font-size:12px;opacity:0.65">Bine ai revenit la cabinetul Dr. Alina</div>
+          </div>
+          <div id="cp-doc-status" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:14px"></div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Scale pentru ședința de azi</div>
+          <div class="scale-action-block">
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">📋 ORS — Înainte de ședință</div><div style="font-size:11px;color:var(--text-muted)">Cum ți-a mers săptămâna aceasta</div></div>
+            <div id="ors-btn-area"><button class="btn btn-ors btn-sm" onclick="showPanel('ors')">Completează</button></div>
+          </div>
+          <div class="scale-action-block">
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">📋 SRS — La finalul ședinței</div><div style="font-size:11px;color:var(--text-muted)">Cum a fost ședința de azi</div></div>
+            <div id="srs-btn-area"><button class="btn btn-srs btn-sm" onclick="showPanel('srs')">Completează</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cp-ors" class="client-panel">
+        <div class="portal-content-pad">
+          <button class="btn btn-ghost btn-sm" onclick="showPanel('home')" style="margin-bottom:12px">← Înapoi</button>
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:16px;font-size:11px;font-weight:600;background:#dbeafe;color:#1d4ed8;margin-bottom:8px">ORS · Outcome Rating Scale</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Cum ți-a mers săptămâna aceasta?</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">Gândind-te la săptămâna trecută, inclusiv astăzi. <strong>Stânga = scăzut · Dreapta = ridicat.</strong></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Individual</div><div class="scale-domain-sub-c">Starea personală de bine</div><div class="scale-labels-c"><span class="scale-lbl">Nivel scăzut</span><span class="scale-lbl right">Nivel ridicat</span></div><input type="range" class="vslider ors-s" id="o1" min="0" max="10" step="0.1" value="5" oninput="upd('o1','ov1','ors');updOrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval ors-v" id="ov1">5.0</div></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Interpersonal</div><div class="scale-domain-sub-c">Familie, Relații apropiate</div><div class="scale-labels-c"><span class="scale-lbl">Nivel scăzut</span><span class="scale-lbl right">Nivel ridicat</span></div><input type="range" class="vslider ors-s" id="o2" min="0" max="10" step="0.1" value="5" oninput="upd('o2','ov2','ors');updOrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval ors-v" id="ov2">5.0</div></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Social</div><div class="scale-domain-sub-c">Muncă, Școală, Prieteni</div><div class="scale-labels-c"><span class="scale-lbl">Nivel scăzut</span><span class="scale-lbl right">Nivel ridicat</span></div><input type="range" class="vslider ors-s" id="o3" min="0" max="10" step="0.1" value="5" oninput="upd('o3','ov3','ors');updOrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval ors-v" id="ov3">5.0</div></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Global</div><div class="scale-domain-sub-c">Starea generală de bine</div><div class="scale-labels-c"><span class="scale-lbl">Nivel scăzut</span><span class="scale-lbl right">Nivel ridicat</span></div><input type="range" class="vslider ors-s" id="o4" min="0" max="10" step="0.1" value="5" oninput="upd('o4','ov4','ors');updOrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval ors-v" id="ov4">5.0</div></div>
+          <div class="total-box ors"><div class="total-box-label">Scor total ORS</div><div><span class="total-box-val" id="ors-total">20.0</span><span style="font-size:13px;color:#1d4ed8"> / 40</span></div><div class="total-box-interp" id="ors-interp" style="color:var(--warn)">Zona de tranziție</div></div>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+            <button class="btn btn-ghost" onclick="showPanel('home')">Anulează</button>
+            <button class="btn btn-ors" onclick="submitORS()">Trimite ORS →</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="cp-srs" class="client-panel">
+        <div class="portal-content-pad">
+          <button class="btn btn-ghost btn-sm" onclick="showPanel('home')" style="margin-bottom:12px">← Înapoi</button>
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:16px;font-size:11px;font-weight:600;background:#ede9fe;color:#6d28d9;margin-bottom:8px">SRS · Session Rating Scale V.3.0</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Cum a fost ședința de azi?</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">Marchează cât mai aproape de descrierea care se potrivește experienței tale.</div>
+          <div class="scale-card-c"><div class="scale-domain-c">Relația</div><div class="scale-labels-c"><span class="scale-lbl">Nu m-am simțit ascultat/ă și respectat/ă.</span><span class="scale-lbl right">M-am simțit ascultat/ă și respectat/ă.</span></div><input type="range" class="vslider srs-s" id="s1" min="0" max="10" step="0.1" value="5" oninput="upd('s1','sv1','srs');updSrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval srs-v" id="sv1">5.0</div></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Scopurile și Subiectele</div><div class="scale-labels-c"><span class="scale-lbl">Nu am discutat ce am vrut.</span><span class="scale-lbl right">Am discutat ce am vrut.</span></div><input type="range" class="vslider srs-s" id="s2" min="0" max="10" step="0.1" value="5" oninput="upd('s2','sv2','srs');updSrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval srs-v" id="sv2">5.0</div></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Abordarea sau Metoda</div><div class="scale-labels-c"><span class="scale-lbl">Abordarea nu mi se potrivește.</span><span class="scale-lbl right">Abordarea mi se potrivește bine.</span></div><input type="range" class="vslider srs-s" id="s3" min="0" max="10" step="0.1" value="5" oninput="upd('s3','sv3','srs');updSrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval srs-v" id="sv3">5.0</div></div>
+          <div class="scale-card-c"><div class="scale-domain-c">Global</div><div class="scale-labels-c"><span class="scale-lbl">A lipsit ceva din ședință.</span><span class="scale-lbl right">Ședința a fost bună pentru mine.</span></div><input type="range" class="vslider srs-s" id="s4" min="0" max="10" step="0.1" value="5" oninput="upd('s4','sv4','srs');updSrsT()"><div class="sticks"><span class="stick">0</span><span class="stick">2</span><span class="stick">4</span><span class="stick">6</span><span class="stick">8</span><span class="stick">10</span></div><div class="sval srs-v" id="sv4">5.0</div></div>
+          <div class="total-box srs"><div class="total-box-label">Scor total SRS</div><div><span class="total-box-val" id="srs-total">20.0</span><span style="font-size:13px;color:#6d28d9"> / 40</span></div><div class="total-box-interp" id="srs-interp" style="color:var(--warn)">Poate necesita ajustări</div></div>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+            <button class="btn btn-ghost" onclick="showPanel('home')">Anulează</button>
+            <button class="btn btn-srs" onclick="submitSRS()">Trimite SRS →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="portal-nav">
+      <div class="client-nav-item active" onclick="showPanel('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Acasă</div>
+      <div class="client-nav-item" onclick="showPanel('ors',this)"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>ORS</div>
+      <div class="client-nav-item" onclick="showPanel('srs',this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>SRS</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-add-appt" class="modal-overlay">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('add-appt')">✕</button>
+    <div class="modal-title">Programare nouă</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Client</label><select id="a-client"><option value="">— Selectează —</option></select></div>
+      <div class="fg"><label>Data</label><input type="date" id="a-date"></div>
+      <div class="fg"><label>Ora</label><input type="time" id="a-time" value="10:00"></div>
+      <div class="fg"><label>Durată (min)</label><input type="number" id="a-dur" value="50"></div>
+      <div class="fg"><label>Tip ședință</label><select id="a-type"><option>Ședință individuală</option><option>Evaluare inițială</option><option>Ședință de criză</option><option>Online</option></select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('add-appt')">Anulează</button>
+      <button class="btn btn-primary" onclick="saveAppt()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-add-invoice" class="modal-overlay">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('add-invoice')">✕</button>
+    <div class="modal-title">Factură nouă</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Client</label><select id="i-client"><option value="">— Selectează —</option></select></div>
+      <div class="fg"><label>Luna</label><input type="month" id="i-month"></div>
+      <div class="fg"><label>Sumă (lei)</label><input type="number" id="i-amount"></div>
+      <div class="fg"><label>Nr. ședințe</label><input type="number" id="i-sessions"></div>
+      <div class="fg"><label>Status</label><select id="i-status"><option value="unpaid">Neachitată</option><option value="paid">Achitată</option></select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('add-invoice')">Anulează</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">Emite</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+const SUPABASE_URL = 'https://tajsaivmbjhvgzvksaqd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SWVntWEu4taASDuD3pjhrg_aDdjOVuS';
+const CABINET_CODE = 'alina2024';
+const INVITE_URL = window.location.origin + window.location.pathname + '?invite=' + CABINET_CODE;
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================================
+// UTILS
+// ============================================================
+function toDS(d){return d.toISOString().slice(0,10)}
+function fmtDate(s){if(!s)return '—';return new Date(s+'T12:00:00').toLocaleDateString('ro-RO',{day:'2-digit',month:'short',year:'numeric'})}
+function ini(f,l){return((f||'?')[0]+((l||'')[0]||'')).toUpperCase()}
+function notify(msg,color){const n=document.createElement('div');n.className='notification';if(color)n.style.background=color;n.textContent=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),3500)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+
+// Modals
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(o=>o.classList.remove('open'))});
+function openModal(id){
+  const o=document.getElementById('modal-'+id);if(!o)return;
+  if(id==='add-appt'||id==='add-invoice'){
+    const sel=document.getElementById(id==='add-appt'?'a-client':'i-client');
+    sel.innerHTML='<option value="">— Selectează —</option>';
+    cachedClients.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.first_name} ${c.last_name}</option>`});
+  }
+  if(id==='add-appt')document.getElementById('a-date').value=toDS(new Date());
+  if(id==='add-invoice')document.getElementById('i-month').value=new Date().toISOString().slice(0,7);
+  o.classList.add('open');
+}
+function closeModal(id){document.getElementById('modal-'+id)?.classList.remove('open')}
+
+// ============================================================
+// STATE
+// ============================================================
+let cachedClients=[];
+let currentClientUser=null;
+let calDate=new Date();
+let selDate=new Date();
+let autoTimer=null;
+
+// ============================================================
+// INIT
+// ============================================================
+async function init(){
+  // Check invite param
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('invite')===CABINET_CODE){
+    document.getElementById('app-loading').classList.add('hidden');
+    document.getElementById('app-shell').classList.remove('hidden');
+    switchMode('client',document.querySelector('.mode-btn:last-child'));
+    return;
+  }
+  // Load clients
+  try{
+    await loadClients();
+    document.getElementById('app-loading').classList.add('hidden');
+    document.getElementById('app-shell').classList.remove('hidden');
+    renderDash();
+    document.getElementById('invite-url-display').textContent=INVITE_URL;
+    initSliders();
+  }catch(e){
+    document.querySelector('#app-loading .loading-sub').textContent='Eroare conexiune: '+e.message;
+  }
+}
+
+async function loadClients(){
+  const {data,error}=await sb.from('clients').select('*').order('registered_at',{ascending:false});
+  if(error)throw error;
+  cachedClients=data||[];
+  return cachedClients;
+}
+
+// ============================================================
+// MODE & NAV
+// ============================================================
+function switchMode(m,el){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+m).classList.add('active');
+  if(m==='therapist'){loadClients().then(()=>{renderDash();renderClientList();})}
+  if(m==='client'){showLanding();}
+}
+
+function tNav(p,el){
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(x=>{x.style.display='none';x.classList.remove('active')});
+  const t=document.getElementById('t-'+p);t.style.display='flex';t.classList.add('active');
+  if(p==='dashboard')renderDash();
+  if(p==='calendar')renderCalendar();
+  if(p==='clients'){loadClients().then(()=>{renderClientList();document.getElementById('client-detail-view').style.display='none';document.getElementById('clients-list-view').style.display=''});}
+  if(p==='notes')populateNoteClients();
+  if(p==='contracts')renderContracts();
+  if(p==='invoices')renderInvoices();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function renderDash(){
+  const clients=cachedClients;
+  document.getElementById('st-active').textContent=clients.filter(c=>c.status==='active').length;
+  document.getElementById('st-waiting').textContent=clients.filter(c=>c.status==='waiting').length;
+
+  const today=toDS(new Date());
+  const {data:appts}=await sb.from('appointments').select('*').eq('date',today).order('time');
+  const {data:scales}=await sb.from('measurements').select('*').eq('date',today).order('submitted_at',{ascending:false});
+
+  document.getElementById('st-sessions').textContent=appts?.length||0;
+  document.getElementById('st-scales').textContent=scales?.length||0;
+
+  // Waiting clients alert
+  const waiting=clients.filter(c=>c.status==='waiting');
+  const ws=document.getElementById('waiting-section');
+  const wl=document.getElementById('waiting-list');
+  if(waiting.length){
+    ws.classList.remove('hidden');
+    wl.innerHTML=waiting.map(c=>`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email} · GDPR: ${c.gdpr_signed?'✓':'—'} · Fișă: ${c.fisa_complete?'✓':'—'}</div></div>
+      <button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button>
+    </div>`).join('');
+  } else ws.classList.add('hidden');
+
+  // Today appointments
+  const da=document.getElementById('dash-appts');
+  if(appts?.length){
+    da.innerHTML=appts.map(a=>{const c=clients.find(x=>x.id===a.client_id);return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div></div>`;}).join('');
+  } else da.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div>';
+
+  // Recent scales
+  const ds=document.getElementById('dash-scales');
+  if(scales?.length){
+    ds.innerHTML=scales.slice(0,5).map(m=>{const c=clients.find(x=>x.id===m.client_id);const isOrs=m.type==='ors';return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:${isOrs?'#dbeafe':'#ede9fe'};color:${isOrs?'#1d4ed8':'#6d28d9'}">${isOrs?'ORS':'SRS'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div></div><div style="font-size:15px;font-weight:600;color:${isOrs?'var(--ors)':'var(--srs)'}">${m.total}</div></div>`;}).join('');
+  } else ds.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio scală completată azi.</div>';
+}
+
+async function activateClient(id){
+  await sb.from('clients').update({status:'active'}).eq('id',id);
+  await loadClients();renderDash();renderClientList();notify('Client activat!');
+}
+
+// ============================================================
+// CLIENTS
+// ============================================================
+function renderClientList(){
+  const clients=cachedClients;const tb=document.getElementById('client-tbody');
+  if(!clients.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:22px;color:var(--text-muted)">Niciun client înregistrat încă.</td></tr>';return}
+  tb.innerHTML=clients.map(c=>`<tr onclick="showClientDetail('${c.id}')">
+    <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${ini(c.first_name,c.last_name)}</div><div><div style="font-weight:500;font-size:13px">${c.first_name} ${c.last_name}</div><div style="font-size:10px;color:var(--text-muted)">${c.email}</div></div></div></td>
+    <td style="font-size:11px;color:var(--text-muted)">${fmtDate(c.registered_at?.slice(0,10))}</td>
+    <td>${c.gdpr_signed?'<span style="color:var(--success);font-size:12px;font-weight:600">✓</span>':'<span style="color:var(--warn);font-size:12px">—</span>'}</td>
+    <td>${c.fisa_complete?'<span style="color:var(--success);font-size:12px;font-weight:600">✓</span>':'<span style="color:var(--warn);font-size:12px">—</span>'}</td>
+    <td id="ors-${c.id}">—</td>
+    <td id="srs-${c.id}">—</td>
+    <td><span class="badge badge-${c.status==='active'?'active':c.status==='waiting'?'waiting':'inactive'}">${c.status==='active'?'Activ':c.status==='waiting'?'Așteptare':'Inactiv'}</span></td>
+  </tr>`).join('');
+  // Load last scores async
+  clients.forEach(async c=>{
+    const {data}=await sb.from('measurements').select('type,total').eq('client_id',c.id).order('submitted_at',{ascending:false}).limit(10);
+    if(!data)return;
+    const lo=data.find(x=>x.type==='ors');const ls=data.find(x=>x.type==='srs');
+    const oe=document.getElementById('ors-'+c.id);const se=document.getElementById('srs-'+c.id);
+    if(oe)oe.innerHTML=lo?`<span style="font-weight:600;color:var(--ors)">${lo.total}</span>`:'—';
+    if(se)se.innerHTML=ls?`<span style="font-weight:600;color:var(--srs)">${ls.total}</span>`:'—';
+  });
+}
+
+async function showClientDetail(id){
+  const c=cachedClients.find(x=>x.id===id);if(!c)return;
+  document.getElementById('clients-list-view').style.display='none';
+  const det=document.getElementById('client-detail-view');det.style.display='block';
+  const [{data:sessions},{data:measurements},{data:fisa}]=await Promise.all([
+    sb.from('session_notes').select('*').eq('client_id',id).order('date',{ascending:false}),
+    sb.from('measurements').select('*').eq('client_id',id).order('session_number'),
+    sb.from('fise').select('*').eq('client_id',id).single()
+  ]);
+  const orsMeas=(measurements||[]).filter(x=>x.type==='ors');
+  const srsMeas=(measurements||[]).filter(x=>x.type==='srs');
+  det.innerHTML=`
+    <div class="back-link" onclick="document.getElementById('clients-list-view').style.display='';document.getElementById('client-detail-view').style.display='none'">← Înapoi la clienți</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0">${ini(c.first_name,c.last_name)}</div>
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">${c.first_name} ${c.last_name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${c.email} · Înregistrat ${fmtDate(c.registered_at?.slice(0,10))}</div>
+        <div>
+          <span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span>
+          <span class="doc-badge ${c.fisa_complete?'doc-signed':'doc-unsigned'}">Fișă ${c.fisa_complete?'✓':'⚠'}</span>
+          <span class="doc-badge ${c.status==='active'?'doc-signed':'doc-unsigned'}">${c.status==='active'?'✓ Activ':'⏳ Așteptare'}</span>
+        </div>
+      </div>
+      ${c.status!=='active'?`<button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button>`:''}
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="cTab('sessions',this)">Ședințe (${sessions?.length||0})</div>
+      <div class="tab" onclick="cTab('fisa',this)">Fișă personală</div>
+      <div class="tab" onclick="cTab('scale',this)">Scale ORS/SRS</div>
+    </div>
+    <div id="ctab-sessions" class="tab-content active">
+      ${sessions?.length?sessions.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:12px;font-weight:600;color:var(--sage)">${fmtDate(s.date)} — ${s.type}</div><div style="font-size:11px;color:var(--text-muted)">Ș #${sessions.length-i}</div></div><div style="font-size:13px;color:var(--text);line-height:1.6">${s.notes||'<em style="color:var(--text-muted)">Fără notițe.</em>'}</div></div>`).join(''):'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Nicio ședință înregistrată.</div>'}
+    </div>
+    <div id="ctab-fisa" class="tab-content">
+      ${fisa?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="info-item"><div class="info-label">Data nașterii</div><div class="info-value">${fmtDate(fisa.dob)}</div></div>
+        <div class="info-item"><div class="info-label">Telefon</div><div class="info-value">${c.phone||'—'}</div></div>
+        <div class="info-item"><div class="info-label">Ocupație</div><div class="info-value">${fisa.job||'—'}</div></div>
+        <div class="info-item"><div class="info-label">Stare civilă</div><div class="info-value">${fisa.civil_status||'—'}</div></div>
+        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Diagnostic medical</div><div class="info-value">${fisa.medical_diagnosis||'—'}</div></div>
+        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Medicație</div><div class="info-value">${fisa.medication||'—'}</div></div>
+        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Terapii anterioare</div><div class="info-value">${fisa.previous_therapy||'—'}</div></div>
+      </div>`:'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Fișa nu a fost completată încă.</div>'}
+    </div>
+    <div id="ctab-scale" class="tab-content">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div style="font-size:12px;font-weight:600;color:var(--ors);margin-bottom:10px">ORS — Evoluție</div>
+          ${orsMeas.length?orsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--ors)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div style="font-size:12px;font-weight:600;color:var(--srs);margin-bottom:10px">SRS — Evoluție</div>
+          ${srsMeas.length?srsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--srs)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}
+        </div>
+      </div>
+    </div>`;
+  function cTab(t,el){det.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');det.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.getElementById('ctab-'+t).classList.add('active');}
+  window.cTab=cTab;
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+async function renderCalendar(){
+  const months=['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+  document.getElementById('cal-label').textContent=months[calDate.getMonth()]+' '+calDate.getFullYear();
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  const first=new Date(y,m,1);let sd=first.getDay();sd=sd===0?6:sd-1;
+  const dim=new Date(y,m+1,0).getDate();
+  const today=toDS(new Date());
+  const {data:appts}=await sb.from('appointments').select('date').gte('date',`${y}-${String(m+1).padStart(2,'0')}-01`).lte('date',`${y}-${String(m+1).padStart(2,'0')}-${dim}`);
+  const apptDates=new Set((appts||[]).map(a=>a.date));
+  let h='';
+  for(let i=0;i<sd;i++){const pd=new Date(y,m,-(sd-i-1));h+=`<div class="cal-day other-month">${pd.getDate()}</div>`;}
+  for(let d=1;d<=dim;d++){const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;h+=`<div class="cal-day${ds===today?' today':''}${apptDates.has(ds)?' has-appt':''}" onclick="selDay('${ds}')">${d}</div>`;}
+  document.getElementById('cal-days').innerHTML=h;
+  renderCalDay(toDS(selDate));
+}
+function changeMonth(d){calDate.setMonth(calDate.getMonth()+d);renderCalendar()}
+function selDay(ds){selDate=new Date(ds+'T12:00:00');renderCalDay(ds)}
+async function renderCalDay(ds){
+  const {data:appts}=await sb.from('appointments').select('*').eq('date',ds).order('time');
+  const label=ds===toDS(new Date())?'Azi':fmtDate(ds);
+  document.getElementById('cal-day-label').textContent=label;
+  const cont=document.getElementById('cal-day-appts');
+  if(!appts?.length){cont.innerHTML='<div style="font-size:13px;color:var(--text-muted)">Nicio programare</div>';return}
+  cont.innerHTML=appts.map(a=>{const c=cachedClients.find(x=>x.id===a.client_id);return`<div class="appt-block"><div style="font-size:11px;font-weight:600;color:var(--sage);margin-bottom:2px">${a.time} · ${a.duration}min</div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>`;}).join('');
+}
+
+// ============================================================
+// APPOINTMENTS
+// ============================================================
+async function saveAppt(){
+  const clientId=document.getElementById('a-client').value;
+  const date=document.getElementById('a-date').value;
+  const time=document.getElementById('a-time').value;
+  const duration=parseInt(document.getElementById('a-dur').value)||50;
+  const type=document.getElementById('a-type').value;
+  if(!clientId||!date){notify('Selectează client și dată.','var(--danger)');return}
+  const {error}=await sb.from('appointments').insert({client_id:clientId,date,time,duration,type});
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return}
+  // Increment session count
+  const c=cachedClients.find(x=>x.id===clientId);
+  if(c)await sb.from('clients').update({session_count:(c.session_count||0)+1}).eq('id',clientId);
+  closeModal('add-appt');renderCalendar();notify('Programare salvată!');
+}
+
+// ============================================================
+// NOTES
+// ============================================================
+async function populateNoteClients(){
+  const sel=document.getElementById('note-client');
+  sel.innerHTML='<option value="">— Selectează client —</option>';
+  cachedClients.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.first_name} ${c.last_name}</option>`});
+  document.getElementById('note-date').value=toDS(new Date());
+}
+async function loadNote(){
+  const cid=document.getElementById('note-client').value;
+  const date=document.getElementById('note-date').value;
+  if(!cid||!date){document.getElementById('note-text').value='';return}
+  const {data}=await sb.from('session_notes').select('*').eq('client_id',cid).eq('date',date).single();
+  document.getElementById('note-text').value=data?.notes||'';
+  document.getElementById('note-type').value=data?.type||'Ședință individuală';
+}
+function autoSave(){
+  clearTimeout(autoTimer);
+  const dot=document.getElementById('save-dot');
+  dot.style.background='var(--warn)';
+  document.getElementById('save-label').textContent='Se salvează...';
+  autoTimer=setTimeout(()=>saveNote(true),1500);
+}
+async function saveNote(silent=false){
+  const cid=document.getElementById('note-client').value;
+  const date=document.getElementById('note-date').value;
+  const notes=document.getElementById('note-text').value;
+  const type=document.getElementById('note-type').value;
+  if(!cid||!date){if(!silent)notify('Selectează client și dată.','var(--danger)');return}
+  const {data:existing}=await sb.from('session_notes').select('id').eq('client_id',cid).eq('date',date).single();
+  if(existing){
+    await sb.from('session_notes').update({notes,type,updated_at:new Date().toISOString()}).eq('id',existing.id);
+  } else {
+    const sessCount=cachedClients.find(x=>x.id===cid)?.session_count||1;
+    await sb.from('session_notes').insert({client_id:cid,date,type,notes,session_number:sessCount});
+  }
+  document.getElementById('save-dot').style.background='var(--success)';
+  document.getElementById('save-label').textContent='Salvat automat';
+}
+
+// ============================================================
+// CONTRACTS
+// ============================================================
+function renderContracts(){
+  const cont=document.getElementById('contracts-content');
+  if(!cachedClients.length){cont.innerHTML='<div style="padding:22px;text-align:center;font-size:13px;color:var(--text-muted)">Niciun client.</div>';return}
+  cont.innerHTML='<div style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Status documente per client.</div>'+
+  cachedClients.map(c=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px 15px;display:flex;align-items:center;gap:11px;margin-bottom:8px">
+    <div class="avatar">${ini(c.first_name,c.last_name)}</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:500">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email}</div></div>
+    <span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span>
+    <span class="doc-badge ${c.contract_signed?'doc-signed':'doc-unsigned'}">Contract ${c.contract_signed?'✓':'⚠'}</span>
+  </div>`).join('');
+}
+
+// ============================================================
+// INVOICES
+// ============================================================
+async function renderInvoices(){
+  const {data:invs}=await sb.from('invoices').select('*').order('created_at',{ascending:false});
+  const tb=document.getElementById('invoices-tbody');
+  if(!invs?.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:22px;color:var(--text-muted)">Nu există facturi.</td></tr>';return}
+  const sm={paid:'badge-active',unpaid:'badge-waiting',overdue:'badge-inactive'};
+  const sl={paid:'Achitată',unpaid:'Neachitată',overdue:'Depășită'};
+  tb.innerHTML=invs.map(inv=>{const c=cachedClients.find(x=>x.id===inv.client_id);return`<tr>
+    <td style="font-weight:500">${inv.invoice_number}</td>
+    <td>${c?c.first_name+' '+c.last_name:'—'}</td>
+    <td>${inv.month}</td>
+    <td>${(inv.amount||0).toLocaleString('ro-RO')} lei</td>
+    <td><span class="badge ${sm[inv.status]||'badge-waiting'}">${sl[inv.status]||inv.status}</span></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="toggleInv('${inv.id}','${inv.status}')">Schimbă status</button></td>
+  </tr>`;}).join('');
+}
+async function saveInvoice(){
+  const clientId=document.getElementById('i-client').value;
+  if(!clientId){notify('Selectează client.','var(--danger)');return}
+  const {data:count}=await sb.from('invoices').select('id',{count:'exact'});
+  const num='FAC-'+String((count?.length||0)+1).padStart(3,'0');
+  await sb.from('invoices').insert({client_id:clientId,invoice_number:num,month:document.getElementById('i-month').value,amount:parseInt(document.getElementById('i-amount').value)||0,sessions_count:parseInt(document.getElementById('i-sessions').value)||0,status:document.getElementById('i-status').value});
+  closeModal('add-invoice');renderInvoices();notify('Factură emisă!');
+}
+async function toggleInv(id,status){
+  const cycle={unpaid:'paid',paid:'overdue',overdue:'unpaid'};
+  await sb.from('invoices').update({status:cycle[status]||'unpaid'}).eq('id',id);
+  renderInvoices();
+}
+
+// ============================================================
+// INVITE
+// ============================================================
+function copyInviteLink(){
+  navigator.clipboard?.writeText(INVITE_URL).catch(()=>{});
+  notify('✓ Link copiat!');
+}
+function shareWA(){
+  const msg=encodeURIComponent('Bună! Te rog să completezi documentele necesare înainte de prima ședință, accesând linkul: '+INVITE_URL);
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+
+// ============================================================
+// CLIENT PORTAL
+// ============================================================
+function showLanding(){
+  ['cp-landing','cp-login','cp-onboard','cp-app'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.toggle('hidden',id!=='cp-landing');
+    if(id==='cp-app')el.style.display='none';
+    if(id==='cp-landing')el.style.display='';
+  });
+}
+function showLogin(){
+  document.getElementById('cp-landing').classList.add('hidden');
+  document.getElementById('cp-login').classList.remove('hidden');
+}
+function goOnboard(){
+  document.getElementById('cp-landing').classList.add('hidden');
+  document.getElementById('cp-onboard').classList.remove('hidden');
+  showObStep('register');
+}
+function showObStep(step){
+  ['register','gdpr','fisa'].forEach(s=>{
+    const el=document.getElementById('ob-'+s);
+    if(el)el.classList.toggle('hidden',s!==step);
+  });
+}
+
+let tempReg={};
+
+async function obRegister(){
+  const first=document.getElementById('ob-first').value.trim();
+  const last=document.getElementById('ob-last').value.trim();
+  const email=document.getElementById('ob-email').value.trim();
+  const pass=document.getElementById('ob-pass').value;
+  if(!first||!last||!email||!pass){notify('Completează toate câmpurile.','var(--danger)');return}
+  if(pass.length<6){notify('Parola trebuie să aibă minimum 6 caractere.','var(--danger)');return}
+  // Check email unique
+  const {data:existing}=await sb.from('users').select('id').eq('email',email).single();
+  if(existing){notify('Există deja un cont cu acest email.','var(--danger)');return}
+  tempReg={first,last,email,pass};
+  showObStep('gdpr');
+}
+
+async function obGdpr(){
+  if(!document.getElementById('gdpr1').checked||!document.getElementById('gdpr2').checked||!document.getElementById('gdpr3').checked){
+    notify('Bifează toate acordurile pentru a continua.','var(--danger)');return;
+  }
+  tempReg.gdprSigned=true;
+  showObStep('fisa');
+}
+
+async function obFisa(){
+  // Create client
+  const {data:client,error:ce}=await sb.from('clients').insert({
+    first_name:tempReg.first,last_name:tempReg.last,email:tempReg.email,
+    phone:document.getElementById('ob-phone').value.trim(),
+    status:'waiting',gdpr_signed:true,fisa_complete:true,
+    source:'invite',cabinet_code:CABINET_CODE
+  }).select().single();
+  if(ce){notify('Eroare la înregistrare: '+ce.message,'var(--danger)');return}
+
+  // Create user (simple password hash - în producție folosește Supabase Auth)
+  const {error:ue}=await sb.from('users').insert({email:tempReg.email,password_hash:tempReg.pass,client_id:client.id});
+  if(ue){notify('Eroare user: '+ue.message,'var(--danger)');return}
+
+  // Save GDPR consent
+  await sb.from('gdpr_consents').insert({client_id:client.id,consents:{gdpr1:true,gdpr2:true,gdpr3:true}});
+
+  // Save fisa
+  await sb.from('fise').insert({
+    client_id:client.id,
+    dob:document.getElementById('ob-dob').value||null,
+    job:document.getElementById('ob-job').value.trim(),
+    civil_status:document.getElementById('ob-civil').value,
+    medical_diagnosis:document.getElementById('ob-diag').value.trim(),
+    medication:document.getElementById('ob-meds').value.trim(),
+    previous_therapy:document.getElementById('ob-prev').value.trim()
+  });
+
+  currentClientUser={...client,name:tempReg.first+' '+tempReg.last};
+  await loadClients();
+  goToClientApp();
+  notify('✓ Înregistrare completă! Bine ai venit!');
+}
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const {data:user}=await sb.from('users').select('*').eq('email',email).eq('password_hash',pass).single();
+  if(!user){notify('Email sau parolă incorectă.','var(--danger)');return}
+  const {data:client}=await sb.from('clients').select('*').eq('id',user.client_id).single();
+  if(!client){notify('Client negăsit.','var(--danger)');return}
+  currentClientUser=client;
+  goToClientApp();
+}
+
+function goToClientApp(){
+  document.getElementById('cp-landing').style.display='none';
+  document.getElementById('cp-onboard').classList.add('hidden');
+  document.getElementById('cp-login').classList.add('hidden');
+  document.getElementById('cp-app').classList.remove('hidden');
+  document.getElementById('cp-app').style.display='flex';
+  document.getElementById('cp-name').textContent=currentClientUser.first_name+' '+currentClientUser.last_name;
+  document.getElementById('cp-greeting').textContent='Bună ziua, '+currentClientUser.first_name+'!';
+  updateDocStatus();checkTodayScales();
+}
+
+function doLogout(){currentClientUser=null;showLanding();}
+
+function updateDocStatus(){
+  if(!currentClientUser)return;
+  const c=currentClientUser;
+  document.getElementById('cp-doc-status').innerHTML=`
+    <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">Statusul documentelor tale</div>
+    <div class="status-row"><span style="font-size:13px;color:var(--text)">GDPR</span><span style="font-size:11px;font-weight:600;color:${c.gdpr_signed?'var(--success)':'var(--danger)'}">${c.gdpr_signed?'✓ Semnat':'⚠ Nesemnat'}</span></div>
+    <div class="status-row"><span style="font-size:13px;color:var(--text)">Fișă personală</span><span style="font-size:11px;font-weight:600;color:${c.fisa_complete?'var(--success)':'var(--warn)'}">${c.fisa_complete?'✓ Completă':'⏳ Incompletă'}</span></div>
+    <div class="status-row" style="border-bottom:none"><span style="font-size:13px;color:var(--text)">Status cont</span><span style="font-size:11px;font-weight:600;color:${c.status==='active'?'var(--success)':'var(--warn)'}">${c.status==='active'?'✓ Activ':'⏳ În așteptare confirmare'}</span></div>
+  `;
+}
+
+async function checkTodayScales(){
+  if(!currentClientUser)return;
+  const today=toDS(new Date());
+  const {data:m}=await sb.from('measurements').select('type,total').eq('client_id',currentClientUser.id).eq('date',today);
+  const to=(m||[]).find(x=>x.type==='ors');
+  const ts=(m||[]).find(x=>x.type==='srs');
+  document.getElementById('ors-btn-area').innerHTML=to?`<span style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px;background:#dbeafe;color:#1d4ed8">✓ ${to.total}/40</span>`:'<button class="btn btn-ors btn-sm" onclick="showPanel(\'ors\')">Completează</button>';
+  document.getElementById('srs-btn-area').innerHTML=ts?`<span style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px;background:#ede9fe;color:#6d28d9">✓ ${ts.total}/40</span>`:'<button class="btn btn-srs btn-sm" onclick="showPanel(\'srs\')">Completează</button>';
+}
+
+function showPanel(p,navEl){
+  document.querySelectorAll('.client-panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('cp-'+p).classList.add('active');
+  document.querySelectorAll('.client-nav-item').forEach(x=>x.classList.remove('active'));
+  if(navEl)navEl.classList.add('active');
+  else{const map={home:0,ors:1,srs:2};const idx=map[p];if(idx!==undefined)document.querySelectorAll('.client-nav-item')[idx]?.classList.add('active');}
+}
+
+// SLIDERS
+function upd(id,valId,type){
+  const s=document.getElementById(id);const v=parseFloat(s.value);
+  document.getElementById(valId).textContent=v.toFixed(1);
+  const pct=(v/10)*100;const color=type==='ors'?'var(--ors)':'var(--srs)';
+  s.style.background=`linear-gradient(to right,${color} ${pct}%,#e2e8f0 ${pct}%)`;
+}
+function initSliders(){
+  ['o1','o2','o3','o4'].forEach((id,i)=>upd(id,'ov'+(i+1),'ors'));
+  ['s1','s2','s3','s4'].forEach((id,i)=>upd(id,'sv'+(i+1),'srs'));
+}
+function updOrsT(){
+  const t=['o1','o2','o3','o4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);
+  document.getElementById('ors-total').textContent=t.toFixed(1);
+  const el=document.getElementById('ors-interp');
+  if(t<25){el.textContent='Sub pragul clinic';el.style.color='var(--danger)';}
+  else if(t<32){el.textContent='Zona de tranziție';el.style.color='var(--warn)';}
+  else{el.textContent='Funcționare bună';el.style.color='var(--success)';}
+}
+function updSrsT(){
+  const t=['s1','s2','s3','s4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);
+  document.getElementById('srs-total').textContent=t.toFixed(1);
+  const el=document.getElementById('srs-interp');
+  if(t<36){el.textContent='Poate necesita ajustări';el.style.color='var(--warn)';}
+  else{el.textContent='Alianță solidă';el.style.color='var(--success)';}
+}
+
+async function submitORS(){
+  if(!currentClientUser)return;
+  const vals=['o1','o2','o3','o4'].map(id=>parseFloat(document.getElementById(id).value));
+  const total=parseFloat(vals.reduce((a,b)=>a+b,0).toFixed(1));
+  const today=toDS(new Date());
+  const {data:existing}=await sb.from('measurements').select('id,session_number').eq('client_id',currentClientUser.id).eq('type','ors').eq('date',today).single();
+  const sessNum=currentClientUser.session_count||1;
+  if(existing){
+    await sb.from('measurements').update({score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total,submitted_at:new Date().toISOString()}).eq('id',existing.id);
+  } else {
+    await sb.from('measurements').insert({client_id:currentClientUser.id,type:'ors',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});
+  }
+  notify('✓ ORS trimis!','#1d4ed8');
+  checkTodayScales();
+  setTimeout(()=>showPanel('home'),1000);
+}
+
+async function submitSRS(){
+  if(!currentClientUser)return;
+  const vals=['s1','s2','s3','s4'].map(id=>parseFloat(document.getElementById(id).value));
+  const total=parseFloat(vals.reduce((a,b)=>a+b,0).toFixed(1));
+  const today=toDS(new Date());
+  const {data:existing}=await sb.from('measurements').select('id').eq('client_id',currentClientUser.id).eq('type','srs').eq('date',today).single();
+  const sessNum=currentClientUser.session_count||1;
+  if(existing){
+    await sb.from('measurements').update({score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total,submitted_at:new Date().toISOString()}).eq('id',existing.id);
+  } else {
+    await sb.from('measurements').insert({client_id:currentClientUser.id,type:'srs',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});
+  }
+  notify('✓ SRS trimis!','#6d28d9');
+  checkTodayScales();
+  setTimeout(()=>showPanel('home'),1000);
+}
+
+// START
+init();
+</script>
+</body>
+</html>
