@@ -333,7 +333,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <div class="fg" style="margin-bottom:4px"><label style="color:rgba(255,255,255,0.5)">Parolă</label><input type="password" id="t-login-pass" placeholder="••••••••" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
     <button onclick="doTherapistLogin()" style="width:100%;padding:13px;border-radius:10px;background:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--sage-dark);font-family:inherit">Intru în cont</button>
   </div>
-  <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:16px;text-align:center">Cont nou? Contactează echipa NARA.</div>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+    <button onclick="showSpecialistRegister()" style="background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Creează cont specialist</button>
+  </div>
+</div>
+
+<!-- ÎNREGISTRARE SPECIALIST -->
+<div id="view-therapist-register" class="hidden" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;position:relative">
+  <button onclick="goToTherapistLogin()" style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:8px 14px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit">← Înapoi</button>
+  <svg width="42" height="42" viewBox="0 0 80 80" style="margin-bottom:12px">
+    <defs><linearGradient id="sra" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="srb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+    <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#sra)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#sra)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#srb)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#srb)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.12)"/>
+  </svg>
+  <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Cont specialist nou</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:24px">Terapeut, coach, consilier</div>
+  <div style="width:100%;max-width:320px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px">
+    <div class="fg"><label style="color:rgba(255,255,255,0.5)">Prenume și nume</label><input type="text" id="sr-name" placeholder="Dr. Alina Pop" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
+    <div class="fg"><label style="color:rgba(255,255,255,0.5)">Specializare</label><input type="text" id="sr-spec" placeholder="Psihoterapeut, Coach..." style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
+    <div class="fg"><label style="color:rgba(255,255,255,0.5)">Email</label><input type="email" id="sr-email" placeholder="email@exemplu.ro" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
+    <div class="fg" style="margin-bottom:4px"><label style="color:rgba(255,255,255,0.5)">Parolă</label><input type="password" id="sr-pass" placeholder="Minimum 6 caractere" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
+    <button onclick="doSpecialistRegister()" style="width:100%;padding:13px;border-radius:10px;background:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--sage-dark);font-family:inherit">Creează cont</button>
+  </div>
 </div>
 
 <!-- THERAPIST -->
@@ -540,52 +560,35 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 </div>
 
 <!-- CLIENT PORTAL -->
-<div id="view-client" class="view">
+<div id="view-client" class="view hidden">
 
-  <!-- LANDING -->
-  <div id="cp-landing">
-    <div class="auth-wrap">
-      <div style="text-align:center;margin-bottom:24px">
-        <div id="landing-logo" style="display:flex;justify-content:center;margin-bottom:14px">
-          <svg width="72" height="72" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-            <defs><linearGradient id="lla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="llb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
-            <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#lla)" opacity="0.9"/>
-            <ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#lla)" opacity="0.65"/>
-            <ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#llb)" opacity="0.5"/>
-            <ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#llb)" opacity="0.75"/>
-            <circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.9)"/>
-          </svg>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--teal);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:4px">NARA</div>
-        <div style="font-size:20px;font-weight:700;color:var(--text)" id="landing-title">Cabinet Dr. Alina</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="landing-subtitle">Cabinet Individual de Psihologie</div>
-      </div>
-      <div class="invite-landing-card">
-        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Bine ai venit!</div>
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px">Completează documentele necesare înainte de prima ședință. Durează aproximativ 5 minute.</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px" onclick="goOnboard()">Sunt client nou — mă înregistrez</button>
-          <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showLogin()">Am deja cont — intru în aplicație</button>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:11px;color:var(--text-muted)">Datele tale sunt protejate conform GDPR.<br>Accesezi doar propriul tău dosar.</div>
+  <!-- LANDING CLIENT -->
+  <div id="cp-landing" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px">
+    <button onclick="showLanding()" style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:8px 14px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit">← Înapoi</button>
+    <svg width="56" height="56" viewBox="0 0 80 80" style="margin-bottom:14px">
+      <defs><linearGradient id="cla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="clb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+      <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#cla)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#cla)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#clb)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#clb)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.12)"/>
+    </svg>
+    <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:0.12em;margin-bottom:4px">NARA</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:40px">Spațiul tău terapeutic</div>
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px">
+      <button onclick="showLogin()" style="width:100%;padding:15px;border-radius:13px;background:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--sage-dark);font-family:inherit">Am deja cont</button>
+      <button onclick="goOnboard()" style="width:100%;padding:15px;border-radius:13px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);cursor:pointer;font-size:14px;font-weight:600;color:#fff;font-family:inherit">Sunt client nou</button>
     </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:24px;text-align:center;line-height:1.6">Datele tale sunt protejate conform GDPR.<br>Accesezi doar propriul tău dosar.</div>
   </div>
 
-  <!-- LOGIN -->
-  <div id="cp-login" class="hidden">
-    <div class="auth-wrap">
-      <div style="text-align:center;margin-bottom:18px">
-        <div style="font-size:18px;font-weight:700;color:var(--sage-dark)" id="login-title">Intră în cont</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px" id="login-subtitle">Cabinet Dr. Alina</div>
-      </div>
-      <div class="auth-card">
-        <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="email@exemplu.ro"></div>
-        <div class="fg"><label>Parolă</label><input type="password" id="login-pass" placeholder="••••••••"></div>
-        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px" onclick="doLogin()">Intru în cont</button>
-      </div>
-      <div style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="showLanding()">← Înapoi</button></div>
+  <!-- LOGIN CLIENT -->
+  <div id="cp-login" class="hidden" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px">
+    <button onclick="showLanding()" style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:8px 14px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit">← Înapoi</button>
+    <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Bun venit înapoi</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:28px" id="login-subtitle">Cont client NARA</div>
+    <div style="width:100%;max-width:320px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px">
+      <div class="fg"><label style="color:rgba(255,255,255,0.5)">Email</label><input type="email" id="login-email" placeholder="email@exemplu.ro" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
+      <div class="fg" style="margin-bottom:4px"><label style="color:rgba(255,255,255,0.5)">Parolă</label><input type="password" id="login-pass" placeholder="••••••••" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff"></div>
+      <button onclick="doLogin()" style="width:100%;padding:13px;border-radius:10px;background:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--sage-dark);font-family:inherit">Intru în cont</button>
     </div>
+    <button onclick="showLanding()" style="margin-top:16px;background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit">← Înapoi la start</button>
   </div>
 
   <!-- ONBOARDING -->
@@ -1172,10 +1175,15 @@ function showLanding(){
   document.getElementById('view-therapist').classList.remove('active');document.getElementById('view-therapist').classList.add('hidden');
   document.getElementById('view-client').classList.add('hidden');
   // Reset client state
-  document.getElementById('cp-landing').style.display='';
+  document.getElementById('cp-landing').style.display='flex';
   document.getElementById('cp-login').classList.add('hidden');
   document.getElementById('cp-onboard').classList.add('hidden');
   const app=document.getElementById('cp-app');app.classList.add('hidden');app.style.display='none';
+}
+
+function showLogin(){
+  document.getElementById('cp-landing').style.display='none';
+  document.getElementById('cp-login').classList.remove('hidden');
 }
 
 function goToTherapistLogin(){
@@ -1186,22 +1194,73 @@ function goToTherapistLogin(){
 
 function goToClientLanding(){
   document.getElementById('view-landing').style.display='none';
-  document.getElementById('view-client').classList.remove('hidden');
+  const vc=document.getElementById('view-client');
+  vc.classList.remove('hidden');
+  // Make sure cp-landing is shown
+  document.getElementById('cp-landing').style.display='flex';
+  document.getElementById('cp-login').classList.add('hidden');
+  document.getElementById('cp-onboard').classList.add('hidden');
+  document.getElementById('cp-app').classList.add('hidden');
+}
+
+function showSpecialistRegister(){
+  document.getElementById('view-therapist-login').classList.add('hidden');
+  document.getElementById('view-therapist-register').classList.remove('hidden');
+}
+
+async function doSpecialistRegister(){
+  const name=document.getElementById('sr-name').value.trim();
+  const spec=document.getElementById('sr-spec').value.trim();
+  const email=document.getElementById('sr-email').value.trim();
+  const pass=document.getElementById('sr-pass').value;
+  if(!name||!email||!pass){notify('Completează toate câmpurile obligatorii.','var(--danger)');return;}
+  if(pass.length<6){notify('Parola trebuie să aibă minimum 6 caractere.','var(--danger)');return;}
+  // Check if email exists
+  const {data:existing}=await sb.from('therapists').select('id').eq('email',email).single();
+  if(existing){notify('Există deja un cont cu acest email.','var(--danger)');return;}
+  const {data:therapist,error}=await sb.from('therapists').insert({
+    name,specialization:spec,email,password_hash:pass,
+    cabinet:name+'\'s Cabinet',cabinet_code:email.split('@')[0]+Math.floor(Math.random()*1000)
+  }).select().single();
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Cont creat cu succes! Te poți loga acum.');
+  document.getElementById('view-therapist-register').classList.add('hidden');
+  document.getElementById('view-therapist-login').classList.remove('hidden');
+  document.getElementById('t-login-email').value=email;
 }
 
 async function doTherapistLogin(){
   const email=document.getElementById('t-login-email').value.trim();
   const pass=document.getElementById('t-login-pass').value;
-  // For now: hardcoded check, to be replaced with Supabase auth
-  if(email===SETTINGS.therapistEmail&&pass===SETTINGS.therapistPass||email==='alina@nara.ro'&&pass==='nara2024'){
+  if(!email||!pass){notify('Completează email și parola.','var(--danger)');return;}
+  // Check in therapists table
+  const {data:therapist}=await sb.from('therapists').select('*').eq('email',email).eq('password_hash',pass).single();
+  if(therapist){
+    // Apply therapist settings
+    SETTINGS.name=therapist.name||SETTINGS.name;
+    SETTINGS.cabinet=therapist.cabinet||SETTINGS.cabinet;
+    SETTINGS.role=therapist.specialization||SETTINGS.role;
+    SETTINGS.therapistId=therapist.id;
+    applySettings(SETTINGS);
     document.getElementById('view-therapist-login').classList.add('hidden');
-    document.getElementById('view-therapist').classList.remove('hidden');document.getElementById('view-therapist').classList.add('active');
+    document.getElementById('view-therapist').classList.remove('hidden');
+    document.getElementById('view-therapist').classList.add('active');
     await loadClients();renderDash();
     document.getElementById('invite-url-display').textContent=INVITE_URL;
     initSliders();
-  } else {
-    notify('Email sau parolă incorectă.','var(--danger)');
+    return;
   }
+  // Fallback: hardcoded for existing account
+  if(email==='alina@nara.ro'&&pass==='nara2024'){
+    document.getElementById('view-therapist-login').classList.add('hidden');
+    document.getElementById('view-therapist').classList.remove('hidden');
+    document.getElementById('view-therapist').classList.add('active');
+    await loadClients();renderDash();
+    document.getElementById('invite-url-display').textContent=INVITE_URL;
+    initSliders();
+    return;
+  }
+  notify('Email sau parolă incorectă.','var(--danger)');
 }
 
 function switchMode(m,el){
