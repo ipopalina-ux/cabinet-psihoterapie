@@ -280,7 +280,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
       <!-- DASHBOARD -->
       <div id="t-dashboard" class="panel active">
-        <div class="topbar"><div class="page-title">Panou principal</div><button class="btn btn-primary" onclick="openModal('add-appt')">+ Programare</button></div>
+        <div class="topbar"><div class="page-title">Panou principal</div><div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="openModal('add-homework')">📚 Temă nouă</button><button class="btn btn-primary" onclick="openModal('add-appt')">+ Programare</button></div></div>
         <div class="content">
           <div class="stats-grid">
             <div class="stat-card blue"><div class="stat-label">Clienți activi</div><div class="stat-value" id="st-active">—</div><div class="stat-delta">în terapie</div></div>
@@ -655,6 +655,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2)" onclick="doLogout()">Ieșire</button>
     </div>
     <div class="portal-body">
+
+      <!-- ACASĂ -->
       <div id="cp-home" class="client-panel active">
         <div class="portal-content-pad">
           <div class="client-greeting">
@@ -662,18 +664,51 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
             <div style="font-size:12px;opacity:0.65" id="cp-greeting-sub">Bine ai revenit</div>
           </div>
           <div id="cp-doc-status" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:14px"></div>
+
+          <!-- Fișa de azi dacă există programare -->
+          <div id="today-session-block" class="hidden">
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Ședința de azi</div>
+            <div id="today-session-card" style="background:var(--sage-light);border:2px solid var(--sage);border-radius:12px;padding:14px;margin-bottom:14px;cursor:pointer" onclick="showPanel('sedinte')">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--sage-dark)" id="today-session-title">Ședință #1</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="today-session-sub">Deschide fișa ședinței →</div>
+                </div>
+                <div style="font-size:22px">📋</div>
+              </div>
+            </div>
+          </div>
+
           <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Scale pentru ședința de azi</div>
           <div class="scale-action-block">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">📋 ORS — Înainte de ședință</div><div style="font-size:11px;color:var(--text-muted)">Cum ți-a mers săptămâna aceasta</div></div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">📊 ORS — Înainte de ședință</div><div style="font-size:11px;color:var(--text-muted)">Cum ți-a mers săptămâna aceasta</div></div>
             <div id="ors-btn-area"><button class="btn btn-ors btn-sm" onclick="showPanel('ors')">Completează</button></div>
           </div>
           <div class="scale-action-block">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">📋 SRS — La finalul ședinței</div><div style="font-size:11px;color:var(--text-muted)">Cum a fost ședința de azi</div></div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">📊 SRS — La finalul ședinței</div><div style="font-size:11px;color:var(--text-muted)">Cum a fost ședința de azi</div></div>
             <div id="srs-btn-area"><button class="btn btn-srs btn-sm" onclick="showPanel('srs')">Completează</button></div>
           </div>
         </div>
       </div>
 
+      <!-- ȘEDINȚE -->
+      <div id="cp-sedinte" class="client-panel">
+        <div class="portal-content-pad">
+          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Ședințele mele</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Fișele tale de ședință — notițe, teme, reflecții</div>
+          <div id="sessions-list"><div style="text-align:center;padding:28px;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
+        </div>
+      </div>
+
+      <!-- FIȘĂ ȘEDINȚĂ -->
+      <div id="cp-fisa-sedinta" class="client-panel">
+        <div class="portal-content-pad">
+          <button class="btn btn-ghost btn-sm" onclick="showPanel('sedinte')" style="margin-bottom:14px">← Înapoi la ședințe</button>
+          <div id="fisa-sedinta-content"></div>
+        </div>
+      </div>
+
+      <!-- ORS -->
       <div id="cp-ors" class="client-panel">
         <div class="portal-content-pad">
           <button class="btn btn-ghost btn-sm" onclick="showPanel('home')" style="margin-bottom:12px">← Înapoi</button>
@@ -692,6 +727,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         </div>
       </div>
 
+      <!-- SRS -->
       <div id="cp-srs" class="client-panel">
         <div class="portal-content-pad">
           <button class="btn btn-ghost btn-sm" onclick="showPanel('home')" style="margin-bottom:12px">← Înapoi</button>
@@ -709,11 +745,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
           </div>
         </div>
       </div>
+
     </div>
     <div class="portal-nav">
-      <div class="client-nav-item active" onclick="showPanel('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Acasă</div>
-      <div class="client-nav-item" onclick="showPanel('ors',this)"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>ORS</div>
-      <div class="client-nav-item" onclick="showPanel('srs',this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>SRS</div>
+      <div class="client-nav-item active" onclick="showPanel('home',this)">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Acasă
+      </div>
+      <div class="client-nav-item" onclick="showPanel('sedinte',this);loadSessionsList()">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Ședințe
+      </div>
+      <div class="client-nav-item" onclick="showPanel('ors',this)">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>ORS
+      </div>
+      <div class="client-nav-item" onclick="showPanel('srs',this)">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>SRS
+      </div>
     </div>
   </div>
 
@@ -753,6 +799,24 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('add-invoice')">Anulează</button>
       <button class="btn btn-primary" onclick="saveInvoice()">Emite</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-add-homework" class="modal-overlay">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('add-homework')">✕</button>
+    <div class="modal-title">Trimite temă clientului</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Client</label><select id="hw-client"><option value="">— Selectează —</option></select></div>
+      <div class="fg full"><label>Titlul temei</label><input type="text" id="hw-title" placeholder="Ex: Jurnal de emoții zilnic"></div>
+      <div class="fg full"><label>Descriere și instrucțiuni</label><textarea id="hw-desc" style="min-height:80px" placeholder="Descrie ce ai vrea să lucreze clientul..."></textarea></div>
+      <div class="fg"><label>Termen (opțional)</label><input type="date" id="hw-due"></div>
+      <div class="fg"><label>Nr. ședință</label><input type="number" id="hw-sess" value="1"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('add-homework')">Anulează</button>
+      <button class="btn btn-primary" onclick="saveHomeworkModal()">Trimite tema</button>
     </div>
   </div>
 </div>
@@ -869,7 +933,11 @@ function openModal(id){
     sel.innerHTML='<option value="">— Selectează —</option>';
     cachedClients.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.first_name} ${c.last_name}</option>`});
   }
-  if(id==='add-appt')document.getElementById('a-date').value=toDS(new Date());
+  if(id==='add-homework'){
+    const sel=document.getElementById('hw-client');
+    sel.innerHTML='<option value="">— Selectează —</option>';
+    cachedClients.filter(c=>c.status==='active').forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.first_name} ${c.last_name}</option>`});
+  }
   if(id==='add-invoice')document.getElementById('i-month').value=new Date().toISOString().slice(0,7);
   o.classList.add('open');
 }
@@ -1183,7 +1251,7 @@ function goToClientApp(){
   // Use personalized greeting from settings
   document.getElementById('cp-greeting').textContent=SETTINGS.greeting+', '+currentClientUser.first_name+'!';
   document.getElementById('cp-greeting-sub').textContent='Bine ai revenit la '+SETTINGS.cabinet;
-  updateDocStatus();checkTodayScales();
+  updateDocStatus();checkTodayScales();checkTodaySession();
 }
 
 function doLogout(){currentClientUser=null;showLanding();}
@@ -1222,6 +1290,223 @@ function upd(id,valId,type){
 function initSliders(){['o1','o2','o3','o4'].forEach((id,i)=>upd(id,'ov'+(i+1),'ors'));['s1','s2','s3','s4'].forEach((id,i)=>upd(id,'sv'+(i+1),'srs'));}
 function updOrsT(){const t=['o1','o2','o3','o4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);document.getElementById('ors-total').textContent=t.toFixed(1);const el=document.getElementById('ors-interp');if(t<25){el.textContent='Sub pragul clinic';el.style.color='var(--danger)';}else if(t<32){el.textContent='Zona de tranziție';el.style.color='var(--warn)';}else{el.textContent='Funcționare bună';el.style.color='var(--success)';}}
 function updSrsT(){const t=['s1','s2','s3','s4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);document.getElementById('srs-total').textContent=t.toFixed(1);const el=document.getElementById('srs-interp');if(t<36){el.textContent='Poate necesita ajustări';el.style.color='var(--warn)';}else{el.textContent='Alianță solidă';el.style.color='var(--success)';}}
+
+// ============================================================
+// SESSIONS — Client Portal
+// ============================================================
+async function checkTodaySession(){
+  if(!currentClientUser)return;
+  const today=toDS(new Date());
+  // Check if there's an appointment today
+  const {data:appt}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).eq('date',today).single();
+  if(!appt){document.getElementById('today-session-block').classList.add('hidden');return;}
+  // Check if journal exists, if not create it
+  let {data:journal}=await sb.from('session_journals').select('*').eq('client_id',currentClientUser.id).eq('date',today).single();
+  if(!journal){
+    const sessNum=(currentClientUser.session_count||0)+1;
+    const {data:newJ}=await sb.from('session_journals').insert({client_id:currentClientUser.id,appointment_id:appt.id,session_number:sessNum,date:today}).select().single();
+    journal=newJ;
+  }
+  // Show today session card
+  const block=document.getElementById('today-session-block');
+  block.classList.remove('hidden');
+  document.getElementById('today-session-title').textContent='Ședința #'+(journal?.session_number||1)+' — '+fmtDate(today);
+  document.getElementById('today-session-card').onclick=()=>{openSessionJournal(journal||{date:today});showPanel('fisa-sedinta');};
+}
+
+async function loadSessionsList(){
+  if(!currentClientUser)return;
+  const cont=document.getElementById('sessions-list');
+  cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Se încarcă...</div>';
+  // Get all appointments
+  const {data:appts}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false});
+  // Get all journals
+  const {data:journals}=await sb.from('session_journals').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false});
+  const today=toDS(new Date());
+  // Merge: appointments + manually created journals
+  const allDates=new Set([...(appts||[]).map(a=>a.date),...(journals||[]).map(j=>j.date)]);
+  if(!allDates.size){cont.innerHTML='<div style="text-align:center;padding:28px;font-size:13px;color:var(--text-muted)">Nu există ședințe înregistrate încă.</div>';return;}
+  const sorted=[...allDates].sort((a,b)=>b.localeCompare(a));
+  cont.innerHTML=sorted.map((date,i)=>{
+    const appt=(appts||[]).find(a=>a.date===date);
+    const journal=(journals||[]).find(j=>j.date===date);
+    const sessNum=journal?.session_number||(sorted.length-i);
+    const isToday=date===today;
+    const hasNotes=journal&&(journal.personal_notes||journal.reflections||journal.homework_response);
+    return`<div style="background:var(--card);border:${isToday?'2px solid var(--sage)':'1px solid var(--border)'};border-radius:11px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.15s" onclick="openSessionJournal(${JSON.stringify({...journal||{},date,session_number:sessNum,appointment_id:appt?.id})});showPanel('fisa-sedinta')" onmouseover="this.style.borderColor='var(--sage)'" onmouseout="this.style.borderColor='${isToday?'var(--sage)':'var(--border)'}'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">Ședința #${sessNum}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:1px">${fmtDate(date)}${appt?' · '+appt.type:''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          ${isToday?'<span style="font-size:10px;font-weight:700;background:var(--sage);color:#fff;padding:2px 8px;border-radius:10px">AZI</span>':''}
+          ${hasNotes?'<span style="font-size:10px;color:var(--success)">✓ Notițe salvate</span>':'<span style="font-size:10px;color:var(--text-muted)">Fișă goală</span>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let currentJournal=null;
+function openSessionJournal(journal){
+  currentJournal=journal;
+  const cont=document.getElementById('fisa-sedinta-content');
+  const isToday=journal.date===toDS(new Date());
+  cont.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${journal.session_number||'—'}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
+      </div>
+    </div>
+
+    <!-- NOTIȚE PERSONALE -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">📝 Notițe personale</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)">
+          <span>Partajez cu terapeutul</span>
+          <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer">
+            <input type="checkbox" id="share-notes" style="opacity:0;width:0;height:0" ${journal.personal_notes_shared?'checked':''} onchange="toggleShare('notes')">
+            <span id="toggle-notes" style="position:absolute;inset:0;border-radius:20px;background:${journal.personal_notes_shared?'var(--sage)':'#ccc'};transition:0.2s"></span>
+            <span id="thumb-notes" style="position:absolute;top:2px;left:${journal.personal_notes_shared?'18px':'2px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></span>
+          </label>
+        </div>
+      </div>
+      <textarea id="j-personal-notes" style="width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Ce ai observat în tine în timpul ședinței? Ce ți-a rămas în minte?" oninput="autoSaveJournal()">${journal.personal_notes||''}</textarea>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px" id="j-save-notes-label">Salvare automată activă</div>
+    </div>
+
+    <!-- REFLECȚII -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">💭 Reflecții după ședință</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)">
+          <span>Partajez cu terapeutul</span>
+          <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer">
+            <input type="checkbox" id="share-reflections" style="opacity:0;width:0;height:0" ${journal.reflections_shared?'checked':''} onchange="toggleShare('reflections')">
+            <span id="toggle-reflections" style="position:absolute;inset:0;border-radius:20px;background:${journal.reflections_shared?'var(--sage)':'#ccc'};transition:0.2s"></span>
+            <span id="thumb-reflections" style="position:absolute;top:2px;left:${journal.reflections_shared?'18px':'2px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></span>
+          </label>
+        </div>
+      </div>
+      <textarea id="j-reflections" style="width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Cum te simți după ședința de azi? Ce ai realizat? Ce ai vrea să explorezi mai departe?" oninput="autoSaveJournal()">${journal.reflections||''}</textarea>
+    </div>
+
+    <!-- TEMĂ -->
+    <div id="homework-section" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">📚 Tema de la terapeut</div>
+      <div id="homework-content"><div style="font-size:13px;color:var(--text-muted)">Se încarcă tema...</div></div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">Notițele se salvează automat · Poți reveni oricând la această fișă</div>`;
+
+  // Load homework
+  loadHomework(journal.date,journal.session_number);
+  // Init toggle visuals
+  ['notes','reflections'].forEach(k=>initToggle(k));
+}
+
+function initToggle(key){
+  const cb=document.getElementById('share-'+key);
+  if(!cb)return;
+  cb.addEventListener('change',()=>{
+    const on=cb.checked;
+    document.getElementById('toggle-'+key).style.background=on?'var(--sage)':'#ccc';
+    document.getElementById('thumb-'+key).style.left=on?'18px':'2px';
+  });
+}
+
+function toggleShare(key){
+  // Triggered by onchange already, just autosave
+  autoSaveJournal();
+}
+
+let journalTimer=null;
+function autoSaveJournal(){
+  clearTimeout(journalTimer);
+  const labels=document.querySelectorAll('[id^="j-save"]');
+  labels.forEach(l=>{l.textContent='Se salvează...';l.style.color='var(--warn)';});
+  journalTimer=setTimeout(()=>saveJournal(),1500);
+}
+
+async function saveJournal(){
+  if(!currentJournal||!currentClientUser)return;
+  const data={
+    personal_notes:document.getElementById('j-personal-notes')?.value||'',
+    personal_notes_shared:document.getElementById('share-notes')?.checked||false,
+    reflections:document.getElementById('j-reflections')?.value||'',
+    reflections_shared:document.getElementById('share-reflections')?.checked||false,
+    updated_at:new Date().toISOString()
+  };
+  if(currentJournal.id){
+    await sb.from('session_journals').update(data).eq('id',currentJournal.id);
+  } else {
+    const {data:newJ}=await sb.from('session_journals').insert({
+      client_id:currentClientUser.id,
+      date:currentJournal.date,
+      session_number:currentJournal.session_number||1,
+      appointment_id:currentJournal.appointment_id||null,
+      ...data
+    }).select().single();
+    if(newJ)currentJournal={...currentJournal,...newJ};
+  }
+  const labels=document.querySelectorAll('[id^="j-save"]');
+  labels.forEach(l=>{l.textContent='Salvat automat ✓';l.style.color='var(--success)';});
+}
+
+async function loadHomework(date,sessNum){
+  if(!currentClientUser)return;
+  const {data:hw}=await sb.from('homework').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(5);
+  const cont=document.getElementById('homework-content');
+  if(!cont)return;
+  // Find homework for this session or most recent
+  const relevant=hw?.find(h=>h.session_number===sessNum)||hw?.[0];
+  if(!relevant){
+    cont.innerHTML='<div style="font-size:13px;color:var(--text-muted);font-style:italic">Nicio temă primită pentru această ședință.</div>';
+    return;
+  }
+  const isCompleted=relevant.status==='completed';
+  cont.innerHTML=`
+    <div style="background:var(--sage-light);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:600;color:var(--sage-dark);margin-bottom:4px">${relevant.title}</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6">${relevant.description||''}</div>
+      ${relevant.due_date?`<div style="font-size:11px;color:var(--accent);margin-top:6px">Termen: ${fmtDate(relevant.due_date)}</div>`:''}
+    </div>
+    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Răspunsul meu</div>
+    <textarea id="j-homework-response" style="width:100%;min-height:80px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Scrie aici ce ai lucrat, ce ai observat, ce a mers sau nu a mers..." oninput="autoSaveJournal()">${currentJournal?.homework_response||''}</textarea>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+      <div style="font-size:11px;color:var(--text-muted)" id="j-save-hw-label">Răspunsul se trimite automat la salvare</div>
+      ${!isCompleted?`<button class="btn btn-primary btn-sm" onclick="markHomeworkDone('${relevant.id}')">✓ Marchez ca rezolvată</button>`:'<span style="font-size:11px;color:var(--success);font-weight:600">✓ Tema rezolvată</span>'}
+    </div>`;
+}
+
+async function markHomeworkDone(hwId){
+  await sb.from('homework').update({status:'completed'}).eq('id',hwId);
+  // Also save response
+  if(currentJournal){
+    const resp=document.getElementById('j-homework-response')?.value||'';
+    if(currentJournal.id){await sb.from('session_journals').update({homework_response:resp,homework_response_shared:true}).eq('id',currentJournal.id);}
+  }
+  notify('✓ Temă marcată ca rezolvată!');
+  loadHomework(currentJournal.date,currentJournal.session_number);
+}
+
+// Terapeut: trimite temă
+async function sendHomework(clientId,sessNum,title,description,dueDate){
+  await sb.from('homework').insert({client_id:clientId,session_number:sessNum,date:toDS(new Date()),title,description,due_date:dueDate||null});
+  notify('✓ Temă trimisă clientului!');
+}
+
+async function saveHomeworkModal(){
+  const clientId=document.getElementById('hw-client').value;
+  const title=document.getElementById('hw-title').value.trim();
+  if(!clientId||!title){notify('Selectează client și completează titlul.','var(--danger)');return}
+  await sendHomework(clientId,parseInt(document.getElementById('hw-sess').value)||1,title,document.getElementById('hw-desc').value.trim(),document.getElementById('hw-due').value||null);
+  closeModal('add-homework');
+  ['hw-title','hw-desc','hw-due'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
 
 async function submitORS(){
   if(!currentClientUser)return;
