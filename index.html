@@ -15,12 +15,9 @@
   --ors:#3b82f6;--srs:#8b5cf6;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:var(--text);font-size:15px;min-height:100vh}
-
-/* ---- UTILS ---- */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
 .btn-primary{background:var(--sage);color:#fff}.btn-primary:hover{background:var(--sage-dark)}
 .btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--sage-light)}
-.btn-danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca}
 .btn-sm{padding:4px 10px;font-size:12px}
 .btn-ors{background:var(--ors);color:#fff}
 .btn-srs{background:var(--srs);color:#fff}
@@ -39,15 +36,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .sec-div::after{content:'';flex:1;height:1px;background:var(--border)}
 .notification{position:fixed;bottom:20px;right:20px;background:var(--sage-dark);color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;z-index:9999;animation:fi 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* ---- LOADING ---- */
 #app-loading{position:fixed;inset:0;background:var(--sage-dark);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px}
 .loading-logo{font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.03em}
 .loading-sub{font-size:13px;color:rgba(255,255,255,0.5)}
 .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ---- MODE BAR ---- */
+/* MODE BAR */
 .mode-bar{background:var(--sage-dark);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .mode-bar-title{color:rgba(255,255,255,0.45);font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
 .mode-btns{display:flex;gap:4px}
@@ -57,7 +52,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .mode-btn:not(.active):hover{background:rgba(255,255,255,0.15);color:#fff}
 .view{display:none}.view.active{display:block}
 
-/* ---- THERAPIST LAYOUT ---- */
+/* THERAPIST */
 .app{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 44px)}
 .sidebar{background:var(--sage-dark);display:flex;flex-direction:column;position:sticky;top:44px;height:calc(100vh - 44px);overflow-y:auto}
 .logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
@@ -76,8 +71,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .content{padding:20px 22px;flex:1}
 .panel{display:none;flex-direction:column;min-height:calc(100vh - 44px)}
 .panel.active{display:flex}
-
-/* ---- STATS ---- */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
@@ -86,16 +79,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
 .stat-value{font-size:22px;font-weight:300;color:var(--text)}
 .stat-delta{font-size:11px;color:var(--text-muted);margin-top:2px}
-
-/* ---- TABLES ---- */
 .tbl{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
 .tbl th{background:var(--sage-light);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.06em}
 .tbl td{padding:10px 12px;border-bottom:1px solid var(--sage-light);font-size:12px;color:var(--text);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:#fafaf9;cursor:pointer}
 .avatar{width:28px;height:28px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--sage-dark);flex-shrink:0}
-
-/* ---- CLIENT DETAIL ---- */
 .back-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);cursor:pointer;margin-bottom:12px}
 .back-link:hover{color:var(--sage)}
 .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
@@ -108,8 +97,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .doc-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:500;margin-right:5px;margin-bottom:4px}
 .doc-signed{background:#dcfce7;color:#15803d}
 .doc-unsigned{background:#fef3c7;color:#92400e}
-
-/* ---- CALENDAR ---- */
 .cal-grid{display:grid;grid-template-columns:1fr 280px;gap:18px}
 .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
 .cal-day-name{text-align:center;font-size:10px;color:var(--text-muted);padding:5px 0;text-transform:uppercase;letter-spacing:0.06em}
@@ -122,18 +109,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .cal-day.other-month{color:rgba(74,124,111,0.2);background:transparent;border-color:transparent}
 .cal-panel{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px}
 .appt-block{background:var(--sage-light);border-radius:8px;padding:9px 11px;border-left:3px solid var(--sage);margin-bottom:8px}
-
-/* ---- NOTES ---- */
 .note-area{width:100%;min-height:260px;padding:14px;border:1px solid var(--border);border-radius:8px;font-size:14px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none}
 .note-area:focus{border-color:var(--sage)}
 .note-sel{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none}
 .note-sel:focus{border-color:var(--sage)}
-
-/* ---- INVITE BOX ---- */
 .invite-box{background:var(--sage-dark);border-radius:12px;padding:20px;margin-bottom:18px}
 .invite-link-display{flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:9px 13px;font-size:12px;color:rgba(255,255,255,0.85);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* ---- SCALE UI ---- */
+/* SCALE UI */
 .scale-card-c{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:15px;margin-bottom:10px}
 .scale-domain-c{font-size:14px;font-weight:700;color:var(--text);text-align:center;margin-bottom:2px}
 .scale-domain-sub-c{font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:10px}
@@ -155,7 +138,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .total-box.ors .total-box-val{color:#1d4ed8}.total-box.srs .total-box-val{color:#6d28d9}
 .total-box-interp{font-size:11px;font-weight:500;margin-top:3px}
 
-/* ---- CLIENT PORTAL ---- */
+/* CLIENT PORTAL */
 .portal-shell{display:flex;flex-direction:column;height:calc(100vh - 44px);overflow:hidden}
 .portal-header{background:var(--sage-dark);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .portal-body{flex:1;overflow-y:auto}
@@ -170,7 +153,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .status-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--sage-light)}
 .status-row:last-child{border-bottom:none}
 
-/* ---- ONBOARDING ---- */
+/* ONBOARDING */
 .onboard-progress{display:flex;gap:0;margin-bottom:20px}
 .op-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
 .op-step:not(:last-child)::after{content:'';position:absolute;top:12px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
@@ -182,17 +165,22 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .op-step.current .op-label{color:var(--accent);font-weight:600}
 .op-step.done .op-label{color:var(--sage)}
 .onboard-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:12px}
-.gdpr-box{background:var(--sage-light);border-radius:8px;padding:13px;font-size:11px;color:var(--text);line-height:1.75;max-height:160px;overflow-y:auto;margin-bottom:12px;border:1px solid var(--border)}
+.gdpr-box{background:var(--sage-light);border-radius:8px;padding:13px;font-size:11px;color:var(--text);line-height:1.75;max-height:220px;overflow-y:auto;margin-bottom:12px;border:1px solid var(--border)}
 .cb-group{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
 .cb-group input[type=checkbox]{width:16px;height:16px;margin-top:2px;accent-color:var(--sage);flex-shrink:0}
 .cb-group label{font-size:12px;color:var(--text);line-height:1.5;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
-
-/* ---- AUTH ---- */
 .auth-wrap{max-width:440px;margin:0 auto;padding:28px 16px}
 .auth-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:12px}
 .invite-landing-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:12px}
 
-/* ---- MODAL ---- */
+/* LOGO SVG */
+.cabinet-logo-svg{width:64px;height:64px;margin:0 auto 12px;display:block}
+
+/* SETTINGS */
+.settings-section{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:20px;margin-bottom:16px}
+.settings-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px}
+
+/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,38,32,0.5);align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px)}
 .modal-overlay.open{display:flex}
 .modal{background:var(--card);border-radius:13px;padding:22px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;position:relative}
@@ -202,31 +190,36 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:13px}
 .close-btn{position:absolute;top:11px;right:11px;width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted);display:flex;align-items:center;justify-content:center}
 .close-btn:hover{background:#dce8e5}
+
+/* DOB selects */
+.dob-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="app-loading">
-  <div class="loading-logo">Cabinet Psihoterapie</div>
+  <div class="loading-logo" id="loading-title">Cabinet Psihoterapie</div>
   <div class="spinner"></div>
   <div class="loading-sub">Se conectează la baza de date...</div>
 </div>
 
 <div id="app-shell" class="hidden">
 <div class="mode-bar">
-  <div class="mode-bar-title">Cabinet Psihoterapie · Dr. Alina</div>
+  <div class="mode-bar-title" id="mode-bar-title">Cabinet Psihoterapie</div>
   <div class="mode-btns">
     <button class="mode-btn active" onclick="switchMode('therapist',this)">🩺 Terapeut</button>
     <button class="mode-btn" onclick="switchMode('client',this)">👤 Portal Client</button>
   </div>
 </div>
 
-<!-- ===== THERAPIST ===== -->
+<!-- THERAPIST -->
 <div id="view-therapist" class="view active">
   <div class="app">
     <aside class="sidebar">
-      <div class="logo"><div class="logo-title">Cabinet<br>Psihoterapie</div><div class="logo-sub">Panou terapeut</div></div>
+      <div class="logo">
+        <div class="logo-title" id="sidebar-title">Cabinet<br>Psihoterapie</div>
+        <div class="logo-sub" id="sidebar-sub">Panou terapeut</div>
+      </div>
       <nav class="nav">
         <div class="nav-section">General</div>
         <div class="nav-item active" onclick="tNav('dashboard',this)">◈ Panou principal</div>
@@ -239,9 +232,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         <div class="nav-item" onclick="tNav('invoices',this)">◈ Facturi</div>
         <div class="nav-section">Configurare</div>
         <div class="nav-item" onclick="tNav('invite',this)">🔗 Link invitație</div>
+        <div class="nav-item" onclick="tNav('settings',this)">⚙ Setări cabinet</div>
       </nav>
       <div class="sidebar-footer">
-        <div style="display:flex;align-items:center;gap:9px"><div class="ua">A</div><div><div style="font-size:12px;color:rgba(255,255,255,0.8)">Dr. Alina</div><div style="font-size:10px;color:rgba(255,255,255,0.35)">Psihoterapeut</div></div></div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <div class="ua" id="sidebar-avatar">A</div>
+          <div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.8)" id="sidebar-name">Dr. Alina</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.35)" id="sidebar-role">Psihoterapeut</div>
+          </div>
+        </div>
       </div>
     </aside>
     <div class="main">
@@ -317,7 +317,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
             </div>
             <textarea class="note-area" id="note-text" placeholder="Notițele ședinței... Salvare automată activă." oninput="autoSave()"></textarea>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
-              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)"><span style="width:6px;height:6px;border-radius:50%;display:inline-block" id="save-dot" style="background:var(--success)"></span><span id="save-label">Salvare automată activă</span></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)"><span style="width:6px;height:6px;border-radius:50%;display:inline-block;background:var(--success)" id="save-dot"></span><span id="save-label">Salvare automată activă</span></div>
               <button class="btn btn-primary btn-sm" onclick="saveNote()">Salvează</button>
             </div>
           </div>
@@ -327,7 +327,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <!-- CONTRACTS -->
       <div id="t-contracts" class="panel">
         <div class="topbar"><div class="page-title">Contracte & GDPR</div></div>
-        <div class="content"><div id="contracts-content"><div style="padding:22px;text-align:center;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div></div>
+        <div class="content"><div id="contracts-content"></div></div>
       </div>
 
       <!-- INVOICES -->
@@ -356,7 +356,46 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
           <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px">
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Cum funcționează</div>
             <div style="display:flex;flex-direction:column;gap:12px">
-              ${['Tu trimiți linkul prin WhatsApp sau email','Clientul creează cont, semnează GDPR și completează fișa','Apare automat în lista ta ca "În așteptare"','Tu apeși "Activează" și devine client activ'].map((s,i)=>`<div style="display:flex;align-items:flex-start;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div><div style="font-size:13px;color:var(--text)">${s}</div></div>`).join('')}
+              <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">1</div><div style="font-size:13px;color:var(--text)">Tu trimiți linkul prin WhatsApp sau email</div></div>
+              <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">2</div><div style="font-size:13px;color:var(--text)">Clientul creează cont, semnează GDPR și completează fișa</div></div>
+              <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">3</div><div style="font-size:13px;color:var(--text)">Apare automat în lista ta ca "În așteptare"</div></div>
+              <div style="display:flex;align-items:flex-start;gap:10px"><div style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">4</div><div style="font-size:13px;color:var(--text)">Tu apeși "Activează" și devine client activ</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="t-settings" class="panel">
+        <div class="topbar"><div class="page-title">Setări cabinet</div></div>
+        <div class="content">
+          <div class="settings-section">
+            <div class="settings-title">Identitate cabinet</div>
+            <div class="form-row">
+              <div class="fg"><label>Nume afișat (ex: Dr. Alina Pop)</label><input type="text" id="set-name" placeholder="Dr. Alina"></div>
+              <div class="fg"><label>Tip cabinet (ex: Cabinet de Psihoterapie)</label><input type="text" id="set-cabinet" placeholder="Cabinet de Psihoterapie"></div>
+            </div>
+            <div class="form-row">
+              <div class="fg"><label>Specializare (ex: Psihoterapeut, Coach)</label><input type="text" id="set-role" placeholder="Psihoterapeut"></div>
+              <div class="fg"><label>Tarif implicit ședință (lei)</label><input type="number" id="set-rate" placeholder="200"></div>
+            </div>
+            <div class="fg"><label>Salut personalizat pentru clienți</label>
+              <select id="set-greeting">
+                <option value="Bună ziua">Bună ziua</option>
+                <option value="Bună">Bună</option>
+                <option value="Salut">Salut</option>
+                <option value="Bine ai venit">Bine ai venit</option>
+              </select>
+            </div>
+            <div style="display:flex;justify-content:flex-end">
+              <button class="btn btn-primary" onclick="saveSettings()">Salvează setările</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-title">Previzualizare logo cabinet</div>
+            <div style="text-align:center;padding:20px">
+              <div id="logo-preview" style="display:inline-block"></div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:10px">Logourile sunt generate automat pe baza numelui și tipului de cabinet</div>
             </div>
           </div>
         </div>
@@ -366,16 +405,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   </div>
 </div>
 
-<!-- ===== CLIENT PORTAL ===== -->
+<!-- CLIENT PORTAL -->
 <div id="view-client" class="view">
 
   <!-- LANDING -->
   <div id="cp-landing">
     <div class="auth-wrap">
       <div style="text-align:center;margin-bottom:20px">
-        <div style="font-size:40px;margin-bottom:10px">🏥</div>
-        <div style="font-size:20px;font-weight:700;color:var(--sage-dark)">Cabinet Dr. Alina</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Cabinet Individual de Psihologie</div>
+        <div id="landing-logo"></div>
+        <div style="font-size:20px;font-weight:700;color:var(--sage-dark)" id="landing-title">Cabinet Dr. Alina</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="landing-subtitle">Cabinet Individual de Psihologie</div>
       </div>
       <div class="invite-landing-card">
         <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Bine ai venit!</div>
@@ -393,8 +432,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   <div id="cp-login" class="hidden">
     <div class="auth-wrap">
       <div style="text-align:center;margin-bottom:18px">
-        <div style="font-size:18px;font-weight:700;color:var(--sage-dark)">Intră în cont</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Cabinet Dr. Alina</div>
+        <div style="font-size:18px;font-weight:700;color:var(--sage-dark)" id="login-title">Intră în cont</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px" id="login-subtitle">Cabinet Dr. Alina</div>
       </div>
       <div class="auth-card">
         <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="email@exemplu.ro"></div>
@@ -426,7 +465,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
           <div class="fg"><label>Email</label><input type="email" id="ob-email" placeholder="email@exemplu.ro"></div>
           <div class="fg"><label>Parolă</label><input type="password" id="ob-pass" placeholder="Minimum 6 caractere"></div>
           <div style="display:flex;justify-content:flex-end;margin-top:4px">
-            <button class="btn btn-primary" onclick="obRegister()">Continuă → GDPR</button>
+            <button class="btn btn-primary" onclick="obRegister()">Continuă</button>
           </div>
         </div>
       </div>
@@ -439,22 +478,54 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
           <div class="op-step"><div class="op-dot">4</div><div class="op-label">Gata</div></div>
         </div>
         <div class="onboard-card">
-          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Consimțământ GDPR</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Citește cu atenție informarea privind prelucrarea datelor.</div>
+          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Consimțământ privind prelucrarea datelor</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Te rugăm să citești cu atenție informarea de mai jos înainte de a-ți exprima consimțământul.</div>
           <div class="gdpr-box">
-            <strong>Informare GDPR — Cabinet Dr. Alina</strong><br><br>
-            Datele tale sunt prelucrate în scopul furnizării serviciilor terapeutice, conform Regulamentului (UE) 2016/679.<br><br>
-            <strong>Date colectate:</strong> nume, contact, date de sănătate (diagnostic, notițe terapeutice).<br><br>
-            <strong>Temei legal:</strong> consimțământul explicit (art. 9 GDPR).<br><br>
-            <strong>Stocare:</strong> pe durata terapiei + 5 ani conform obligațiilor profesionale.<br><br>
-            <strong>Drepturi:</strong> acces, rectificare, ștergere, portabilitate. Poți retrage consimțământul oricând.<br><br>
-            <strong>Confidențialitate:</strong> datele nu se divulgă terților, cu excepția obligațiilor legale.
+            <strong>INFORMARE PRIVIND PRELUCRAREA DATELOR CU CARACTER PERSONAL</strong><br>
+            <em>conform Regulamentului (UE) 2016/679 (GDPR) și Legii nr. 190/2018</em><br><br>
+
+            <strong>1. Identitatea operatorului</strong><br>
+            Operatorul datelor cu caracter personal este cabinetul individual de psihologie, reprezentat de specialistul care ți-a transmis acest link de înregistrare. Datele de contact ale operatorului îți sunt disponibile la cerere.<br><br>
+
+            <strong>2. Datele colectate</strong><br>
+            Colectăm următoarele categorii de date: date de identificare (nume, prenume, dată naștere, CNP), date de contact (email, telefon), date privind sănătatea și starea psihologică (diagnostic, medicație, istoricul terapeutic, notițele de ședință, rezultatele scalelor de evaluare ORS/SRS). Datele privind sănătatea constituie o categorie specială de date conform art. 9 GDPR.<br><br>
+
+            <strong>3. Scopurile și temeiul legal al prelucrării</strong><br>
+            Datele sunt prelucrate exclusiv în scopul furnizării serviciilor psihologice/psihoterapeutice, în baza:<br>
+            — Consimțământului explicit al persoanei vizate (art. 6 alin. 1 lit. a și art. 9 alin. 2 lit. a GDPR)<br>
+            — Executării contractului de servicii psihologice (art. 6 alin. 1 lit. b GDPR)<br>
+            — Obligațiilor legale profesionale ale psihologului (art. 6 alin. 1 lit. c GDPR)<br><br>
+
+            <strong>4. Durata stocării</strong><br>
+            Datele sunt stocate pe durata relației terapeutice și ulterior pentru o perioadă de 5 ani, conform obligațiilor legale profesionale impuse de Colegiul Psihologilor din România. La expirarea acestei perioade, datele vor fi șterse sau anonimizate.<br><br>
+
+            <strong>5. Destinatarii datelor</strong><br>
+            Datele tale nu sunt transmise către terți, cu excepția cazurilor prevăzute de lege (de exemplu, situații de risc iminent de vătămare a ta sau a altora, obligații de raportare legală). Datele sunt stocate pe servere securizate în Uniunea Europeană.<br><br>
+
+            <strong>6. Drepturile tale</strong><br>
+            În conformitate cu GDPR, ai următoarele drepturi:<br>
+            — <strong>Dreptul de acces</strong> — poți solicita o copie a datelor tale<br>
+            — <strong>Dreptul la rectificare</strong> — poți solicita corectarea datelor inexacte<br>
+            — <strong>Dreptul la ștergere</strong> — poți solicita ștergerea datelor, în condițiile legii<br>
+            — <strong>Dreptul la restricționarea prelucrării</strong> — poți solicita limitarea prelucrării<br>
+            — <strong>Dreptul la portabilitatea datelor</strong> — poți primi datele într-un format structurat<br>
+            — <strong>Dreptul de opoziție</strong> — poți obiecta față de anumite prelucrări<br>
+            — <strong>Dreptul de a retrage consimțământul</strong> — oricând, fără a afecta legalitatea prelucrărilor anterioare retragerii<br><br>
+
+            <strong>7. Dreptul de a depune plângere</strong><br>
+            Ai dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP), cu sediul în București, B-dul G-ral. Gheorghe Magheru nr. 28-30, www.dataprotection.ro.<br><br>
+
+            <strong>8. Confidențialitate profesională</strong><br>
+            Psihologul/terapeutul are obligația legală și deontologică de păstrare a secretului profesional, conform Codului deontologic al Colegiului Psihologilor din România. Informațiile din cadrul ședințelor sunt strict confidențiale.<br><br>
+
+            <strong>9. Caracterul obligatoriu al furnizării datelor</strong><br>
+            Furnizarea datelor de identificare și de contact este necesară pentru încheierea și executarea contractului de servicii. Refuzul furnizării acestor date poate face imposibilă prestarea serviciilor. Datele medicale suplimentare sunt furnizate voluntar și contribuie la calitatea serviciilor.
           </div>
-          <div class="cb-group"><input type="checkbox" id="gdpr1"><label for="gdpr1">Am citit și înțeleg informarea privind prelucrarea datelor cu caracter personal.</label></div>
-          <div class="cb-group"><input type="checkbox" id="gdpr2"><label for="gdpr2">Îmi exprim consimțământul pentru prelucrarea datelor de sănătate în scop terapeutic.</label></div>
-          <div class="cb-group"><input type="checkbox" id="gdpr3"><label for="gdpr3">Înțeleg că pot retrage consimțământul oricând, contactând terapeutul.</label></div>
+          <div class="cb-group"><input type="checkbox" id="gdpr1"><label for="gdpr1">Am citit integral și înțeleg informarea privind prelucrarea datelor cu caracter personal prezentată mai sus.</label></div>
+          <div class="cb-group"><input type="checkbox" id="gdpr2"><label for="gdpr2">Îmi exprim consimțământul explicit pentru prelucrarea datelor mele privind sănătatea (categorie specială de date conform art. 9 GDPR), în scopul furnizării serviciilor psihologice/psihoterapeutice.</label></div>
+          <div class="cb-group"><input type="checkbox" id="gdpr3"><label for="gdpr3">Am luat la cunoștință că îmi pot retrage consimțământul oricând, că pot solicita accesul, rectificarea sau ștergerea datelor mele, și că pot depune plângere la ANSPDCP.</label></div>
           <div style="display:flex;justify-content:flex-end;margin-top:4px">
-            <button class="btn btn-primary" onclick="obGdpr()">Confirm și continuă →</button>
+            <button class="btn btn-primary" onclick="obGdpr()">Continuă</button>
           </div>
         </div>
       </div>
@@ -470,22 +541,61 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
           <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">Fișă personală</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Aceste date ajută terapeutul să te cunoască înaintea primei ședințe.</div>
           <div class="sec-div">Date personale</div>
-          <div class="form-row">
-            <div class="fg"><label>Data nașterii</label><input type="date" id="ob-dob"></div>
-            <div class="fg"><label>Telefon</label><input type="tel" id="ob-phone" placeholder="07xx xxx xxx"></div>
-          </div>
-          <div class="form-row">
-            <div class="fg"><label>Ocupație</label><input type="text" id="ob-job" placeholder="Ex: Contabil, student..."></div>
-            <div class="fg"><label>Stare civilă</label>
-              <select id="ob-civil"><option value="">— Selectează —</option><option>Necăsătorit/ă</option><option>Căsătorit/ă</option><option>Divorțat/ă</option><option>Văduv/ă</option><option>Uniune liberă</option></select>
+
+          <!-- DATA NAȘTERII — 3 câmpuri separate -->
+          <div class="fg">
+            <label>Data nașterii</label>
+            <div class="dob-row">
+              <select id="ob-dob-day" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:var(--card);outline:none;width:100%">
+                <option value="">Zi</option>
+              </select>
+              <select id="ob-dob-month" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:var(--card);outline:none;width:100%">
+                <option value="">Lună</option>
+                <option value="01">Ianuarie</option><option value="02">Februarie</option><option value="03">Martie</option>
+                <option value="04">Aprilie</option><option value="05">Mai</option><option value="06">Iunie</option>
+                <option value="07">Iulie</option><option value="08">August</option><option value="09">Septembrie</option>
+                <option value="10">Octombrie</option><option value="11">Noiembrie</option><option value="12">Decembrie</option>
+              </select>
+              <select id="ob-dob-year" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:var(--card);outline:none;width:100%">
+                <option value="">An</option>
+              </select>
             </div>
           </div>
+
+          <div class="fg"><label>Telefon</label><input type="tel" id="ob-phone" placeholder="07xx xxx xxx"></div>
+
+          <!-- OCUPAȚIE — dropdown cu variante empatice -->
+          <div class="fg">
+            <label>Ocupație</label>
+            <select id="ob-job">
+              <option value="">— Selectează —</option>
+              <option value="Student/ă">Student/ă</option>
+              <option value="Angajat/ă">Angajat/ă</option>
+              <option value="Antreprenor / Freelancer">Antreprenor / Freelancer</option>
+              <option value="În concediu de creștere copil">În concediu de creștere copil</option>
+              <option value="Casnic/ă">Casnic/ă</option>
+              <option value="În căutarea unui loc de muncă">În căutarea unui loc de muncă</option>
+              <option value="Pensionar/ă">Pensionar/ă</option>
+              <option value="Prefer să nu specific">Prefer să nu specific</option>
+            </select>
+          </div>
+
+          <div class="fg"><label>Stare civilă</label>
+            <select id="ob-civil"><option value="">— Selectează —</option><option>Necăsătorit/ă</option><option>Căsătorit/ă</option><option>Divorțat/ă</option><option>Văduv/ă</option><option>Uniune liberă</option><option>Prefer să nu specific</option></select>
+          </div>
+
           <div class="sec-div">Situație medicală</div>
-          <div class="fg"><label>Diagnostic medical (dacă există)</label><input type="text" id="ob-diag" placeholder="Ex: Hipertensiune, sau 'Niciun diagnostic'"></div>
-          <div class="fg"><label>Medicație actuală</label><textarea id="ob-meds" placeholder="Listează medicamentele sau 'Nu iau nicio medicație'"></textarea></div>
-          <div class="fg"><label>Terapii anterioare</label><textarea id="ob-prev" placeholder="Ai mai urmat terapie? Cu ce tip de terapeut?"></textarea></div>
+          <div class="fg"><label>Diagnostic medical actual (dacă există)</label><input type="text" id="ob-diag" placeholder="Ex: Hipertensiune, sau 'Niciun diagnostic'"></div>
+          <div class="fg"><label>Medicație actuală</label><textarea id="ob-meds" placeholder="Listează medicamentele și dozele, sau 'Nu iau nicio medicație'"></textarea></div>
+
+          <!-- TERAPII ANTERIOARE — întrebare reformulată -->
+          <div class="fg">
+            <label>Experiențe terapeutice anterioare</label>
+            <textarea id="ob-prev" style="min-height:100px" placeholder="Ai mai participat la vreun proces de psihoterapie individual sau de grup? Sau alte forme de lucru personal (coaching, dezvoltare personală etc.)? Dacă da, ce durată a avut și, dacă știi, ce formă de terapie a fost practicată?"></textarea>
+          </div>
+
           <div style="display:flex;justify-content:flex-end;margin-top:4px">
-            <button class="btn btn-primary" onclick="obFisa()">Finalizează →</button>
+            <button class="btn btn-primary" onclick="obFisa()">Continuă</button>
           </div>
         </div>
       </div>
@@ -493,10 +603,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     </div>
   </div>
 
-  <!-- APP (după login) -->
+  <!-- APP după login -->
   <div id="cp-app" class="hidden portal-shell">
     <div class="portal-header">
-      <div><div id="cp-name" style="font-size:14px;font-weight:600;color:#fff"></div><div style="font-size:11px;color:rgba(255,255,255,0.5)">Cabinet Dr. Alina</div></div>
+      <div>
+        <div id="cp-name" style="font-size:14px;font-weight:600;color:#fff"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)" id="cp-cabinet-name">Cabinet Dr. Alina</div>
+      </div>
       <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2)" onclick="doLogout()">Ieșire</button>
     </div>
     <div class="portal-body">
@@ -504,7 +617,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         <div class="portal-content-pad">
           <div class="client-greeting">
             <div style="font-size:17px;font-weight:600;margin-bottom:3px" id="cp-greeting">Bună ziua!</div>
-            <div style="font-size:12px;opacity:0.65">Bine ai revenit la cabinetul Dr. Alina</div>
+            <div style="font-size:12px;opacity:0.65" id="cp-greeting-sub">Bine ai revenit</div>
           </div>
           <div id="cp-doc-status" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:14px"></div>
           <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Scale pentru ședința de azi</div>
@@ -603,27 +716,101 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 </div>
 
 <script>
-// ============================================================
-// SUPABASE CONFIG
-// ============================================================
-const SUPABASE_URL = 'https://tajsaivmbjhvgzvksaqd.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_SWVntWEu4taASDuD3pjhrg_aDdjOVuS';
-const CABINET_CODE = 'alina2024';
-const INVITE_URL = window.location.origin + window.location.pathname + '?invite=' + CABINET_CODE;
+const SUPABASE_URL='https://tajsaivmbjhvgzvksaqd.supabase.co';
+const SUPABASE_KEY='sb_publishable_SWVntWEu4taASDuD3pjhrg_aDdjOVuS';
+const CABINET_CODE='alina2024';
+const INVITE_URL=window.location.origin+window.location.pathname+'?invite='+CABINET_CODE;
 
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const {createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-// ============================================================
-// UTILS
-// ============================================================
+// DEFAULT SETTINGS
+let SETTINGS={
+  name:'Dr. Alina',
+  cabinet:'Cabinet de Psihoterapie',
+  role:'Psihoterapeut',
+  rate:200,
+  greeting:'Bună ziua'
+};
+
 function toDS(d){return d.toISOString().slice(0,10)}
 function fmtDate(s){if(!s)return '—';return new Date(s+'T12:00:00').toLocaleDateString('ro-RO',{day:'2-digit',month:'short',year:'numeric'})}
 function ini(f,l){return((f||'?')[0]+((l||'')[0]||'')).toUpperCase()}
 function notify(msg,color){const n=document.createElement('div');n.className='notification';if(color)n.style.background=color;n.textContent=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),3500)}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
 
-// Modals
+// Generate SVG logo
+function generateLogo(name,cabinet,size=64){
+  const initials=name.replace('Dr.','').replace('Coach','').trim().split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const isTherapy=cabinet.toLowerCase().includes('psiho')||cabinet.toLowerCase().includes('terapie');
+  const isCoach=cabinet.toLowerCase().includes('coach');
+  const color1=isCoach?'#c17b4a':'#2d5248';
+  const color2=isCoach?'#e8a070':'#4a7c6f';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${color1}"/><stop offset="100%" style="stop-color:${color2}"/></linearGradient></defs>
+    <rect width="64" height="64" rx="16" fill="url(#lg)"/>
+    <text x="32" y="38" text-anchor="middle" font-family="Segoe UI,system-ui,sans-serif" font-size="22" font-weight="700" fill="white">${initials}</text>
+  </svg>`;
+}
+
+function applySettings(s){
+  SETTINGS={...SETTINGS,...s};
+  const n=SETTINGS.name,c=SETTINGS.cabinet,r=SETTINGS.role;
+  // Mode bar
+  const mbt=document.getElementById('mode-bar-title');
+  if(mbt)mbt.textContent=c+' · '+n;
+  // Sidebar
+  const st=document.getElementById('sidebar-title');if(st)st.innerHTML=c.replace(' ',`<br>`);
+  const sn=document.getElementById('sidebar-name');if(sn)sn.textContent=n;
+  const sr=document.getElementById('sidebar-role');if(sr)sr.textContent=r;
+  const sa=document.getElementById('sidebar-avatar');if(sa)sa.textContent=n.replace('Dr.','').replace('Coach','').trim()[0]||'A';
+  // Loading
+  const lt=document.getElementById('loading-title');if(lt)lt.textContent=c;
+  // Landing
+  const ll=document.getElementById('landing-logo');if(ll)ll.innerHTML=generateLogo(n,c,56);
+  const llt=document.getElementById('landing-title');if(llt)llt.textContent=n;
+  const lls=document.getElementById('landing-subtitle');if(lls)lls.textContent=c;
+  // Login
+  const lnt=document.getElementById('login-title');if(lnt)lnt.textContent='Intră în cont';
+  const lns=document.getElementById('login-subtitle');if(lns)lns.textContent=c+' · '+n;
+  // Portal header
+  const cpn=document.getElementById('cp-cabinet-name');if(cpn)cpn.textContent=c+' · '+n;
+  // Logo preview in settings
+  const lp=document.getElementById('logo-preview');if(lp)lp.innerHTML=generateLogo(n,c,80);
+  // Settings fields
+  const sfi=document.getElementById('set-name');if(sfi)sfi.value=n;
+  const sfc=document.getElementById('set-cabinet');if(sfc)sfc.value=c;
+  const sfr=document.getElementById('set-role');if(sfr)sfr.value=r;
+  const sfrate=document.getElementById('set-rate');if(sfrate)sfrate.value=SETTINGS.rate;
+  const sfg=document.getElementById('set-greeting');if(sfg)sfg.value=SETTINGS.greeting;
+}
+
+function saveSettings(){
+  const s={
+    name:document.getElementById('set-name').value.trim()||'Dr. Alina',
+    cabinet:document.getElementById('set-cabinet').value.trim()||'Cabinet de Psihoterapie',
+    role:document.getElementById('set-role').value.trim()||'Psihoterapeut',
+    rate:parseInt(document.getElementById('set-rate').value)||200,
+    greeting:document.getElementById('set-greeting').value||'Bună ziua'
+  };
+  localStorage.setItem('cabinet_settings',JSON.stringify(s));
+  applySettings(s);
+  notify('Setări salvate!');
+}
+
+function loadSettings(){
+  try{const s=localStorage.getItem('cabinet_settings');if(s)applySettings(JSON.parse(s));}catch(e){}
+}
+
+// Populate DOB selects
+function initDobSelects(){
+  const dayEl=document.getElementById('ob-dob-day');
+  const yearEl=document.getElementById('ob-dob-year');
+  if(!dayEl||!yearEl)return;
+  for(let d=1;d<=31;d++){dayEl.innerHTML+=`<option value="${String(d).padStart(2,'0')}">${d}</option>`;}
+  const cy=new Date().getFullYear();
+  for(let y=cy-10;y>=cy-100;y--){yearEl.innerHTML+=`<option value="${y}">${y}</option>`;}
+}
+
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')})});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(o=>o.classList.remove('open'))});
 function openModal(id){
@@ -639,20 +826,15 @@ function openModal(id){
 }
 function closeModal(id){document.getElementById('modal-'+id)?.classList.remove('open')}
 
-// ============================================================
-// STATE
-// ============================================================
 let cachedClients=[];
 let currentClientUser=null;
 let calDate=new Date();
 let selDate=new Date();
 let autoTimer=null;
 
-// ============================================================
-// INIT
-// ============================================================
 async function init(){
-  // Check invite param
+  loadSettings();
+  initDobSelects();
   const params=new URLSearchParams(window.location.search);
   if(params.get('invite')===CABINET_CODE){
     document.getElementById('app-loading').classList.add('hidden');
@@ -660,7 +842,6 @@ async function init(){
     switchMode('client',document.querySelector('.mode-btn:last-child'));
     return;
   }
-  // Load clients
   try{
     await loadClients();
     document.getElementById('app-loading').classList.add('hidden');
@@ -669,7 +850,7 @@ async function init(){
     document.getElementById('invite-url-display').textContent=INVITE_URL;
     initSliders();
   }catch(e){
-    document.querySelector('#app-loading .loading-sub').textContent='Eroare conexiune: '+e.message;
+    document.querySelector('#app-loading .loading-sub').textContent='Eroare: '+e.message;
   }
 }
 
@@ -680,9 +861,6 @@ async function loadClients(){
   return cachedClients;
 }
 
-// ============================================================
-// MODE & NAV
-// ============================================================
 function switchMode(m,el){
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -701,47 +879,30 @@ function tNav(p,el){
   if(p==='notes')populateNoteClients();
   if(p==='contracts')renderContracts();
   if(p==='invoices')renderInvoices();
+  if(p==='settings')applySettings(SETTINGS);
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
 async function renderDash(){
   const clients=cachedClients;
   document.getElementById('st-active').textContent=clients.filter(c=>c.status==='active').length;
   document.getElementById('st-waiting').textContent=clients.filter(c=>c.status==='waiting').length;
-
   const today=toDS(new Date());
   const {data:appts}=await sb.from('appointments').select('*').eq('date',today).order('time');
   const {data:scales}=await sb.from('measurements').select('*').eq('date',today).order('submitted_at',{ascending:false});
-
   document.getElementById('st-sessions').textContent=appts?.length||0;
   document.getElementById('st-scales').textContent=scales?.length||0;
-
-  // Waiting clients alert
   const waiting=clients.filter(c=>c.status==='waiting');
-  const ws=document.getElementById('waiting-section');
-  const wl=document.getElementById('waiting-list');
+  const ws=document.getElementById('waiting-section');const wl=document.getElementById('waiting-list');
   if(waiting.length){
     ws.classList.remove('hidden');
-    wl.innerHTML=waiting.map(c=>`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px">
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0"></div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email} · GDPR: ${c.gdpr_signed?'✓':'—'} · Fișă: ${c.fisa_complete?'✓':'—'}</div></div>
-      <button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button>
-    </div>`).join('');
+    wl.innerHTML=waiting.map(c=>`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email} · GDPR: ${c.gdpr_signed?'✓':'—'} · Fișă: ${c.fisa_complete?'✓':'—'}</div></div><button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button></div>`).join('');
   } else ws.classList.add('hidden');
-
-  // Today appointments
   const da=document.getElementById('dash-appts');
-  if(appts?.length){
-    da.innerHTML=appts.map(a=>{const c=clients.find(x=>x.id===a.client_id);return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div></div>`;}).join('');
-  } else da.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div>';
-
-  // Recent scales
+  if(appts?.length){da.innerHTML=appts.map(a=>{const c=clients.find(x=>x.id===a.client_id);return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div></div>`;}).join('');}
+  else da.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div>';
   const ds=document.getElementById('dash-scales');
-  if(scales?.length){
-    ds.innerHTML=scales.slice(0,5).map(m=>{const c=clients.find(x=>x.id===m.client_id);const isOrs=m.type==='ors';return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:${isOrs?'#dbeafe':'#ede9fe'};color:${isOrs?'#1d4ed8':'#6d28d9'}">${isOrs?'ORS':'SRS'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div></div><div style="font-size:15px;font-weight:600;color:${isOrs?'var(--ors)':'var(--srs)'}">${m.total}</div></div>`;}).join('');
-  } else ds.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio scală completată azi.</div>';
+  if(scales?.length){ds.innerHTML=scales.slice(0,5).map(m=>{const c=clients.find(x=>x.id===m.client_id);const isOrs=m.type==='ors';return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:${isOrs?'#dbeafe':'#ede9fe'};color:${isOrs?'#1d4ed8':'#6d28d9'}">${isOrs?'ORS':'SRS'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div></div><div style="font-size:15px;font-weight:600;color:${isOrs?'var(--ors)':'var(--srs)'}">${m.total}</div></div>`;}).join('');}
+  else ds.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio scală completată azi.</div>';
 }
 
 async function activateClient(id){
@@ -749,9 +910,6 @@ async function activateClient(id){
   await loadClients();renderDash();renderClientList();notify('Client activat!');
 }
 
-// ============================================================
-// CLIENTS
-// ============================================================
 function renderClientList(){
   const clients=cachedClients;const tb=document.getElementById('client-tbody');
   if(!clients.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:22px;color:var(--text-muted)">Niciun client înregistrat încă.</td></tr>';return}
@@ -760,11 +918,9 @@ function renderClientList(){
     <td style="font-size:11px;color:var(--text-muted)">${fmtDate(c.registered_at?.slice(0,10))}</td>
     <td>${c.gdpr_signed?'<span style="color:var(--success);font-size:12px;font-weight:600">✓</span>':'<span style="color:var(--warn);font-size:12px">—</span>'}</td>
     <td>${c.fisa_complete?'<span style="color:var(--success);font-size:12px;font-weight:600">✓</span>':'<span style="color:var(--warn);font-size:12px">—</span>'}</td>
-    <td id="ors-${c.id}">—</td>
-    <td id="srs-${c.id}">—</td>
+    <td id="ors-${c.id}">—</td><td id="srs-${c.id}">—</td>
     <td><span class="badge badge-${c.status==='active'?'active':c.status==='waiting'?'waiting':'inactive'}">${c.status==='active'?'Activ':c.status==='waiting'?'Așteptare':'Inactiv'}</span></td>
   </tr>`).join('');
-  // Load last scores async
   clients.forEach(async c=>{
     const {data}=await sb.from('measurements').select('type,total').eq('client_id',c.id).order('submitted_at',{ascending:false}).limit(10);
     if(!data)return;
@@ -790,22 +946,11 @@ async function showClientDetail(id){
     <div class="back-link" onclick="document.getElementById('clients-list-view').style.display='';document.getElementById('client-detail-view').style.display='none'">← Înapoi la clienți</div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px">
       <div style="width:48px;height:48px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0">${ini(c.first_name,c.last_name)}</div>
-      <div style="flex:1">
-        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">${c.first_name} ${c.last_name}</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${c.email} · Înregistrat ${fmtDate(c.registered_at?.slice(0,10))}</div>
-        <div>
-          <span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span>
-          <span class="doc-badge ${c.fisa_complete?'doc-signed':'doc-unsigned'}">Fișă ${c.fisa_complete?'✓':'⚠'}</span>
-          <span class="doc-badge ${c.status==='active'?'doc-signed':'doc-unsigned'}">${c.status==='active'?'✓ Activ':'⏳ Așteptare'}</span>
-        </div>
-      </div>
+      <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">${c.first_name} ${c.last_name}</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${c.email} · Înregistrat ${fmtDate(c.registered_at?.slice(0,10))}</div>
+      <div><span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span><span class="doc-badge ${c.fisa_complete?'doc-signed':'doc-unsigned'}">Fișă ${c.fisa_complete?'✓':'⚠'}</span><span class="doc-badge ${c.status==='active'?'doc-signed':'doc-unsigned'}">${c.status==='active'?'✓ Activ':'⏳ Așteptare'}</span></div></div>
       ${c.status!=='active'?`<button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button>`:''}
     </div>
-    <div class="tabs">
-      <div class="tab active" onclick="cTab('sessions',this)">Ședințe (${sessions?.length||0})</div>
-      <div class="tab" onclick="cTab('fisa',this)">Fișă personală</div>
-      <div class="tab" onclick="cTab('scale',this)">Scale ORS/SRS</div>
-    </div>
+    <div class="tabs"><div class="tab active" onclick="cTab('sessions',this)">Ședințe (${sessions?.length||0})</div><div class="tab" onclick="cTab('fisa',this)">Fișă personală</div><div class="tab" onclick="cTab('scale',this)">Scale ORS/SRS</div></div>
     <div id="ctab-sessions" class="tab-content active">
       ${sessions?.length?sessions.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:12px;font-weight:600;color:var(--sage)">${fmtDate(s.date)} — ${s.type}</div><div style="font-size:11px;color:var(--text-muted)">Ș #${sessions.length-i}</div></div><div style="font-size:13px;color:var(--text);line-height:1.6">${s.notes||'<em style="color:var(--text-muted)">Fără notițe.</em>'}</div></div>`).join(''):'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Nicio ședință înregistrată.</div>'}
     </div>
@@ -817,225 +962,137 @@ async function showClientDetail(id){
         <div class="info-item"><div class="info-label">Stare civilă</div><div class="info-value">${fisa.civil_status||'—'}</div></div>
         <div class="info-item" style="grid-column:1/-1"><div class="info-label">Diagnostic medical</div><div class="info-value">${fisa.medical_diagnosis||'—'}</div></div>
         <div class="info-item" style="grid-column:1/-1"><div class="info-label">Medicație</div><div class="info-value">${fisa.medication||'—'}</div></div>
-        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Terapii anterioare</div><div class="info-value">${fisa.previous_therapy||'—'}</div></div>
-      </div>`:'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Fișa nu a fost completată încă.</div>'}
+        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Experiențe terapeutice anterioare</div><div class="info-value">${fisa.previous_therapy||'—'}</div></div>
+      </div>`:'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Fișa nu a fost completată.</div>'}
     </div>
     <div id="ctab-scale" class="tab-content">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
-          <div style="font-size:12px;font-weight:600;color:var(--ors);margin-bottom:10px">ORS — Evoluție</div>
-          ${orsMeas.length?orsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--ors)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
-          <div style="font-size:12px;font-weight:600;color:var(--srs);margin-bottom:10px">SRS — Evoluție</div>
-          ${srsMeas.length?srsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--srs)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}
-        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="font-size:12px;font-weight:600;color:var(--ors);margin-bottom:10px">ORS</div>${orsMeas.length?orsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--ors)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="font-size:12px;font-weight:600;color:var(--srs);margin-bottom:10px">SRS</div>${srsMeas.length?srsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--srs)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}</div>
       </div>
     </div>`;
   function cTab(t,el){det.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');det.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.getElementById('ctab-'+t).classList.add('active');}
   window.cTab=cTab;
 }
 
-// ============================================================
-// CALENDAR
-// ============================================================
 async function renderCalendar(){
   const months=['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
   document.getElementById('cal-label').textContent=months[calDate.getMonth()]+' '+calDate.getFullYear();
   const y=calDate.getFullYear(),m=calDate.getMonth();
   const first=new Date(y,m,1);let sd=first.getDay();sd=sd===0?6:sd-1;
-  const dim=new Date(y,m+1,0).getDate();
-  const today=toDS(new Date());
+  const dim=new Date(y,m+1,0).getDate();const today=toDS(new Date());
   const {data:appts}=await sb.from('appointments').select('date').gte('date',`${y}-${String(m+1).padStart(2,'0')}-01`).lte('date',`${y}-${String(m+1).padStart(2,'0')}-${dim}`);
   const apptDates=new Set((appts||[]).map(a=>a.date));
   let h='';
   for(let i=0;i<sd;i++){const pd=new Date(y,m,-(sd-i-1));h+=`<div class="cal-day other-month">${pd.getDate()}</div>`;}
   for(let d=1;d<=dim;d++){const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;h+=`<div class="cal-day${ds===today?' today':''}${apptDates.has(ds)?' has-appt':''}" onclick="selDay('${ds}')">${d}</div>`;}
-  document.getElementById('cal-days').innerHTML=h;
-  renderCalDay(toDS(selDate));
+  document.getElementById('cal-days').innerHTML=h;renderCalDay(toDS(selDate));
 }
 function changeMonth(d){calDate.setMonth(calDate.getMonth()+d);renderCalendar()}
 function selDay(ds){selDate=new Date(ds+'T12:00:00');renderCalDay(ds)}
 async function renderCalDay(ds){
   const {data:appts}=await sb.from('appointments').select('*').eq('date',ds).order('time');
-  const label=ds===toDS(new Date())?'Azi':fmtDate(ds);
-  document.getElementById('cal-day-label').textContent=label;
+  document.getElementById('cal-day-label').textContent=ds===toDS(new Date())?'Azi':fmtDate(ds);
   const cont=document.getElementById('cal-day-appts');
   if(!appts?.length){cont.innerHTML='<div style="font-size:13px;color:var(--text-muted)">Nicio programare</div>';return}
   cont.innerHTML=appts.map(a=>{const c=cachedClients.find(x=>x.id===a.client_id);return`<div class="appt-block"><div style="font-size:11px;font-weight:600;color:var(--sage);margin-bottom:2px">${a.time} · ${a.duration}min</div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>`;}).join('');
 }
 
-// ============================================================
-// APPOINTMENTS
-// ============================================================
 async function saveAppt(){
-  const clientId=document.getElementById('a-client').value;
-  const date=document.getElementById('a-date').value;
-  const time=document.getElementById('a-time').value;
-  const duration=parseInt(document.getElementById('a-dur').value)||50;
-  const type=document.getElementById('a-type').value;
+  const clientId=document.getElementById('a-client').value;const date=document.getElementById('a-date').value;
+  const time=document.getElementById('a-time').value;const duration=parseInt(document.getElementById('a-dur').value)||50;const type=document.getElementById('a-type').value;
   if(!clientId||!date){notify('Selectează client și dată.','var(--danger)');return}
-  const {error}=await sb.from('appointments').insert({client_id:clientId,date,time,duration,type});
-  if(error){notify('Eroare: '+error.message,'var(--danger)');return}
-  // Increment session count
+  await sb.from('appointments').insert({client_id:clientId,date,time,duration,type});
   const c=cachedClients.find(x=>x.id===clientId);
   if(c)await sb.from('clients').update({session_count:(c.session_count||0)+1}).eq('id',clientId);
   closeModal('add-appt');renderCalendar();notify('Programare salvată!');
 }
 
-// ============================================================
-// NOTES
-// ============================================================
 async function populateNoteClients(){
-  const sel=document.getElementById('note-client');
-  sel.innerHTML='<option value="">— Selectează client —</option>';
+  const sel=document.getElementById('note-client');sel.innerHTML='<option value="">— Selectează client —</option>';
   cachedClients.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.first_name} ${c.last_name}</option>`});
   document.getElementById('note-date').value=toDS(new Date());
 }
 async function loadNote(){
-  const cid=document.getElementById('note-client').value;
-  const date=document.getElementById('note-date').value;
+  const cid=document.getElementById('note-client').value;const date=document.getElementById('note-date').value;
   if(!cid||!date){document.getElementById('note-text').value='';return}
   const {data}=await sb.from('session_notes').select('*').eq('client_id',cid).eq('date',date).single();
   document.getElementById('note-text').value=data?.notes||'';
   document.getElementById('note-type').value=data?.type||'Ședință individuală';
 }
-function autoSave(){
-  clearTimeout(autoTimer);
-  const dot=document.getElementById('save-dot');
-  dot.style.background='var(--warn)';
-  document.getElementById('save-label').textContent='Se salvează...';
-  autoTimer=setTimeout(()=>saveNote(true),1500);
-}
+function autoSave(){clearTimeout(autoTimer);document.getElementById('save-dot').style.background='var(--warn)';document.getElementById('save-label').textContent='Se salvează...';autoTimer=setTimeout(()=>saveNote(true),1500)}
 async function saveNote(silent=false){
-  const cid=document.getElementById('note-client').value;
-  const date=document.getElementById('note-date').value;
-  const notes=document.getElementById('note-text').value;
-  const type=document.getElementById('note-type').value;
+  const cid=document.getElementById('note-client').value;const date=document.getElementById('note-date').value;
+  const notes=document.getElementById('note-text').value;const type=document.getElementById('note-type').value;
   if(!cid||!date){if(!silent)notify('Selectează client și dată.','var(--danger)');return}
   const {data:existing}=await sb.from('session_notes').select('id').eq('client_id',cid).eq('date',date).single();
-  if(existing){
-    await sb.from('session_notes').update({notes,type,updated_at:new Date().toISOString()}).eq('id',existing.id);
-  } else {
-    const sessCount=cachedClients.find(x=>x.id===cid)?.session_count||1;
-    await sb.from('session_notes').insert({client_id:cid,date,type,notes,session_number:sessCount});
-  }
-  document.getElementById('save-dot').style.background='var(--success)';
-  document.getElementById('save-label').textContent='Salvat automat';
+  if(existing){await sb.from('session_notes').update({notes,type,updated_at:new Date().toISOString()}).eq('id',existing.id);}
+  else{const sessCount=cachedClients.find(x=>x.id===cid)?.session_count||1;await sb.from('session_notes').insert({client_id:cid,date,type,notes,session_number:sessCount});}
+  document.getElementById('save-dot').style.background='var(--success)';document.getElementById('save-label').textContent='Salvat automat';
 }
 
-// ============================================================
-// CONTRACTS
-// ============================================================
 function renderContracts(){
   const cont=document.getElementById('contracts-content');
   if(!cachedClients.length){cont.innerHTML='<div style="padding:22px;text-align:center;font-size:13px;color:var(--text-muted)">Niciun client.</div>';return}
   cont.innerHTML='<div style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Status documente per client.</div>'+
-  cachedClients.map(c=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px 15px;display:flex;align-items:center;gap:11px;margin-bottom:8px">
-    <div class="avatar">${ini(c.first_name,c.last_name)}</div>
-    <div style="flex:1"><div style="font-size:13px;font-weight:500">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email}</div></div>
-    <span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span>
-    <span class="doc-badge ${c.contract_signed?'doc-signed':'doc-unsigned'}">Contract ${c.contract_signed?'✓':'⚠'}</span>
-  </div>`).join('');
+  cachedClients.map(c=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px 15px;display:flex;align-items:center;gap:11px;margin-bottom:8px"><div class="avatar">${ini(c.first_name,c.last_name)}</div><div style="flex:1"><div style="font-size:13px;font-weight:500">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email}</div></div><span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span><span class="doc-badge ${c.contract_signed?'doc-signed':'doc-unsigned'}">Contract ${c.contract_signed?'✓':'⚠'}</span></div>`).join('');
 }
 
-// ============================================================
-// INVOICES
-// ============================================================
 async function renderInvoices(){
   const {data:invs}=await sb.from('invoices').select('*').order('created_at',{ascending:false});
   const tb=document.getElementById('invoices-tbody');
   if(!invs?.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:22px;color:var(--text-muted)">Nu există facturi.</td></tr>';return}
   const sm={paid:'badge-active',unpaid:'badge-waiting',overdue:'badge-inactive'};
   const sl={paid:'Achitată',unpaid:'Neachitată',overdue:'Depășită'};
-  tb.innerHTML=invs.map(inv=>{const c=cachedClients.find(x=>x.id===inv.client_id);return`<tr>
-    <td style="font-weight:500">${inv.invoice_number}</td>
-    <td>${c?c.first_name+' '+c.last_name:'—'}</td>
-    <td>${inv.month}</td>
-    <td>${(inv.amount||0).toLocaleString('ro-RO')} lei</td>
-    <td><span class="badge ${sm[inv.status]||'badge-waiting'}">${sl[inv.status]||inv.status}</span></td>
-    <td><button class="btn btn-ghost btn-sm" onclick="toggleInv('${inv.id}','${inv.status}')">Schimbă status</button></td>
-  </tr>`;}).join('');
+  tb.innerHTML=invs.map(inv=>{const c=cachedClients.find(x=>x.id===inv.client_id);return`<tr><td style="font-weight:500">${inv.invoice_number}</td><td>${c?c.first_name+' '+c.last_name:'—'}</td><td>${inv.month}</td><td>${(inv.amount||0).toLocaleString('ro-RO')} lei</td><td><span class="badge ${sm[inv.status]||'badge-waiting'}">${sl[inv.status]||inv.status}</span></td><td><button class="btn btn-ghost btn-sm" onclick="toggleInv('${inv.id}','${inv.status}')">Schimbă status</button></td></tr>`;}).join('');
 }
 async function saveInvoice(){
-  const clientId=document.getElementById('i-client').value;
-  if(!clientId){notify('Selectează client.','var(--danger)');return}
+  const clientId=document.getElementById('i-client').value;if(!clientId){notify('Selectează client.','var(--danger)');return}
   const {data:count}=await sb.from('invoices').select('id',{count:'exact'});
   const num='FAC-'+String((count?.length||0)+1).padStart(3,'0');
   await sb.from('invoices').insert({client_id:clientId,invoice_number:num,month:document.getElementById('i-month').value,amount:parseInt(document.getElementById('i-amount').value)||0,sessions_count:parseInt(document.getElementById('i-sessions').value)||0,status:document.getElementById('i-status').value});
   closeModal('add-invoice');renderInvoices();notify('Factură emisă!');
 }
-async function toggleInv(id,status){
-  const cycle={unpaid:'paid',paid:'overdue',overdue:'unpaid'};
-  await sb.from('invoices').update({status:cycle[status]||'unpaid'}).eq('id',id);
-  renderInvoices();
-}
+async function toggleInv(id,status){const cycle={unpaid:'paid',paid:'overdue',overdue:'unpaid'};await sb.from('invoices').update({status:cycle[status]||'unpaid'}).eq('id',id);renderInvoices();}
 
-// ============================================================
-// INVITE
-// ============================================================
-function copyInviteLink(){
-  navigator.clipboard?.writeText(INVITE_URL).catch(()=>{});
-  notify('✓ Link copiat!');
-}
-function shareWA(){
-  const msg=encodeURIComponent('Bună! Te rog să completezi documentele necesare înainte de prima ședință, accesând linkul: '+INVITE_URL);
-  window.open('https://wa.me/?text='+msg,'_blank');
-}
+function copyInviteLink(){navigator.clipboard?.writeText(INVITE_URL).catch(()=>{});notify('✓ Link copiat!');}
+function shareWA(){const msg=encodeURIComponent('Bună! Te rog să completezi documentele necesare înainte de prima ședință: '+INVITE_URL);window.open('https://wa.me/?text='+msg,'_blank');}
 
-// ============================================================
 // CLIENT PORTAL
-// ============================================================
 function showLanding(){
-  ['cp-landing','cp-login','cp-onboard','cp-app'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.classList.toggle('hidden',id!=='cp-landing');
-    if(id==='cp-app')el.style.display='none';
-    if(id==='cp-landing')el.style.display='';
-  });
+  document.getElementById('cp-landing').style.display='';
+  document.getElementById('cp-login').classList.add('hidden');
+  document.getElementById('cp-onboard').classList.add('hidden');
+  const app=document.getElementById('cp-app');app.classList.add('hidden');app.style.display='none';
 }
-function showLogin(){
-  document.getElementById('cp-landing').classList.add('hidden');
-  document.getElementById('cp-login').classList.remove('hidden');
-}
-function goOnboard(){
-  document.getElementById('cp-landing').classList.add('hidden');
-  document.getElementById('cp-onboard').classList.remove('hidden');
-  showObStep('register');
-}
-function showObStep(step){
-  ['register','gdpr','fisa'].forEach(s=>{
-    const el=document.getElementById('ob-'+s);
-    if(el)el.classList.toggle('hidden',s!==step);
-  });
-}
+function showLogin(){document.getElementById('cp-landing').style.display='none';document.getElementById('cp-login').classList.remove('hidden');}
+function goOnboard(){document.getElementById('cp-landing').style.display='none';document.getElementById('cp-onboard').classList.remove('hidden');showObStep('register');}
+function showObStep(step){['register','gdpr','fisa'].forEach(s=>{const el=document.getElementById('ob-'+s);if(el)el.classList.toggle('hidden',s!==step)});}
 
 let tempReg={};
 
 async function obRegister(){
-  const first=document.getElementById('ob-first').value.trim();
-  const last=document.getElementById('ob-last').value.trim();
-  const email=document.getElementById('ob-email').value.trim();
-  const pass=document.getElementById('ob-pass').value;
+  const first=document.getElementById('ob-first').value.trim();const last=document.getElementById('ob-last').value.trim();
+  const email=document.getElementById('ob-email').value.trim();const pass=document.getElementById('ob-pass').value;
   if(!first||!last||!email||!pass){notify('Completează toate câmpurile.','var(--danger)');return}
   if(pass.length<6){notify('Parola trebuie să aibă minimum 6 caractere.','var(--danger)');return}
-  // Check email unique
   const {data:existing}=await sb.from('users').select('id').eq('email',email).single();
   if(existing){notify('Există deja un cont cu acest email.','var(--danger)');return}
-  tempReg={first,last,email,pass};
-  showObStep('gdpr');
+  tempReg={first,last,email,pass};showObStep('gdpr');
 }
 
 async function obGdpr(){
-  if(!document.getElementById('gdpr1').checked||!document.getElementById('gdpr2').checked||!document.getElementById('gdpr3').checked){
-    notify('Bifează toate acordurile pentru a continua.','var(--danger)');return;
-  }
-  tempReg.gdprSigned=true;
-  showObStep('fisa');
+  if(!document.getElementById('gdpr1').checked||!document.getElementById('gdpr2').checked||!document.getElementById('gdpr3').checked){notify('Bifează toate acordurile pentru a continua.','var(--danger)');return}
+  tempReg.gdprSigned=true;showObStep('fisa');
 }
 
 async function obFisa(){
-  // Create client
+  // Build DOB from 3 fields
+  const d=document.getElementById('ob-dob-day').value;
+  const m=document.getElementById('ob-dob-month').value;
+  const y=document.getElementById('ob-dob-year').value;
+  const dob=(d&&m&&y)?`${y}-${m}-${d}`:null;
+
   const {data:client,error:ce}=await sb.from('clients').insert({
     first_name:tempReg.first,last_name:tempReg.last,email:tempReg.email,
     phone:document.getElementById('ob-phone').value.trim(),
@@ -1043,72 +1100,58 @@ async function obFisa(){
     source:'invite',cabinet_code:CABINET_CODE
   }).select().single();
   if(ce){notify('Eroare la înregistrare: '+ce.message,'var(--danger)');return}
-
-  // Create user (simple password hash - în producție folosește Supabase Auth)
-  const {error:ue}=await sb.from('users').insert({email:tempReg.email,password_hash:tempReg.pass,client_id:client.id});
-  if(ue){notify('Eroare user: '+ue.message,'var(--danger)');return}
-
-  // Save GDPR consent
+  await sb.from('users').insert({email:tempReg.email,password_hash:tempReg.pass,client_id:client.id});
   await sb.from('gdpr_consents').insert({client_id:client.id,consents:{gdpr1:true,gdpr2:true,gdpr3:true}});
-
-  // Save fisa
   await sb.from('fise').insert({
-    client_id:client.id,
-    dob:document.getElementById('ob-dob').value||null,
-    job:document.getElementById('ob-job').value.trim(),
+    client_id:client.id,dob,
+    job:document.getElementById('ob-job').value,
     civil_status:document.getElementById('ob-civil').value,
     medical_diagnosis:document.getElementById('ob-diag').value.trim(),
     medication:document.getElementById('ob-meds').value.trim(),
     previous_therapy:document.getElementById('ob-prev').value.trim()
   });
-
-  currentClientUser={...client,name:tempReg.first+' '+tempReg.last};
+  currentClientUser=client;
   await loadClients();
   goToClientApp();
   notify('✓ Înregistrare completă! Bine ai venit!');
 }
 
 async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const pass=document.getElementById('login-pass').value;
+  const email=document.getElementById('login-email').value.trim();const pass=document.getElementById('login-pass').value;
   const {data:user}=await sb.from('users').select('*').eq('email',email).eq('password_hash',pass).single();
   if(!user){notify('Email sau parolă incorectă.','var(--danger)');return}
   const {data:client}=await sb.from('clients').select('*').eq('id',user.client_id).single();
   if(!client){notify('Client negăsit.','var(--danger)');return}
-  currentClientUser=client;
-  goToClientApp();
+  currentClientUser=client;goToClientApp();
 }
 
 function goToClientApp(){
   document.getElementById('cp-landing').style.display='none';
   document.getElementById('cp-onboard').classList.add('hidden');
   document.getElementById('cp-login').classList.add('hidden');
-  document.getElementById('cp-app').classList.remove('hidden');
-  document.getElementById('cp-app').style.display='flex';
+  const app=document.getElementById('cp-app');app.classList.remove('hidden');app.style.display='flex';
   document.getElementById('cp-name').textContent=currentClientUser.first_name+' '+currentClientUser.last_name;
-  document.getElementById('cp-greeting').textContent='Bună ziua, '+currentClientUser.first_name+'!';
+  // Use personalized greeting from settings
+  document.getElementById('cp-greeting').textContent=SETTINGS.greeting+', '+currentClientUser.first_name+'!';
+  document.getElementById('cp-greeting-sub').textContent='Bine ai revenit la '+SETTINGS.cabinet;
   updateDocStatus();checkTodayScales();
 }
 
 function doLogout(){currentClientUser=null;showLanding();}
 
 function updateDocStatus(){
-  if(!currentClientUser)return;
-  const c=currentClientUser;
+  if(!currentClientUser)return;const c=currentClientUser;
   document.getElementById('cp-doc-status').innerHTML=`
     <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">Statusul documentelor tale</div>
     <div class="status-row"><span style="font-size:13px;color:var(--text)">GDPR</span><span style="font-size:11px;font-weight:600;color:${c.gdpr_signed?'var(--success)':'var(--danger)'}">${c.gdpr_signed?'✓ Semnat':'⚠ Nesemnat'}</span></div>
     <div class="status-row"><span style="font-size:13px;color:var(--text)">Fișă personală</span><span style="font-size:11px;font-weight:600;color:${c.fisa_complete?'var(--success)':'var(--warn)'}">${c.fisa_complete?'✓ Completă':'⏳ Incompletă'}</span></div>
-    <div class="status-row" style="border-bottom:none"><span style="font-size:13px;color:var(--text)">Status cont</span><span style="font-size:11px;font-weight:600;color:${c.status==='active'?'var(--success)':'var(--warn)'}">${c.status==='active'?'✓ Activ':'⏳ În așteptare confirmare'}</span></div>
-  `;
+    <div class="status-row" style="border-bottom:none"><span style="font-size:13px;color:var(--text)">Status cont</span><span style="font-size:11px;font-weight:600;color:${c.status==='active'?'var(--success)':'var(--warn)'}">${c.status==='active'?'✓ Activ':'⏳ În așteptare confirmare'}</span></div>`;
 }
 
 async function checkTodayScales(){
-  if(!currentClientUser)return;
-  const today=toDS(new Date());
+  if(!currentClientUser)return;const today=toDS(new Date());
   const {data:m}=await sb.from('measurements').select('type,total').eq('client_id',currentClientUser.id).eq('date',today);
-  const to=(m||[]).find(x=>x.type==='ors');
-  const ts=(m||[]).find(x=>x.type==='srs');
+  const to=(m||[]).find(x=>x.type==='ors');const ts=(m||[]).find(x=>x.type==='srs');
   document.getElementById('ors-btn-area').innerHTML=to?`<span style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px;background:#dbeafe;color:#1d4ed8">✓ ${to.total}/40</span>`:'<button class="btn btn-ors btn-sm" onclick="showPanel(\'ors\')">Completează</button>';
   document.getElementById('srs-btn-area').innerHTML=ts?`<span style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px;background:#ede9fe;color:#6d28d9">✓ ${ts.total}/40</span>`:'<button class="btn btn-srs btn-sm" onclick="showPanel(\'srs\')">Completează</button>';
 }
@@ -1121,68 +1164,38 @@ function showPanel(p,navEl){
   else{const map={home:0,ors:1,srs:2};const idx=map[p];if(idx!==undefined)document.querySelectorAll('.client-nav-item')[idx]?.classList.add('active');}
 }
 
-// SLIDERS
 function upd(id,valId,type){
   const s=document.getElementById(id);const v=parseFloat(s.value);
   document.getElementById(valId).textContent=v.toFixed(1);
   const pct=(v/10)*100;const color=type==='ors'?'var(--ors)':'var(--srs)';
   s.style.background=`linear-gradient(to right,${color} ${pct}%,#e2e8f0 ${pct}%)`;
 }
-function initSliders(){
-  ['o1','o2','o3','o4'].forEach((id,i)=>upd(id,'ov'+(i+1),'ors'));
-  ['s1','s2','s3','s4'].forEach((id,i)=>upd(id,'sv'+(i+1),'srs'));
-}
-function updOrsT(){
-  const t=['o1','o2','o3','o4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);
-  document.getElementById('ors-total').textContent=t.toFixed(1);
-  const el=document.getElementById('ors-interp');
-  if(t<25){el.textContent='Sub pragul clinic';el.style.color='var(--danger)';}
-  else if(t<32){el.textContent='Zona de tranziție';el.style.color='var(--warn)';}
-  else{el.textContent='Funcționare bună';el.style.color='var(--success)';}
-}
-function updSrsT(){
-  const t=['s1','s2','s3','s4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);
-  document.getElementById('srs-total').textContent=t.toFixed(1);
-  const el=document.getElementById('srs-interp');
-  if(t<36){el.textContent='Poate necesita ajustări';el.style.color='var(--warn)';}
-  else{el.textContent='Alianță solidă';el.style.color='var(--success)';}
-}
+function initSliders(){['o1','o2','o3','o4'].forEach((id,i)=>upd(id,'ov'+(i+1),'ors'));['s1','s2','s3','s4'].forEach((id,i)=>upd(id,'sv'+(i+1),'srs'));}
+function updOrsT(){const t=['o1','o2','o3','o4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);document.getElementById('ors-total').textContent=t.toFixed(1);const el=document.getElementById('ors-interp');if(t<25){el.textContent='Sub pragul clinic';el.style.color='var(--danger)';}else if(t<32){el.textContent='Zona de tranziție';el.style.color='var(--warn)';}else{el.textContent='Funcționare bună';el.style.color='var(--success)';}}
+function updSrsT(){const t=['s1','s2','s3','s4'].map(id=>parseFloat(document.getElementById(id).value)).reduce((a,b)=>a+b,0);document.getElementById('srs-total').textContent=t.toFixed(1);const el=document.getElementById('srs-interp');if(t<36){el.textContent='Poate necesita ajustări';el.style.color='var(--warn)';}else{el.textContent='Alianță solidă';el.style.color='var(--success)';}}
 
 async function submitORS(){
   if(!currentClientUser)return;
   const vals=['o1','o2','o3','o4'].map(id=>parseFloat(document.getElementById(id).value));
-  const total=parseFloat(vals.reduce((a,b)=>a+b,0).toFixed(1));
-  const today=toDS(new Date());
+  const total=parseFloat(vals.reduce((a,b)=>a+b,0).toFixed(1));const today=toDS(new Date());
   const {data:existing}=await sb.from('measurements').select('id,session_number').eq('client_id',currentClientUser.id).eq('type','ors').eq('date',today).single();
   const sessNum=currentClientUser.session_count||1;
-  if(existing){
-    await sb.from('measurements').update({score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total,submitted_at:new Date().toISOString()}).eq('id',existing.id);
-  } else {
-    await sb.from('measurements').insert({client_id:currentClientUser.id,type:'ors',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});
-  }
-  notify('✓ ORS trimis!','#1d4ed8');
-  checkTodayScales();
-  setTimeout(()=>showPanel('home'),1000);
+  if(existing){await sb.from('measurements').update({score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total,submitted_at:new Date().toISOString()}).eq('id',existing.id);}
+  else{await sb.from('measurements').insert({client_id:currentClientUser.id,type:'ors',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});}
+  notify('✓ ORS trimis!','#1d4ed8');checkTodayScales();setTimeout(()=>showPanel('home'),1000);
 }
 
 async function submitSRS(){
   if(!currentClientUser)return;
   const vals=['s1','s2','s3','s4'].map(id=>parseFloat(document.getElementById(id).value));
-  const total=parseFloat(vals.reduce((a,b)=>a+b,0).toFixed(1));
-  const today=toDS(new Date());
+  const total=parseFloat(vals.reduce((a,b)=>a+b,0).toFixed(1));const today=toDS(new Date());
   const {data:existing}=await sb.from('measurements').select('id').eq('client_id',currentClientUser.id).eq('type','srs').eq('date',today).single();
   const sessNum=currentClientUser.session_count||1;
-  if(existing){
-    await sb.from('measurements').update({score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total,submitted_at:new Date().toISOString()}).eq('id',existing.id);
-  } else {
-    await sb.from('measurements').insert({client_id:currentClientUser.id,type:'srs',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});
-  }
-  notify('✓ SRS trimis!','#6d28d9');
-  checkTodayScales();
-  setTimeout(()=>showPanel('home'),1000);
+  if(existing){await sb.from('measurements').update({score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total,submitted_at:new Date().toISOString()}).eq('id',existing.id);}
+  else{await sb.from('measurements').insert({client_id:currentClientUser.id,type:'srs',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});}
+  notify('✓ SRS trimis!','#6d28d9');checkTodayScales();setTimeout(()=>showPanel('home'),1000);
 }
 
-// START
 init();
 </script>
 </body>
