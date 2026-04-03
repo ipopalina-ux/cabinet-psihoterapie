@@ -12,7 +12,7 @@
   --warm:#ffffff;--card:#fdf6ee;--border:rgba(74,124,111,0.18);
   --text:#1e3530;--text-muted:#7a9a90;--accent:#c17b4a;
   --success:#27ae60;--danger:#c0392b;--warn:#e67e22;
-  --ors:#3b82f6;--srs:#8b5cf6;
+  --ors:#4a7c6f;--srs:#8b5cf6;
   --teal:#4a7c6f;--teal-light:#1dd8b0;--teal-dark:#2d4a44;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:var(--text);font-size:15px;min-height:100vh}
@@ -177,7 +177,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .cp-sc-btns{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
 .cp-scbtn{padding:5px 11px;border-radius:8px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px;cursor:pointer}
 .cp-scbtn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
-.cp-scbtn-ors{background:#3b82f6;color:#fff}
+.cp-scbtn-ors{background:#4a7c6f;color:#fff}
 .cp-scbtn-teal{background:var(--sage-light);color:var(--sage)}
 .cp-scbtn-ghost{background:#f3f4f6;color:#4b5563}
 
@@ -204,7 +204,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .cp-badge-done{font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#dcfce7;color:#15803d}
 
 /* NARA AI */
-.cp-ai-card{background:linear-gradient(135deg,#e8f4f0,#c5f0e8);border-radius:13px;padding:14px;margin-bottom:10px;border:1px solid rgba(74,124,111,0.2)}
+.cp-ai-card{background:var(--card);border-radius:13px;padding:14px;margin-bottom:10px;border:1px solid rgba(74,124,111,0.2)}
 .cp-ai-msg{background:rgba(255,255,255,0.65);border-radius:9px;padding:10px;margin-bottom:9px;border:1px solid rgba(74,124,111,0.12)}
 .cp-ai-input{background:rgba(255,255,255,0.5);border:1px solid rgba(74,124,111,0.15);border-radius:9px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between}
 .cp-ai-send{width:26px;height:26px;border-radius:7px;background:var(--sage);display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -809,7 +809,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
             </div>
             <div id="cp-ors-graph-svg" style="width:100%;height:80px"><div style="text-align:center;padding:20px;font-size:11px;color:var(--text-muted)">Se încarcă graficul...</div></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#3b82f6;border-radius:2px"></div>Starea mea de bine</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#4a7c6f;border-radius:2px"></div>Starea mea de bine</div>
               <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;border-top:1.5px dashed #94a3b8"></div>Prag de referință</div>
             </div>
           </div>
@@ -1958,7 +1958,7 @@ async function cpLoadHome(){
           ${nextBadge}
         </div>
         <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.role?SETTINGS.role.toLowerCase()+' ':''} ${SETTINGS.name}</div>
-        <div class="cp-sc-sub" style="margin-top:4px">Atinge pentru a deschide fișa →</div>
+        
       </div>`;
   } else if(nextAppt){
     sessBlock.innerHTML=`
@@ -2059,9 +2059,9 @@ async function cpLoadSessions(){
     if(vals.length>=2){
       const prev=vals[vals.length-2];
       const diff=(last-prev).toFixed(1);
-      if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#3b82f6">${last}</span><span style="font-size:11px;color:${diff>=0?'#15803d':'var(--danger)'};font-weight:700">${diff>=0?'↑':'↓'} ${Math.abs(diff)}</span>`;
+      if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#4a7c6f">${last}</span><span style="font-size:11px;color:${diff>=0?'#15803d':'var(--danger)'};font-weight:700">${diff>=0?'↑':'↓'} ${Math.abs(diff)}</span>`;
     } else {
-      if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#3b82f6">${last}</span><span style="font-size:10px;color:var(--text-muted);margin-left:4px">/ 40</span>`;
+      if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#4a7c6f">${last}</span><span style="font-size:10px;color:var(--text-muted);margin-left:4px">/ 40</span>`;
     }
     if(graphEl){
       const w=240,h=74,pad=8;
@@ -2076,13 +2076,13 @@ async function cpLoadSessions(){
       // Area path — só com 2+ pontos
       const areaPath=vals.length>1?`M${pts[0]} L${pts.join(' L')} L${pad+(vals.length-1)*xStep},${h-2} L${pad},${h-2} Z`:'';
       graphEl.innerHTML=`<svg width="100%" height="74" viewBox="0 0 240 74" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="${uid}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.15"/><stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0"/></linearGradient></defs>
+        <defs><linearGradient id="${uid}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f;stop-opacity:0.15"/><stop offset="100%" style="stop-color:#4a7c6f;stop-opacity:0"/></linearGradient></defs>
         <line x1="0" y1="${prag}" x2="240" y2="${prag}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
         <text x="4" y="${prag-2}" font-size="7" fill="#94a3b8" font-family="system-ui">25</text>
         ${areaPath?`<path d="${areaPath}" fill="url(#${uid})"/>`:''}
-        ${vals.length>1?`<polyline points="${pts.join(' ')}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`:''}
-        ${pts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="5" fill="#3b82f6" stroke="#fff" stroke-width="2"/>`).join('')}
-        ${vals.map((v,i)=>`<text x="${pts[i].split(',')[0]}" y="72" font-size="7" fill="#3b82f6" font-family="system-ui" text-anchor="middle" font-weight="700">Ș${orsMeas[i].session_number}</text>`).join('')}
+        ${vals.length>1?`<polyline points="${pts.join(' ')}" fill="none" stroke="#4a7c6f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`:''}
+        ${pts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="5" fill="#4a7c6f" stroke="#fff" stroke-width="2"/>`).join('')}
+        ${vals.map((v,i)=>`<text x="${pts[i].split(',')[0]}" y="72" font-size="7" fill="#4a7c6f" font-family="system-ui" text-anchor="middle" font-weight="700">Ș${orsMeas[i].session_number}</text>`).join('')}
       </svg>`;
     }
   } else {
