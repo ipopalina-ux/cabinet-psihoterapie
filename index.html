@@ -820,7 +820,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <!-- FIȘĂ ȘEDINȚĂ -->
       <div id="cp-fisa-sedinta" class="client-panel">
         <div class="portal-content-pad">
-          <button class="btn btn-ghost btn-sm" onclick="cpShowPanel('sedinte')" style="margin-bottom:14px">← Înapoi</button>
+          <button class="btn btn-ghost btn-sm" onclick="cpShowPanel(fisaOrigin||'home',document.getElementById('cpnav-'+(fisaOrigin||'home')))" style="margin-bottom:14px">← Înapoi</button>
           <div id="fisa-sedinta-content"></div>
         </div>
       </div>
@@ -1906,7 +1906,7 @@ async function cpLoadHome(){
     const sessNum=(appts||[]).filter(a=>a.date<=today).length;
     sessBlock.innerHTML=`
       <div class="cp-stitle">Ședința de azi</div>
-      <div class="cp-sesscard today" onclick="openSessionJournal({date:'${today}',session_number:${sessNum}})" style="cursor:pointer">
+      <div class="cp-sesscard today" onclick="openSessionJournal({date:'${today}',session_number:${sessNum}},'home')" style="cursor:pointer">
         <div class="cp-sc-top">
           <div class="cp-sc-lbl">${fmtDate(today)}</div>
           <span class="cp-badge-today">Azi</span>
@@ -1922,7 +1922,7 @@ async function cpLoadHome(){
     const nextBadge=nextAppt?`<span class="cp-badge-next">Urmează ${fmtDate(nextAppt.date)}</span>`:'';
     sessBlock.innerHTML=`
       <div class="cp-stitle">Ultima ședință</div>
-      <div class="cp-sesscard" onclick="openSessionJournal({date:'${lastAppt.date}',session_number:${sessNum}})" style="cursor:pointer">
+      <div class="cp-sesscard" onclick="openSessionJournal({date:'${lastAppt.date}',session_number:${sessNum}},'home')" style="cursor:pointer">
         <div class="cp-sc-top">
           <div class="cp-sc-lbl">${fmtDate(lastAppt.date)}</div>
           ${nextBadge}
@@ -2009,7 +2009,7 @@ async function cpLoadSessions(){
     const sessNum=appts.length-i; // cel mai recent = cel mai mare număr
     const isToday=a.date===today;
     const hasMeas=orsMeas.find(m=>m.session_number===sessNum);
-    return`<div class="cp-sitem${isToday?' today':''}" onclick="openSessionJournal({date:'${a.date}',session_number:${sessNum}});cpShowPanel('fisa-sedinta')">
+    return`<div class="cp-sitem${isToday?' today':''}" onclick="openSessionJournal({date:'${a.date}',session_number:${sessNum}},'sedinte')">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
         <div><div class="cp-si-num">Ședința #${sessNum}</div><div class="cp-si-date">${fmtDate(a.date)}${a.type?' · '+a.type:''}</div></div>
         ${isToday?'<span class="cp-badge-today">Azi</span>':'<span class="cp-badge-done">Completă</span>'}
@@ -2137,7 +2137,9 @@ async function loadSessionsList(){
 }
 
 let currentJournal=null;
-async function openSessionJournal(hint){
+let fisaOrigin='home'; // de unde s-a deschis fișa — 'home' sau 'sedinte'
+async function openSessionJournal(hint,origin){
+  fisaOrigin=origin||'home';
   // Întotdeauna fetch din DB pentru datele reale
   const cont=document.getElementById('fisa-sedinta-content');
   cont.innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--text-muted)">Se încarcă...</div>';
@@ -2170,43 +2172,44 @@ async function openSessionJournal(hint){
   }
   currentJournal=journal;
   const isToday=journal.date===toDS(new Date());
+  // Helper pentru toggle inline
+  const mkToggle=(id,checked,label)=>`
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted)">
+      <span id="${id}-lbl">${checked?'Partajat cu '+SETTINGS.name:label}</span>
+      <label style="position:relative;display:inline-block;width:34px;height:19px;cursor:pointer;flex-shrink:0">
+        <input type="checkbox" id="${id}" style="opacity:0;width:0;height:0" ${checked?'checked':''} onchange="toggleSection('${id}')">
+        <span id="${id}-bg" style="position:absolute;inset:0;border-radius:19px;background:${checked?'var(--sage)':'#ccc'};transition:0.2s"></span>
+        <span id="${id}-thumb" style="position:absolute;top:2px;left:${checked?'17px':'2px'};width:15px;height:15px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
+      </label>
+    </div>`;
+
   cont.innerHTML=`
     <div style="margin-bottom:16px">
       <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${journal.session_number||'—'}</div>
       <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
     </div>
 
-    <!-- TOGGLE PARTAJARE GLOBAL -->
-    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sage-light);border-radius:9px;padding:9px 12px;margin-bottom:14px">
-      <div>
-        <div style="font-size:11px;font-weight:600;color:var(--text)" id="j-share-label">${journal.personal_notes_shared?'Partajat cu '+SETTINGS.name:'Privat — doar tu poți vedea'}</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:1px">Activează pentru a partaja cu terapeutul</div>
-      </div>
-      <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;flex-shrink:0">
-        <input type="checkbox" id="share-notes" style="opacity:0;width:0;height:0" ${journal.personal_notes_shared?'checked':''} onchange="updateJournalShareLabel()">
-        <span id="j-toggle-bg" style="position:absolute;inset:0;border-radius:22px;background:${journal.personal_notes_shared?'var(--sage)':'#ccc'};transition:0.2s"></span>
-        <span id="j-toggle-thumb" style="position:absolute;top:3px;left:${journal.personal_notes_shared?'19px':'3px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.25)"></span>
-      </label>
-    </div>
-
-    <!-- EDITOR CONTINUU -->
+    <!-- NOTIȚE PERSONALE -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:11px 14px;border-bottom:1px solid var(--sage-light)">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Notițe personale</div>
+        ${mkToggle('share-notes',journal.personal_notes_shared,'Privat')}
       </div>
-      <textarea id="j-personal-notes" style="width:100%;min-height:120px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Ce ai observat în tine în timpul ședinței? Ce ți-a rămas în minte?" oninput="autoSaveJournal()">${journal.personal_notes||''}</textarea>
+      <textarea id="j-personal-notes" style="width:100%;min-height:100px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Ce ai observat în tine în timpul ședinței? Ce ți-a rămas în minte?" oninput="autoSaveJournal()">${journal.personal_notes||''}</textarea>
     </div>
 
+    <!-- REFLECȚII -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:11px 14px;border-bottom:1px solid var(--sage-light)">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Reflecții după ședință</div>
+        ${mkToggle('share-reflections',journal.reflections_shared,'Privat')}
       </div>
-      <textarea id="j-reflections" style="width:100%;min-height:120px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Cum te simți după ședința de azi? Ce ai realizat? Ce ai vrea să explorezi mai departe?" oninput="autoSaveJournal()">${journal.reflections||''}</textarea>
+      <textarea id="j-reflections" style="width:100%;min-height:100px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Cum te simți după ședința de azi? Ce ai realizat? Ce ai vrea să explorezi mai departe?" oninput="autoSaveJournal()">${journal.reflections||''}</textarea>
     </div>
 
     <!-- TEMĂ -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:11px 14px;border-bottom:1px solid var(--sage-light)">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light)">
         <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Tema de la terapeut</div>
       </div>
       <div id="homework-content" style="padding:12px 14px"><div style="font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
@@ -2217,29 +2220,14 @@ async function openSessionJournal(hint){
   loadHomework(journal.date,journal.session_number);
 }
 
-function updateJournalShareLabel(){
-  const shared=document.getElementById('share-notes')?.checked;
-  const lbl=document.getElementById('j-share-label');
-  const bg=document.getElementById('j-toggle-bg');
-  const thumb=document.getElementById('j-toggle-thumb');
-  if(lbl)lbl.textContent=shared?'Partajat cu '+SETTINGS.name:'Privat — doar tu poți vedea';
-  if(bg)bg.style.background=shared?'var(--sage)':'#ccc';
-  if(thumb)thumb.style.left=shared?'19px':'3px';
-  autoSaveJournal();
-}
-
-function initToggle(key){
-  const cb=document.getElementById('share-'+key);
-  if(!cb)return;
-  cb.addEventListener('change',()=>{
-    const on=cb.checked;
-    document.getElementById('toggle-'+key).style.background=on?'var(--sage)':'#ccc';
-    document.getElementById('thumb-'+key).style.left=on?'18px':'2px';
-  });
-}
-
-function toggleShare(key){
-  // Triggered by onchange already, just autosave
+function toggleSection(id){
+  const checked=document.getElementById(id)?.checked;
+  const bg=document.getElementById(id+'-bg');
+  const thumb=document.getElementById(id+'-thumb');
+  const lbl=document.getElementById(id+'-lbl');
+  if(bg)bg.style.background=checked?'var(--sage)':'#ccc';
+  if(thumb)thumb.style.left=checked?'17px':'2px';
+  if(lbl)lbl.textContent=checked?'Partajat cu '+SETTINGS.name:'Privat';
   autoSaveJournal();
 }
 
@@ -2253,12 +2241,13 @@ function autoSaveJournal(){
 
 async function saveJournal(){
   if(!currentJournal||!currentClientUser)return;
-  const shared=document.getElementById('share-notes')?.checked||false;
+  const sharedNotes=document.getElementById('share-notes')?.checked||false;
+  const sharedRefl=document.getElementById('share-reflections')?.checked||false;
   const data={
     personal_notes:document.getElementById('j-personal-notes')?.value||'',
-    personal_notes_shared:shared,
+    personal_notes_shared:sharedNotes,
     reflections:document.getElementById('j-reflections')?.value||'',
-    reflections_shared:shared,
+    reflections_shared:sharedRefl,
     updated_at:new Date().toISOString()
   };
   if(currentJournal.id){
