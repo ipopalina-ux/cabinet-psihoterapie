@@ -2809,7 +2809,13 @@ async function saveFisaClient(fisaId){
     currentClientUser={...currentClientUser,phone};
   }
   notify('✓ Fișă actualizată!');
-  closeCpPage('documente');
+  // Colapsăm secțiunea fișei
+  const fisaBody=document.getElementById('doc-fisa-body');
+  const fisaArrow=document.getElementById('doc-fisa-arrow');
+  if(fisaBody){fisaBody.style.display='none';}
+  if(fisaArrow){fisaArrow.style.transform='rotate(0deg)';}
+  // Reîncarcă datele
+  loadDocumentePage();
 }
 
 async function signContractClient(){
