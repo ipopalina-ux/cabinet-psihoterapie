@@ -72,6 +72,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .content{padding:20px 22px;flex:1}
 .cd-tab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;-webkit-tap-highlight-color:transparent}
 .cd-tab.active{color:var(--sage);border-bottom-color:var(--sage)}
+.panel{display:none;flex-direction:column;min-height:calc(100vh - 44px)}
+.panel.active{display:flex}
 /* Mobile therapist nav */
 .t-mobile-header{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--sage-dark);z-index:190;align-items:center;justify-content:space-between;padding:0 15px}
 .t-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--card);border-top:1px solid var(--border);z-index:200;flex-direction:row}
@@ -85,16 +87,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .t-menu-item{display:flex;align-items:center;gap:12px;padding:13px 20px;color:rgba(255,255,255,0.75);font-size:14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06)}
 .t-menu-item:hover{background:rgba(255,255,255,0.06);color:#fff}
 @media(max-width:768px){
-  .app{grid-template-columns:1fr;min-height:calc(100vh - 116px);margin-top:52px;margin-bottom:64px}
-  .sidebar{display:none}
-  .mode-bar{display:none}
+  .app{display:block;min-height:calc(100vh - 116px);margin-top:52px;margin-bottom:64px;overflow-y:auto}
+  .sidebar{display:none!important}
+  .mode-bar{display:none!important}
   .t-mobile-header{display:flex}
   .t-mobile-nav{display:flex}
   .topbar{padding:10px 14px}
   .page-title{font-size:15px}
   .content{padding:12px 14px}
-  .panel{min-height:auto}
+  .panel{min-height:auto;width:100%}
+  .panel.active{display:block}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .main{overflow-y:visible}
 }
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden}
