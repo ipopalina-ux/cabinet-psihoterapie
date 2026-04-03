@@ -2408,64 +2408,88 @@ async function openSessionJournal(hint,origin){
     </div>`;
   }
 
+  // Badge counts
+  const agendaCount=agendaEntries.length;
+  const noteCount=noteEntries.length;
+
   cont.innerHTML=`
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:14px">
       <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${sessNum}</div>
       <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
     </div>
 
-    <!-- DE DISCUTAT (agendă) -->
-    ${agendaEntries.length||isToday===false&&journal.date>toDS(new Date())?`
+    <!-- TAB-URI -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">De discutat</div>
-        <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="openAgenda(${sessNum})">+ Adaugă</button>
-      </div>
-      <div style="padding:10px 12px">
-        ${agendaEntries.length
-          ?agendaEntries.map(e=>`<div style="background:var(--sage-light);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer" onclick="editBubble('${e.id}',this)">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-              <div style="font-size:10px;color:var(--text-muted)">${fmtDate(e.created_at?.slice(0,10))}</div>
-              <div style="font-size:10px;color:var(--sage)">Editează</div>
-            </div>
-            <div style="font-size:13px;color:var(--text);line-height:1.6" id="bubble-text-${e.id}">${e.text}</div>
-          </div>`).join('')
-          :'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Nimic notat încă.</div>'}
-      </div>
-    </div>`:''}
-
-    <!-- NOTIȚELE MELE -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Notițele mele</div>
-        ${mkToggle('share-note-new','Privat')}
-      </div>
-      <div style="padding:10px 12px">
-        <textarea id="j-note-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce ai observat, ce ți-a rămas în minte..."></textarea>
-        <div style="display:flex;justify-content:flex-end;margin-top:7px">
-          <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('note')">Salvează</button>
+      <div style="display:flex;border-bottom:1px solid var(--sage-light)">
+        <div id="ftab-agenda" onclick="switchFisaTab('agenda')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--sage);border-bottom:2px solid var(--sage);display:flex;align-items:center;justify-content:center;gap:4px">
+          De discutat${agendaCount?`<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">${agendaCount}</span>`:''}
+        </div>
+        <div id="ftab-note" onclick="switchFisaTab('note')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px">
+          Notițe${noteCount?`<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">${noteCount}</span>`:''}
+        </div>
+        <div id="ftab-tema" onclick="switchFisaTab('tema')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">
+          Temă
         </div>
       </div>
-      ${noteEntries.length?'<div style="padding:0 12px 10px">'+noteEntries.map(e=>mkBubble(e)).join('')+'</div>':''}
-    </div>
 
-    <!-- MESAJ TERAPEUT -->
-    ${therapistEntries.length?`<div style="background:var(--card);border:1px solid var(--border);border-left:2.5px solid var(--sage);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light)">
-        <div style="font-size:10px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">Mesaj de la terapeut</div>
+      <!-- TAB DE DISCUTAT -->
+      <div id="ftab-content-agenda" style="padding:12px">
+        ${therapistEntries.length?`<div style="background:var(--sage-light);border-left:2.5px solid var(--sage);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:10px">${therapistEntries.map(e=>`<div style="font-size:12px;color:var(--text);line-height:1.6">${e.text}</div><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${fmtDate(e.created_at?.slice(0,10))} · Mesaj terapeut</div>`).join('')}</div>`:''}
+        <textarea id="j-agenda-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce vrei să aduci în ședință?"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${agendaCount?'10px':'0'}">
+          <button class="btn btn-primary btn-sm" onclick="saveFisaTabEntry('agenda')">Salvează</button>
+        </div>
+        ${agendaEntries.map(e=>mkBubble(e)).join('')}
       </div>
-      <div style="padding:10px 12px">${therapistEntries.map(e=>`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}</div><div style="font-size:13px;color:var(--text);line-height:1.6">${e.text}</div></div>`).join('')}</div>
-    </div>`:''}
 
-    <!-- TEMĂ -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light)">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Temă</div>
+      <!-- TAB NOTIȚE -->
+      <div id="ftab-content-note" style="display:none;padding:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          ${mkToggle('share-note-new','Privat')}
+        </div>
+        <textarea id="j-note-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce ai observat, ce ți-a rămas în minte..."></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${noteCount?'10px':'0'}">
+          <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('note')">Salvează</button>
+        </div>
+        ${noteEntries.map(e=>mkBubble(e)).join('')}
       </div>
-      <div id="homework-content" style="padding:12px 14px"><div style="font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
+
+      <!-- TAB TEMĂ -->
+      <div id="ftab-content-tema" style="display:none;padding:12px">
+        <div id="homework-content"><div style="font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
+      </div>
     </div>`;
 
   loadHomework(journal.date,sessNum);
+}
+
+function switchFisaTab(tab){
+  ['agenda','note','tema'].forEach(t=>{
+    const tabEl=document.getElementById('ftab-'+t);
+    const contentEl=document.getElementById('ftab-content-'+t);
+    const isActive=t===tab;
+    if(tabEl){
+      tabEl.style.color=isActive?'var(--sage)':'var(--text-muted)';
+      tabEl.style.borderBottom=isActive?'2px solid var(--sage)':'2px solid transparent';
+    }
+    if(contentEl)contentEl.style.display=isActive?'block':'none';
+  });
+}
+
+async function saveFisaTabEntry(type){
+  if(!currentJournal||!currentClientUser)return;
+  const inputId=type==='agenda'?'j-agenda-new':'j-note-new';
+  const text=document.getElementById(inputId)?.value?.trim();
+  if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
+  const shared=type==='note'?(document.getElementById('share-note-new')?.checked||false):false;
+  const {error}=await sb.from('journal_entries').insert({
+    client_id:currentClientUser.id,
+    session_number:currentJournal.session_number||1,
+    type,text,shared
+  });
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Salvat!');
+  openSessionJournal(currentJournal,fisaOrigin);
 }
 
 function toggleSection(id){
