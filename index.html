@@ -971,7 +971,23 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     </div>
   </div>
 
-  <!-- PAGINA PROFILUL MEU -->
+  <!-- MODAL AGENDĂ -->
+  <div id="cp-agenda-overlay" class="cp-note-overlay hidden" onclick="closeAgendaModal(event)">
+    <div class="cp-note-modal">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">De discutat</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:1px" id="cp-agenda-label">Ședința următoare</div>
+        </div>
+        <button onclick="closeAgendaModalDirect()" style="background:var(--sage-light);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
+      </div>
+      <textarea id="cp-agenda-text" style="width:100%;min-height:110px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.7;font-family:inherit;color:var(--text);background:var(--warm);outline:none;resize:none" placeholder="Ce vrei să aduci în ședință? Un gând, o situație, ceva ce vrei să explorezi..."></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button class="btn btn-ghost" onclick="closeAgendaModalDirect()">Renunță</button>
+        <button class="btn btn-primary" onclick="saveAgendaItem()">Salvează</button>
+      </div>
+    </div>
+  </div>
   <div id="cp-page-profil" class="cp-page">
     <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)">Profilul meu</div>
     <div class="cp-page-body">
@@ -1838,9 +1854,40 @@ async function saveQuickNote(){
   notify('✓ Notița salvată!');
 }
 
-async function openAgenda(sessNum){
-  // Deschide fișa ședinței viitoare pentru a nota ce vrea să discute
-  openSessionJournal({session_number:sessNum},'sedinte');
+let currentAgendaSessNum=null;
+
+function openAgenda(sessNum){
+  currentAgendaSessNum=sessNum;
+  document.getElementById('cp-agenda-text').value='';
+  document.getElementById('cp-agenda-label').textContent='Ședința #'+sessNum;
+  document.getElementById('cp-agenda-overlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('cp-agenda-text').focus(),100);
+}
+
+function closeAgendaModal(e){
+  if(e.target===document.getElementById('cp-agenda-overlay'))
+    document.getElementById('cp-agenda-overlay').classList.add('hidden');
+}
+
+function closeAgendaModalDirect(){
+  document.getElementById('cp-agenda-overlay').classList.add('hidden');
+}
+
+async function saveAgendaItem(){
+  const text=document.getElementById('cp-agenda-text').value.trim();
+  if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
+  if(!currentClientUser||!currentAgendaSessNum)return;
+  const {error}=await sb.from('journal_entries').insert({
+    client_id:currentClientUser.id,
+    session_number:currentAgendaSessNum,
+    type:'agenda',
+    text,
+    shared:false
+  });
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  closeAgendaModalDirect();
+  notify('✓ Salvat!');
+  cpLoadHome();
 }
 
 async function cpLoadHome(){
@@ -1936,14 +1983,14 @@ async function cpLoadHome(){
     if(nextAppt){
       const nextSessNum=(appts||[]).filter(a=>a.date<=nextAppt.date).length;
       const {data:agendaItems}=await sb.from('journal_entries').select('*')
-        .eq('client_id',c.id).eq('session_number',nextSessNum).eq('type','note')
+        .eq('client_id',c.id).eq('session_number',nextSessNum).eq('type','agenda')
         .order('created_at',{ascending:false}).limit(3);
       blockHtml+=`<div class="cp-stitle">Ședința #${nextSessNum} · ${fmtDate(nextAppt.date)}</div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:8px;cursor:pointer" onclick="openAgenda(${nextSessNum})">
-          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">De discutat</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px">De discutat</div>
           ${agendaItems?.length
-            ?agendaItems.map(e=>`<div style="font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:3px">· ${e.text.slice(0,80)}${e.text.length>80?'...':''}</div>`).join('')
-            :'<div style="font-size:11px;color:var(--text-muted);font-style:italic">Notează ce vrei să aduci în ședință →</div>'}
+            ?agendaItems.map(e=>`<div style="font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:3px;display:flex;gap:5px"><span style="color:var(--sage)">·</span>${e.text.slice(0,80)}${e.text.length>80?'...':''}</div>`).join('')
+            :'<div style="font-size:11px;color:var(--text-muted);font-style:italic">Notează ce vrei să aduci în ședință...</div>'}
         </div>`;
     }
     if(therapistMsgs?.length){
