@@ -1849,7 +1849,8 @@ async function saveQuickNote(){
   if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
   const shared=document.getElementById('cp-note-shared')?.checked||false;
   const today=toDS(new Date());
-  // Găsim ședința curentă/recentă
+
+  // Găsim ședința curentă
   const {data:appts}=await sb.from('appointments').select('*')
     .eq('client_id',currentClientUser.id).order('date',{ascending:true});
   const allPast=(appts||[]).filter(a=>a.date<=today);
@@ -1857,38 +1858,29 @@ async function saveQuickNote(){
   const sessNum=allPast.length||1;
   const sessDate=lastAppt?.date||today;
 
-  // 1. Salvează în session_journals (personal_notes)
-  let {data:journal}=await sb.from('session_journals').select('*')
+  // Fetch jurnalul existent
+  const {data:existing}=await sb.from('session_journals').select('*')
     .eq('client_id',currentClientUser.id).eq('session_number',sessNum).single();
+
   const noteEntry=`[${today}] ${text}`;
-  if(journal){
-    const existing=journal.personal_notes||'';
-    await sb.from('session_journals').update({
-      personal_notes:existing+(existing?'\n\n':'')+noteEntry,
-      personal_notes_shared:shared
-    }).eq('id',journal.id);
-  } else {
-    const {data:newJ}=await sb.from('session_journals').insert({
-      client_id:currentClientUser.id,
-      date:sessDate,
-      session_number:sessNum,
-      appointment_id:lastAppt?.id||null,
-      personal_notes:noteEntry,
-      personal_notes_shared:shared
-    }).select().single();
-    journal=newJ;
-  }
+  const newNotes=(existing?.personal_notes||'')+(existing?.personal_notes?'\n\n':'')+noteEntry;
+  const newRefl=(existing?.reflections||'')+(existing?.reflections?'\n\n---\n\n':'')+noteEntry;
 
-  // 2. Salvează și ca reflecție separată (în câmpul reflections)
-  if(journal){
-    const existingRefl=journal.reflections||'';
-    const reflEntry=`[${today}] ${text}`;
-    await sb.from('session_journals').update({
-      reflections:existingRefl+(existingRefl?'\n\n---\n\n':'')+reflEntry,
-      reflections_shared:shared
-    }).eq('id',journal.id);
-  }
+  // Upsert — insert dacă nu există, update dacă există
+  const {data:saved,error}=await sb.from('session_journals').upsert({
+    ...(existing?.id?{id:existing.id}:{}),
+    client_id:currentClientUser.id,
+    session_number:sessNum,
+    date:sessDate,
+    appointment_id:lastAppt?.id||null,
+    personal_notes:newNotes,
+    personal_notes_shared:shared,
+    reflections:newRefl,
+    reflections_shared:shared,
+    updated_at:new Date().toISOString()
+  },{onConflict:'client_id,session_number'}).select().single();
 
+  if(error){notify('Eroare la salvare: '+error.message,'var(--danger)');return;}
   closeNoteModalDirect();
   notify('✓ Notița salvată!');
 }
@@ -2152,13 +2144,15 @@ async function openSessionJournal(hint,origin){
   }
   if(!journal&&hint.session_number){
     const {data}=await sb.from('session_journals').select('*')
-      .eq('client_id',currentClientUser.id).eq('session_number',hint.session_number).single();
-    journal=data;
+      .eq('client_id',currentClientUser.id).eq('session_number',hint.session_number)
+      .order('updated_at',{ascending:false}).limit(1);
+    journal=data?.[0]||null;
   }
   if(!journal&&hint.date){
     const {data}=await sb.from('session_journals').select('*')
-      .eq('client_id',currentClientUser.id).eq('date',hint.date).single();
-    journal=data;
+      .eq('client_id',currentClientUser.id).eq('date',hint.date)
+      .order('updated_at',{ascending:false}).limit(1);
+    journal=data?.[0]||null;
   }
   // Dacă nu există, fișă goală
   if(!journal){
@@ -2242,30 +2236,32 @@ function autoSaveJournal(){
 async function saveJournal(){
   if(!currentJournal||!currentClientUser)return;
   const sharedNotes=document.getElementById('share-notes')?.checked||false;
+async function saveJournal(){
+  if(!currentJournal||!currentClientUser)return;
+  const sharedNotes=document.getElementById('share-notes')?.checked||false;
   const sharedRefl=document.getElementById('share-reflections')?.checked||false;
   const data={
+    client_id:currentClientUser.id,
+    session_number:currentJournal.session_number||1,
+    date:currentJournal.date,
+    appointment_id:currentJournal.appointment_id||null,
     personal_notes:document.getElementById('j-personal-notes')?.value||'',
     personal_notes_shared:sharedNotes,
     reflections:document.getElementById('j-reflections')?.value||'',
     reflections_shared:sharedRefl,
     updated_at:new Date().toISOString()
   };
+  // Dacă avem id, facem update direct; altfel upsert pe (client_id, session_number)
   if(currentJournal.id){
     await sb.from('session_journals').update(data).eq('id',currentJournal.id);
   } else {
-    const {data:newJ}=await sb.from('session_journals').insert({
-      client_id:currentClientUser.id,
-      date:currentJournal.date,
-      session_number:currentJournal.session_number||1,
-      appointment_id:currentJournal.appointment_id||null,
-      ...data
-    }).select().single();
+    const {data:newJ}=await sb.from('session_journals')
+      .upsert(data,{onConflict:'client_id,session_number'})
+      .select().single();
     if(newJ)currentJournal={...currentJournal,...newJ};
   }
   const statusEl=document.getElementById('j-save-status');
   if(statusEl){statusEl.textContent='Salvat automat ✓';statusEl.style.color='var(--success)';}
-  const labels=document.querySelectorAll('[id^="j-save"]');
-  labels.forEach(l=>{l.textContent='Salvat automat ✓';l.style.color='var(--success)';});
 }
 
 async function loadHomework(date,sessNum){
