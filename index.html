@@ -2236,9 +2236,6 @@ function autoSaveJournal(){
 async function saveJournal(){
   if(!currentJournal||!currentClientUser)return;
   const sharedNotes=document.getElementById('share-notes')?.checked||false;
-async function saveJournal(){
-  if(!currentJournal||!currentClientUser)return;
-  const sharedNotes=document.getElementById('share-notes')?.checked||false;
   const sharedRefl=document.getElementById('share-reflections')?.checked||false;
   const data={
     client_id:currentClientUser.id,
