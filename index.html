@@ -8,12 +8,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --sage:#0a7a6e;--sage-light:#e0f7f2;--sage-dark:#073d36;
-  --warm:#f0faf8;--card:#fff;--border:rgba(10,122,110,0.18);
-  --text:#0a2420;--text-muted:#3a8a80;--accent:#c17b4a;
+  --sage:#4a7c6f;--sage-light:#e8f4f0;--sage-dark:#2d4a44;
+  --warm:#ffffff;--card:#fdf6ee;--border:rgba(74,124,111,0.18);
+  --text:#1e3530;--text-muted:#7a9a90;--accent:#c17b4a;
   --success:#27ae60;--danger:#c0392b;--warn:#e67e22;
   --ors:#3b82f6;--srs:#8b5cf6;
-  --teal:#0a7a6e;--teal-light:#1dd8b0;--teal-dark:#073d36;
+  --teal:#4a7c6f;--teal-light:#1dd8b0;--teal-dark:#2d4a44;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:var(--text);font-size:15px;min-height:100vh}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
@@ -167,7 +167,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
 /* SESSION CARD */
 .cp-sesscard{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:13px;margin-bottom:8px}
-.cp-sesscard.today{border-color:rgba(10,122,110,0.4)}
+.cp-sesscard.today{border-color:rgba(74,124,111,0.4)}
 .cp-sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
 .cp-sc-lbl{font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em}
 .cp-badge-today{font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:var(--sage);color:#fff}
@@ -194,7 +194,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
 /* SESSION LIST ITEMS */
 .cp-sitem{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:7px;cursor:pointer}
-.cp-sitem.today{border:1.5px solid rgba(10,122,110,0.4)}
+.cp-sitem.today{border:1.5px solid rgba(74,124,111,0.4)}
 .cp-si-num{font-size:13px;font-weight:700;color:var(--text)}
 .cp-si-date{font-size:10px;color:var(--text-muted);margin-top:1px}
 .cp-tag{font-size:9px;padding:2px 7px;border-radius:5px;font-weight:600}
@@ -204,9 +204,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .cp-badge-done{font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#dcfce7;color:#15803d}
 
 /* NARA AI */
-.cp-ai-card{background:linear-gradient(135deg,#e0f7f2,#c5f0e8);border-radius:13px;padding:14px;margin-bottom:10px;border:1px solid rgba(10,122,110,0.2)}
-.cp-ai-msg{background:rgba(255,255,255,0.65);border-radius:9px;padding:10px;margin-bottom:9px;border:1px solid rgba(10,122,110,0.12)}
-.cp-ai-input{background:rgba(255,255,255,0.5);border:1px solid rgba(10,122,110,0.15);border-radius:9px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between}
+.cp-ai-card{background:linear-gradient(135deg,#e8f4f0,#c5f0e8);border-radius:13px;padding:14px;margin-bottom:10px;border:1px solid rgba(74,124,111,0.2)}
+.cp-ai-msg{background:rgba(255,255,255,0.65);border-radius:9px;padding:10px;margin-bottom:9px;border:1px solid rgba(74,124,111,0.12)}
+.cp-ai-input{background:rgba(255,255,255,0.5);border:1px solid rgba(74,124,111,0.15);border-radius:9px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between}
 .cp-ai-send{width:26px;height:26px;border-radius:7px;background:var(--sage);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .cp-ai-send svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
 
@@ -295,7 +295,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
 <div id="app-loading">
   <svg width="52" height="52" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="lda" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="ldb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+    <defs><linearGradient id="lda" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="ldb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
     <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#lda)" opacity="0.9"/>
     <ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#lda)" opacity="0.65"/>
     <ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#ldb)" opacity="0.5"/>
@@ -312,7 +312,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 <!-- LANDING PAGE NARA -->
 <div id="view-landing" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px">
   <svg width="72" height="72" viewBox="0 0 80 80" style="margin-bottom:16px">
-    <defs><linearGradient id="lla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="llb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+    <defs><linearGradient id="lla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="llb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
     <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#lla)" opacity="0.9"/>
     <ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#lla)" opacity="0.65"/>
     <ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#llb)" opacity="0.5"/>
@@ -337,7 +337,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 <div id="view-therapist-login" class="hidden" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px">
   <button onclick="showLanding()" style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:8px 14px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit">← Înapoi</button>
   <svg width="48" height="48" viewBox="0 0 80 80" style="margin-bottom:12px">
-    <defs><linearGradient id="tla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="tlb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+    <defs><linearGradient id="tla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="tlb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
     <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#tla)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#tla)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#tlb)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#tlb)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.12)"/>
   </svg>
   <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Bun venit înapoi</div>
@@ -356,7 +356,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 <div id="view-therapist-register" class="hidden" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;position:relative">
   <button onclick="goToTherapistLogin()" style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:8px 14px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit">← Înapoi</button>
   <svg width="42" height="42" viewBox="0 0 80 80" style="margin-bottom:12px">
-    <defs><linearGradient id="sra" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="srb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+    <defs><linearGradient id="sra" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="srb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
     <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#sra)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#sra)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#srb)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#srb)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.12)"/>
   </svg>
   <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Cont specialist nou</div>
@@ -376,7 +376,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <aside class="sidebar">
       <div class="logo" style="display:flex;align-items:center;gap:11px;padding:16px 18px">
         <svg width="36" height="36" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
-          <defs><linearGradient id="sba" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="sbb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+          <defs><linearGradient id="sba" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="sbb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
           <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#sba)" opacity="0.9"/>
           <ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#sba)" opacity="0.65"/>
           <ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#sbb)" opacity="0.5"/>
@@ -580,7 +580,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   <div id="cp-landing" style="min-height:100vh;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px">
     <button onclick="showLanding()" style="position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:8px 14px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit">← Înapoi</button>
     <svg width="56" height="56" viewBox="0 0 80 80" style="margin-bottom:14px">
-      <defs><linearGradient id="cla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="clb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
+      <defs><linearGradient id="cla" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="clb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs>
       <ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#cla)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#cla)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#clb)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#clb)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.12)"/>
     </svg>
     <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:0.12em;margin-bottom:4px">NARA</div>
@@ -768,7 +768,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   <div id="cp-app" class="hidden portal-shell">
     <div class="portal-header">
       <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="closeAllCpPages();cpShowPanel('home',document.getElementById('cpnav-home'))">
-        <svg width="26" height="26" viewBox="0 0 80 80"><defs><linearGradient id="cpa1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="cpa2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs><ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#cpa1)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#cpa1)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#cpa2)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#cpa2)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.1)"/></svg>
+        <svg width="26" height="26" viewBox="0 0 80 80"><defs><linearGradient id="cpa1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="cpa2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs><ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#cpa1)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#cpa1)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#cpa2)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#cpa2)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.1)"/></svg>
         <div><div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.1em">NARA</div><div style="font-size:8px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em">Spațiul tău terapeutic</div></div>
       </div>
       <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px">
@@ -1303,7 +1303,7 @@ function generateLogo(name,cabinet,size=64){
         <stop offset="100%" style="stop-color:#2ec4d6"/>
       </linearGradient>
       <linearGradient id="${uid}b" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#0a7a6e"/>
+        <stop offset="0%" style="stop-color:#4a7c6f"/>
         <stop offset="100%" style="stop-color:#1dd8b0"/>
       </linearGradient>
     </defs>
@@ -1314,7 +1314,7 @@ function generateLogo(name,cabinet,size=64){
     <ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#${uid}b)" opacity="0.75"/>
     <!-- Center with initials -->
     <circle cx="40" cy="40" r="18" fill="#fff" opacity="0.95"/>
-    <text x="40" y="45" text-anchor="middle" font-family="Segoe UI,system-ui,sans-serif" font-size="${initials.length>1?13:16}" font-weight="700" fill="#0a7a6e">${initials}</text>
+    <text x="40" y="45" text-anchor="middle" font-family="Segoe UI,system-ui,sans-serif" font-size="${initials.length>1?13:16}" font-weight="700" fill="#4a7c6f">${initials}</text>
   </svg>`;
 }
 
@@ -2103,7 +2103,7 @@ async function cpLoadSessions(){
     let badge='';
     if(isToday)badge='<span class="cp-badge-today">Azi</span>';
     else if(isPast)badge='<span class="cp-badge-done">Efectuată</span>';
-    else badge='<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e0f7f2;color:#0a7a6e">Programată</span>';
+    else badge='<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e8f4f0;color:#4a7c6f">Programată</span>';
     return`<div class="cp-sitem${isToday?' today':''}" onclick="openSessionJournal({date:'${a.date}',session_number:${sessNum}},'sedinte')">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
         <div><div class="cp-si-num">Ședința #${sessNum}</div><div class="cp-si-date">${fmtDate(a.date)}${a.type?' · '+a.type:''}</div></div>
@@ -2265,8 +2265,8 @@ async function cpLoadReflections(){
       </div>
       ${items.map(e=>{
         const isRefl=e.type==='reflection';
-        const bg=isRefl&&e.shared?'background:#e0f7f2':'background:var(--card)';
-        const border=isRefl&&e.shared?'border:1px solid rgba(10,122,110,0.2)':'border:1px solid var(--border)';
+        const bg=isRefl&&e.shared?'background:#e8f4f0':'background:var(--card)';
+        const border=isRefl&&e.shared?'border:1px solid rgba(74,124,111,0.2)':'border:1px solid var(--border)';
         const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
         return`<div class="cp-ritem" style="${bg};${border};cursor:pointer;margin-bottom:7px" onclick="openSessionJournal({session_number:${sn}},'reflectii')">
           <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">${fmtDate(e.created_at?.slice(0,10))}, ${time} · ${e.type==='note'?'Notița':'Reflecție'}</div>
@@ -2786,7 +2786,7 @@ async function loadProgramariPage(){
 
   function mkApptCard(a,sessNum,isFuture){
     const badge=isFuture
-      ?`<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e0f7f2;color:#085041">Programată</span>`
+      ?`<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e8f4f0;color:#2d4a44">Programată</span>`
       :`<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#dcfce7;color:#15803d">Efectuată</span>`;
     return`<div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:8px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -3033,7 +3033,7 @@ function initSignatureCanvas(){
   canvas.height=160;
   signatureCanvas=canvas;
   sigCtx=canvas.getContext('2d');
-  sigCtx.strokeStyle='#0a2420';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';
+  sigCtx.strokeStyle='#1e3530';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';
   sigHasData=false;
   function getPos(e){
     const r=canvas.getBoundingClientRect();
@@ -3160,7 +3160,7 @@ async function sendAiMessage(){
 
   // Typing indicator
   const typing=document.createElement('div');
-  typing.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;max-width:85%;color:var(--sage-dark);display:flex;align-items:center;gap:4px';
+  typing.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(74,124,111,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;max-width:85%;color:var(--sage-dark);display:flex;align-items:center;gap:4px';
   typing.innerHTML='<span style="opacity:0.6;font-size:11px;font-style:italic">NARA scrie...</span>';
   chat.appendChild(typing);
   chat.scrollIntoView({behavior:'smooth',block:'end'});
@@ -3199,14 +3199,14 @@ Clientul se numește ${currentClientUser?.first_name||''}. Răspunde natural, em
 
     typing.remove();
     const aiMsg=document.createElement('div');
-    aiMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;line-height:1.6;max-width:85%;color:var(--sage-dark)';
+    aiMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(74,124,111,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;line-height:1.6;max-width:85%;color:var(--sage-dark)';
     aiMsg.textContent=aiText;
     chat.appendChild(aiMsg);
     chat.scrollIntoView({behavior:'smooth',block:'end'});
   } catch(e){
     typing.remove();
     const errMsg=document.createElement('div');
-    errMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;max-width:85%;color:var(--sage-dark);font-style:italic;opacity:0.7';
+    errMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(74,124,111,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;max-width:85%;color:var(--sage-dark);font-style:italic;opacity:0.7';
     errMsg.textContent='Momentan nu mă pot conecta. Încearcă din nou în câteva secunde.';
     chat.appendChild(errMsg);
     aiConversationHistory.pop(); // remove failed user message
