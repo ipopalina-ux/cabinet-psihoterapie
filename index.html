@@ -2812,10 +2812,8 @@ async function saveFisaClient(fisaId){
   // Colapsăm secțiunea fișei
   const fisaBody=document.getElementById('doc-fisa-body');
   const fisaArrow=document.getElementById('doc-fisa-arrow');
-  if(fisaBody){fisaBody.style.display='none';}
-  if(fisaArrow){fisaArrow.style.transform='rotate(0deg)';}
-  // Reîncarcă datele
-  loadDocumentePage();
+  if(fisaBody)fisaBody.style.display='none';
+  if(fisaArrow)fisaArrow.style.transform='rotate(0deg)';
 }
 
 async function signContractClient(){
