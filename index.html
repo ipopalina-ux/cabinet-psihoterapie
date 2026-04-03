@@ -70,8 +70,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;flex-wrap:wrap}
 .page-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.02em}
 .content{padding:20px 22px;flex:1}
-.panel{display:none;flex-direction:column;min-height:calc(100vh - 44px)}
-.panel.active{display:flex}
+.cd-tab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;-webkit-tap-highlight-color:transparent}
+.cd-tab.active{color:var(--sage);border-bottom-color:var(--sage)}
 /* Mobile therapist nav */
 .t-mobile-header{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--sage-dark);z-index:190;align-items:center;justify-content:space-between;padding:0 15px}
 .t-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--card);border-top:1px solid var(--border);z-index:200;flex-direction:row}
@@ -1709,48 +1709,297 @@ function renderClientList(){
 }
 
 async function showClientDetail(id){
-  const c=cachedClients.find(x=>x.id===id);if(!c)return;
+  const c=cachedClients.find(x=>x.id===id);
+  if(!c)return;
   document.getElementById('clients-list-view').style.display='none';
   const det=document.getElementById('client-detail-view');det.style.display='block';
-  const [{data:sessions},{data:measurements},{data:fisa}]=await Promise.all([
+
+  // Fetch all data in parallel
+  const [{data:sessions},{data:measurements},{data:fisa},{data:appointments},{data:journalEntries},{data:therapistData}]=await Promise.all([
     sb.from('session_notes').select('*').eq('client_id',id).order('date',{ascending:false}),
     sb.from('measurements').select('*').eq('client_id',id).order('session_number'),
-    sb.from('fise').select('*').eq('client_id',id).single()
+    sb.from('fise').select('*').eq('client_id',id).single(),
+    sb.from('appointments').select('*').eq('client_id',id).order('date',{ascending:false}),
+    sb.from('journal_entries').select('*').eq('client_id',id).order('created_at',{ascending:false}),
+    sb.from('clients').select('therapist_objective,client_objective,case_summary,work_plan,observations').eq('id',id).single()
   ]);
+
   const orsMeas=(measurements||[]).filter(x=>x.type==='ors');
-  const srsMeas=(measurements||[]).filter(x=>x.type==='srs');
+  const lastOrs=orsMeas[orsMeas.length-1];
+  const prevOrs=orsMeas[orsMeas.length-2];
+  const orsTrend=lastOrs&&prevOrs?(lastOrs.total>prevOrs.total?' ↑':lastOrs.total<prevOrs.total?' ↓':''):'';
+
   det.innerHTML=`
-    <div class="back-link" onclick="document.getElementById('clients-list-view').style.display='';document.getElementById('client-detail-view').style.display='none'">← Înapoi la clienți</div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px">
-      <div style="width:48px;height:48px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0">${ini(c.first_name,c.last_name)}</div>
-      <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px">${c.first_name} ${c.last_name}</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${c.email} · Înregistrat ${fmtDate(c.registered_at?.slice(0,10))}</div>
-      <div><span class="doc-badge ${c.gdpr_signed?'doc-signed':'doc-unsigned'}">GDPR ${c.gdpr_signed?'✓':'⚠'}</span><span class="doc-badge ${c.fisa_complete?'doc-signed':'doc-unsigned'}">Fișă ${c.fisa_complete?'✓':'⚠'}</span><span class="doc-badge ${c.status==='active'?'doc-signed':'doc-unsigned'}">${c.status==='active'?'✓ Activ':'⏳ Așteptare'}</span></div></div>
-      ${c.status!=='active'?`<button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button>`:''}
+    <div style="padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:var(--card)">
+      <button onclick="document.getElementById('clients-list-view').style.display='';document.getElementById('client-detail-view').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--sage);padding:0">← Înapoi</button>
     </div>
-    <div class="tabs"><div class="tab active" onclick="cTab('sessions',this)">Ședințe (${sessions?.length||0})</div><div class="tab" onclick="cTab('fisa',this)">Fișă personală</div><div class="tab" onclick="cTab('scale',this)">Scale ORS/SRS</div></div>
-    <div id="ctab-sessions" class="tab-content active">
-      ${sessions?.length?sessions.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:12px;font-weight:600;color:var(--sage)">${fmtDate(s.date)} — ${s.type}</div><div style="font-size:11px;color:var(--text-muted)">Ș #${sessions.length-i}</div></div><div style="font-size:13px;color:var(--text);line-height:1.6">${s.notes||'<em style="color:var(--text-muted)">Fără notițe.</em>'}</div></div>`).join(''):'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Nicio ședință înregistrată.</div>'}
+
+    <!-- HEADER CLIENT -->
+    <div style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sage-dark);flex-shrink:0">${ini(c.first_name,c.last_name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${c.first_name} ${c.last_name}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #${appointments?.length||0} · ${c.status==='active'?'Activ':'În așteptare'}</div>
+        </div>
+        ${lastOrs?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${lastOrs.total}${orsTrend}</span>`:''}
+      </div>
     </div>
-    <div id="ctab-fisa" class="tab-content">
-      ${fisa?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="info-item"><div class="info-label">Data nașterii</div><div class="info-value">${fmtDate(fisa.dob)}</div></div>
-        <div class="info-item"><div class="info-label">Telefon</div><div class="info-value">${c.phone||'—'}</div></div>
-        <div class="info-item"><div class="info-label">Ocupație</div><div class="info-value">${fisa.job||'—'}</div></div>
-        <div class="info-item"><div class="info-label">Stare civilă</div><div class="info-value">${fisa.civil_status||'—'}</div></div>
-        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Diagnostic medical</div><div class="info-value">${fisa.medical_diagnosis||'—'}</div></div>
-        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Medicație</div><div class="info-value">${fisa.medication||'—'}</div></div>
-        <div class="info-item" style="grid-column:1/-1"><div class="info-label">Experiențe terapeutice anterioare</div><div class="info-value">${fisa.previous_therapy||'—'}</div></div>
-      </div>`:'<div style="padding:10px 0;font-size:13px;color:var(--text-muted)">Fișa nu a fost completată.</div>'}
+
+    <!-- TAB-URI -->
+    <div style="display:flex;background:var(--card);border-bottom:1px solid var(--border)">
+      <div class="cd-tab active" id="cdtab-azi" onclick="cdTab('azi')">Azi</div>
+      <div class="cd-tab" id="cdtab-istoric" onclick="cdTab('istoric')">Istoric</div>
+      <div class="cd-tab" id="cdtab-client" onclick="cdTab('client')">Client</div>
+      <div class="cd-tab" id="cdtab-plan" onclick="cdTab('plan')">Plan</div>
     </div>
-    <div id="ctab-scale" class="tab-content">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="font-size:12px;font-weight:600;color:var(--ors);margin-bottom:10px">ORS</div>${orsMeas.length?orsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--ors)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}</div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="font-size:12px;font-weight:600;color:var(--srs);margin-bottom:10px">SRS</div>${srsMeas.length?srsMeas.slice(-5).map(m=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--sage-light);font-size:12px"><span style="color:var(--text-muted)">Ș${m.session_number}</span><span style="font-weight:600;color:var(--srs)">${m.total}/40</span></div>`).join(''):'<div style="font-size:12px;color:var(--text-muted)">Nicio măsurătoare.</div>'}</div>
+
+    <!-- TAB AZI -->
+    <div id="cdcontent-azi" style="padding:12px 14px">
+      ${_renderTabAzi(c,appointments,journalEntries,id)}
+    </div>
+
+    <!-- TAB ISTORIC -->
+    <div id="cdcontent-istoric" style="display:none;padding:12px 14px">
+      ${_renderTabIstoric(sessions,appointments,orsMeas)}
+    </div>
+
+    <!-- TAB CLIENT -->
+    <div id="cdcontent-client" style="display:none;padding:12px 14px">
+      ${_renderTabClient(c,fisa,therapistData)}
+    </div>
+
+    <!-- TAB PLAN -->
+    <div id="cdcontent-plan" style="display:none;padding:12px 14px">
+      ${_renderTabPlan(therapistData,id)}
+    </div>`;
+
+  // Attach global functions
+  window.cdTab=function(t){
+    document.querySelectorAll('.cd-tab').forEach(x=>x.classList.remove('active'));
+    document.getElementById('cdtab-'+t)?.classList.add('active');
+    ['azi','istoric','client','plan'].forEach(x=>{
+      const el=document.getElementById('cdcontent-'+x);
+      if(el)el.style.display=x===t?'block':'none';
+    });
+  };
+}
+
+function _renderTabAzi(c,appointments,journalEntries,clientId){
+  const today=toDS(new Date());
+  const todayAppt=(appointments||[]).find(a=>a.date===today);
+  const nextAppt=(appointments||[]).filter(a=>a.date>=today).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  const currentSessNum=nextAppt?(appointments||[]).filter(a=>a.date<=nextAppt.date).length:(appointments?.length||0);
+
+  // Agenda clientului
+  const agendaItems=(journalEntries||[]).filter(e=>e.type==='agenda'&&e.session_number===currentSessNum);
+
+  // Tema
+  const hwGoal=(journalEntries||[]).find(e=>e.type==='homework_goal'&&e.session_number===currentSessNum);
+  const hwItems=(journalEntries||[]).filter(e=>e.type==='homework'&&e.session_number===currentSessNum);
+
+  let html='';
+
+  // De discutat
+  html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">De discutat — notat de client</div>`;
+  if(agendaItems.length){
+    html+=agendaItems.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px;font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>`).join('');
+  } else {
+    html+=`<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Clientul nu a notat nimic de discutat.</div>`;
+  }
+
+  // Tema
+  html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:12px;margin-bottom:6px">Tema</div>`;
+  if(hwGoal||hwItems.length){
+    const goalText=hwGoal?.text||'Temă din ședință anterioară';
+    html+=`<div style="background:var(--sage-light);border-radius:8px;padding:9px 11px;margin-bottom:5px;cursor:pointer" onclick="openHomeworkModal('${clientId}',${currentSessNum})">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;color:var(--text);font-weight:500">${goalText}</div>
+        <span style="font-size:9px;font-weight:700;color:var(--sage)">${hwItems.length?'Rezolvată →':'Nerezolvată'}</span>
       </div>
     </div>`;
-  function cTab(t,el){det.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');det.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.getElementById('ctab-'+t).classList.add('active');}
-  window.cTab=cTab;
+  } else {
+    html+=`<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Nicio temă dată.</div>`;
+  }
+
+  // Notițe ședință
+  html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:12px;margin-bottom:6px">Notițe ședință</div>
+  <textarea id="cd-note-text" style="width:100%;min-height:90px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Scrie rapid în timpul ședinței..." oninput="cdAutoSaveNote('${clientId}',${currentSessNum})"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-primary btn-sm" onclick="openAddHomeworkForClient('${clientId}',${currentSessNum})">+ Temă nouă</button>
+    <button class="btn btn-ghost btn-sm" onclick="openAddApptForClient('${clientId}')">Programează</button>
+  </div>`;
+
+  // Load existing note
+  setTimeout(async()=>{
+    const {data:note}=await sb.from('session_notes').select('notes').eq('client_id',clientId).eq('date',toDS(new Date())).single();
+    const el=document.getElementById('cd-note-text');
+    if(el&&note?.notes)el.value=note.notes;
+  },100);
+
+  return html;
 }
+
+function _renderTabIstoric(sessions,appointments,orsMeas){
+  if(!sessions?.length)return'<div style="font-size:13px;color:var(--text-muted);padding:10px 0">Nicio ședință înregistrată.</div>';
+
+  return(sessions||[]).map((s,i)=>{
+    const sessNum=(sessions.length-i);
+    const ors=orsMeas.find(m=>m.session_number===sessNum);
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden">
+      <div style="padding:11px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="cdToggleSession('sess-${s.id}')">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Ședința #${sessNum}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px">${fmtDate(s.date)} · ${s.type||'Individuală'}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${ors?`<span style="font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${ors.total}</span>`:''}
+          <svg id="arrow-${s.id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div id="sess-${s.id}" style="display:none;border-top:1px solid var(--border);padding:11px 13px">
+        ${s.notes?`<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">${s.notes}</div>`:'<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>'}
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="generateAiSummary('${s.id}','${s.notes?.replace(/'/g,"\'")||''}')">✦ Rezumat AI</button>
+        </div>
+        <div id="ai-summary-${s.id}" style="margin-top:8px"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _renderTabClient(c,fisa,therapistData){
+  let html='';
+  html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv client</div>
+  <textarea id="cd-client-obj" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none;margin-bottom:12px" placeholder="Ce dorește clientul să obțină..." oninput="cdSaveTherapistData('${c.id}')">${therapistData?.client_objective||''}</textarea>
+
+  <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv terapeutic</div>
+  <textarea id="cd-therap-obj" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none;margin-bottom:12px" placeholder="Obiectivul terapeutic..." oninput="cdSaveTherapistData('${c.id}')">${therapistData?.therapist_objective||''}</textarea>
+
+  <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Rezumat parcurs</div>
+  <textarea id="cd-summary" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none;margin-bottom:14px" placeholder="Ce am lucrat până acum..." oninput="cdSaveTherapistData('${c.id}')">${therapistData?.case_summary||''}</textarea>`;
+
+  if(fisa){
+    html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Fișă personală</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${[['Data nașterii',fmtDate(fisa.dob)],['Telefon',c.phone||'—'],['Ocupație',fisa.job||'—'],['Stare civilă',fisa.civil_status||'—']].map(([l,v])=>`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">${l}</div><div style="font-size:12px;color:var(--text)">${v}</div></div>`).join('')}
+      ${fisa.medical_diagnosis?`<div style="grid-column:1/-1;background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">${fisa.medical_diagnosis}</div></div>`:''}
+      ${fisa.medication?`<div style="grid-column:1/-1;background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicație</div><div style="font-size:12px;color:var(--text)">${fisa.medication}</div></div>`:''}
+    </div>`;
+  }
+  return html;
+}
+
+function _renderTabPlan(therapistData,clientId){
+  return`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Plan de lucru</div>
+  <textarea id="cd-plan" style="width:100%;min-height:90px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none;margin-bottom:14px" placeholder="Structura terapeutică, faze, obiective pe termen scurt..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.work_plan||''}</textarea>
+
+  <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Observații</div>
+  <textarea id="cd-observations" style="width:100%;min-height:80px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none;margin-bottom:14px" placeholder="Credințe limitative, patternuri, observații clinice..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.observations||''}</textarea>
+
+  <!-- NARA AI -->
+  <div style="background:var(--sage-light);border-radius:10px;padding:13px">
+    <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">NARA AI · Asistent terapeutic</div>
+    <div id="cd-ai-chat" style="max-height:200px;overflow-y:auto;margin-bottom:8px;display:flex;flex-direction:column;gap:6px"></div>
+    <div style="display:flex;gap:6px">
+      <input id="cd-ai-input" type="text" style="flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text);background:var(--card);outline:none" placeholder="Întreabă despre abordarea acestui client..." onkeydown="if(event.key==='Enter')cdSendAi('${clientId}')">
+      <button class="btn btn-primary btn-sm" onclick="cdSendAi('${clientId}')">Trimite</button>
+    </div>
+  </div>`;
+}
+
+function cdToggleSession(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById('arrow-'+id.replace('sess-',''));
+  if(!el)return;
+  const open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  if(arrow)arrow.style.transform=open?'':'rotate(180deg)';
+}
+
+let cdSaveTimer=null;
+async function cdSaveTherapistData(clientId){
+  clearTimeout(cdSaveTimer);
+  cdSaveTimer=setTimeout(async()=>{
+    const data={
+      client_objective:document.getElementById('cd-client-obj')?.value||undefined,
+      therapist_objective:document.getElementById('cd-therap-obj')?.value||undefined,
+      case_summary:document.getElementById('cd-summary')?.value||undefined,
+      work_plan:document.getElementById('cd-plan')?.value||undefined,
+      observations:document.getElementById('cd-observations')?.value||undefined
+    };
+    const clean=Object.fromEntries(Object.entries(data).filter(([,v])=>v!==undefined));
+    await sb.from('clients').update(clean).eq('id',clientId);
+  },1500);
+}
+
+let cdNoteTimer=null;
+async function cdAutoSaveNote(clientId,sessNum){
+  clearTimeout(cdNoteTimer);
+  cdNoteTimer=setTimeout(async()=>{
+    const notes=document.getElementById('cd-note-text')?.value||'';
+    const today=toDS(new Date());
+    const {data:existing}=await sb.from('session_notes').select('id').eq('client_id',clientId).eq('date',today).single();
+    if(existing){await sb.from('session_notes').update({notes,updated_at:new Date().toISOString()}).eq('id',existing.id);}
+    else{await sb.from('session_notes').insert({client_id:clientId,date:today,type:'Ședință individuală',notes,session_number:sessNum});}
+  },1500);
+}
+
+async function generateAiSummary(sessionId,notes){
+  const cont=document.getElementById('ai-summary-'+sessionId);
+  if(!cont)return;
+  if(!notes.trim()){cont.innerHTML='<div style="font-size:12px;color:var(--text-muted);font-style:italic">Nu există notițe pentru această ședință.</div>';return;}
+  cont.innerHTML='<div style="font-size:12px;color:var(--text-muted)">Generez rezumat...</div>';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Ești un asistent pentru psihoterapeuți. Pe baza acestor notițe de ședință, scrie un rezumat clinic concis de 2-3 propoziții:\n\n${notes}`}]})});
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'Eroare la generare.';
+    cont.innerHTML=`<div style="background:var(--sage-light);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--text);line-height:1.6">${text}</div>`;
+  }catch(e){cont.innerHTML='<div style="font-size:12px;color:var(--danger)">Eroare la conectare AI.</div>';}
+}
+
+async function cdSendAi(clientId){
+  const input=document.getElementById('cd-ai-input');
+  const chat=document.getElementById('cd-ai-chat');
+  const msg=input?.value?.trim();
+  if(!msg||!chat)return;
+  input.value='';
+  // Get client context
+  const c=cachedClients.find(x=>x.id===clientId);
+  const plan=document.getElementById('cd-plan')?.value||'';
+  const obs=document.getElementById('cd-observations')?.value||'';
+  const obj=document.getElementById('cd-therap-obj')?.value||'';
+  chat.innerHTML+=`<div style="background:var(--card);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--text);align-self:flex-end;border:1px solid var(--border)">${msg}</div>`;
+  chat.innerHTML+=`<div id="cd-ai-resp-${Date.now()}" style="font-size:12px;color:var(--text-muted);font-style:italic">Se gândește...</div>`;
+  chat.scrollTop=chat.scrollHeight;
+  const lastId=chat.lastElementChild.id;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`Ești NARA AI, asistent terapeutic pentru psihoterapeutul care lucrează cu clientul ${c?.first_name} ${c?.last_name}.\nObiectiv terapeutic: ${obj}\nPlan de lucru: ${plan}\nObservații: ${obs}\n\nÎntrebare: ${msg}`}]})});
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'Eroare.';
+    const el=document.getElementById(lastId);
+    if(el){el.style.fontStyle='normal';el.style.color='var(--text)';el.innerHTML=text;el.style.background='var(--sage-light)';el.style.borderRadius='8px';el.style.padding='8px 10px';}
+  }catch(e){const el=document.getElementById(lastId);if(el)el.textContent='Eroare la conectare.';}
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function openHomeworkModal(clientId,sessNum){
+  // Deschide modal cu tema clientului
+  // TODO: implementat în sprint următor
+  notify('Funcționalitate în curând disponibilă.');
+}
+
+function openAddApptForClient(clientId){
+  document.getElementById('a-client').value=clientId;
+  openModal('add-appt');
+}
+
+function openAddHomeworkForClient(clientId,sessNum){
+  document.getElementById('hw-client').value=clientId;
+  document.getElementById('hw-sess').value=sessNum;
+  openModal('add-homework');
+}
+
 
 async function renderCalendar(){
   const months=['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
