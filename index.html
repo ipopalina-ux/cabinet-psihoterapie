@@ -767,7 +767,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   <!-- APP după login -->
   <div id="cp-app" class="hidden portal-shell">
     <div class="portal-header">
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="cpShowPanel('home',document.getElementById('cpnav-home'))">
         <svg width="26" height="26" viewBox="0 0 80 80"><defs><linearGradient id="cpa1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="cpa2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs><ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#cpa1)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#cpa1)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#cpa2)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#cpa2)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.1)"/></svg>
         <div><div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.1em">NARA</div><div style="font-size:8px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em">Spațiul tău terapeutic</div></div>
       </div>
@@ -941,12 +941,24 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   <!-- MODAL NOTEAZĂ -->
   <div id="cp-note-overlay" class="cp-note-overlay hidden" onclick="closeNoteModal(event)">
     <div class="cp-note-modal">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="font-size:14px;font-weight:700;color:var(--text)">Notează</div>
         <button onclick="closeNoteModalDirect()" style="background:var(--sage-light);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
       </div>
-      <textarea id="cp-note-text" style="width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.7;font-family:inherit;color:var(--text);background:var(--warm);outline:none;resize:none" placeholder="Gând, vis, observație... scrie liber."></textarea>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:6px;margin-bottom:12px" id="cp-note-session-label">Se va salva la ședința curentă</div>
+      <textarea id="cp-note-text" style="width:100%;min-height:110px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.7;font-family:inherit;color:var(--text);background:var(--warm);outline:none;resize:none" placeholder="Gând, vis, observație... scrie liber."></textarea>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:5px;margin-bottom:10px" id="cp-note-session-label">Se va salva la ședința curentă</div>
+      <!-- Toggle privat/partajat -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sage-light);border-radius:9px;padding:9px 12px;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text)" id="cp-note-share-label">Privat — doar tu poți vedea</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:1px">Activează pentru a partaja cu terapeutul</div>
+        </div>
+        <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;flex-shrink:0">
+          <input type="checkbox" id="cp-note-shared" style="opacity:0;width:0;height:0" onchange="updateNoteShareLabel()">
+          <span id="cp-note-toggle-bg" style="position:absolute;inset:0;border-radius:22px;background:#ccc;transition:0.2s"></span>
+          <span id="cp-note-toggle-thumb" style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.25)"></span>
+        </label>
+      </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-ghost" onclick="closeNoteModalDirect()">Renunță</button>
         <button class="btn btn-primary" onclick="saveQuickNote()">Salvează</button>
@@ -959,6 +971,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <div class="cp-page-header">
       <button class="cp-page-back" onclick="closeCpPage('profil')">← Înapoi</button>
       <div class="cp-page-title">Profilul meu</div>
+      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+      </button>
     </div>
     <div class="cp-page-body">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:12px;text-align:center">
@@ -991,6 +1008,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <div class="cp-page-header">
       <button class="cp-page-back" onclick="closeCpPage('documente')">← Înapoi</button>
       <div class="cp-page-title">Documentele mele</div>
+      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+      </button>
     </div>
     <div class="cp-page-body">
 
@@ -998,7 +1020,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:12px;overflow:hidden">
         <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDocSection('gdpr')">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="font-size:20px">📋</div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;margin-top:3px"></div>
             <div>
               <div style="font-size:13px;font-weight:700;color:var(--text)">Consimțământ GDPR</div>
               <div id="doc-gdpr-date" style="font-size:10px;color:var(--text-muted);margin-top:1px">—</div>
@@ -1030,7 +1052,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:12px;overflow:hidden">
         <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDocSection('contract')">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="font-size:20px">📄</div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;margin-top:3px"></div>
             <div>
               <div style="font-size:13px;font-weight:700;color:var(--text)">Contract terapeutic</div>
               <div id="doc-contract-date" style="font-size:10px;color:var(--text-muted);margin-top:1px">—</div>
@@ -1066,7 +1088,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
             <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
               <button class="btn btn-ghost btn-sm" onclick="clearSignature()">✕ Șterge semnătura</button>
               <div style="flex:1"></div>
-              <button class="btn btn-primary" onclick="saveContractSignature()">✍ Confirmă și semnează</button>
+              <button class="btn btn-primary" onclick="saveContractSignature()">Confirmă și semnează</button>
             </div>
           </div>
           <div id="doc-contract-signed-info" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px">
@@ -1080,7 +1102,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden">
         <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDocSection('fisa')">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="font-size:20px">📁</div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;margin-top:3px"></div>
             <div>
               <div style="font-size:13px;font-weight:700;color:var(--text)">Fișa personală</div>
               <div style="font-size:10px;color:var(--text-muted);margin-top:1px">Date completate la înregistrare</div>
@@ -1101,11 +1123,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <div class="cp-page-header">
       <button class="cp-page-back" onclick="closeCpPage('notificari')">← Înapoi</button>
       <div class="cp-page-title">Notificări</div>
+      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+      </button>
     </div>
     <div class="cp-page-body">
       <div id="cp-notif-list">
         <div style="text-align:center;padding:40px 20px">
-          <div style="font-size:32px;margin-bottom:10px">🔔</div>
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
           <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Nicio notificare nouă</div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Vei primi notificări despre programări, teme noi și mesaje de la terapeut.</div>
         </div>
@@ -1118,6 +1147,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
     <div class="cp-page-header">
       <button class="cp-page-back" onclick="closeCpPage('mesaj')">← Înapoi</button>
       <div class="cp-page-title" id="cp-mesaj-title">Mesaj pentru terapeut</div>
+      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
+      </button>
     </div>
     <div style="flex:1;overflow-y:auto;padding:16px" id="cp-mesaj-body">
       <div id="cp-mesaj-list" style="display:flex;flex-direction:column;gap:8px;padding-bottom:8px">
@@ -1791,30 +1825,70 @@ function showConfidentialitate(){document.getElementById('cp-confidentialitate')
 function openNoteModal(){
   if(!currentClientUser)return;
   document.getElementById('cp-note-text').value='';
+  // Reset toggle to privat
+  const cb=document.getElementById('cp-note-shared');
+  if(cb){cb.checked=false;updateNoteShareLabel();}
   document.getElementById('cp-note-overlay').classList.remove('hidden');
   setTimeout(()=>document.getElementById('cp-note-text').focus(),100);
 }
 function closeNoteModal(e){if(e.target===document.getElementById('cp-note-overlay'))document.getElementById('cp-note-overlay').classList.add('hidden');}
 function closeNoteModalDirect(){document.getElementById('cp-note-overlay').classList.add('hidden');}
 
+function updateNoteShareLabel(){
+  const shared=document.getElementById('cp-note-shared')?.checked;
+  const lbl=document.getElementById('cp-note-share-label');
+  const bg=document.getElementById('cp-note-toggle-bg');
+  const thumb=document.getElementById('cp-note-toggle-thumb');
+  if(lbl)lbl.textContent=shared?'Partajat cu '+SETTINGS.name:'Privat — doar tu poți vedea';
+  if(bg)bg.style.background=shared?'var(--sage)':'#ccc';
+  if(thumb)thumb.style.left=shared?'19px':'3px';
+}
+
 async function saveQuickNote(){
   const text=document.getElementById('cp-note-text').value.trim();
   if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
-  // Find current session window
+  const shared=document.getElementById('cp-note-shared')?.checked||false;
   const today=toDS(new Date());
-  const {data:appts}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(10);
-  // Find last appointment <= today
-  const lastAppt=(appts||[]).find(a=>a.date<=today);
-  const sessNum=lastAppt?((appts||[]).indexOf(lastAppt)+1):(currentClientUser.session_count||1);
-  // Find or create journal for that session
-  let {data:journal}=await sb.from('session_journals').select('*').eq('client_id',currentClientUser.id).eq('session_number',sessNum).single();
+  // Găsim ședința curentă/recentă
+  const {data:appts}=await sb.from('appointments').select('*')
+    .eq('client_id',currentClientUser.id).order('date',{ascending:true});
+  const allPast=(appts||[]).filter(a=>a.date<=today);
+  const lastAppt=allPast[allPast.length-1];
+  const sessNum=allPast.length||1;
+  const sessDate=lastAppt?.date||today;
+
+  // 1. Salvează în session_journals (personal_notes)
+  let {data:journal}=await sb.from('session_journals').select('*')
+    .eq('client_id',currentClientUser.id).eq('session_number',sessNum).single();
   const noteEntry=`[${today}] ${text}`;
   if(journal){
     const existing=journal.personal_notes||'';
-    await sb.from('session_journals').update({personal_notes:existing+(existing?'\n\n':'')+noteEntry}).eq('id',journal.id);
+    await sb.from('session_journals').update({
+      personal_notes:existing+(existing?'\n\n':'')+noteEntry,
+      personal_notes_shared:shared
+    }).eq('id',journal.id);
   } else {
-    await sb.from('session_journals').insert({client_id:currentClientUser.id,date:lastAppt?.date||today,session_number:sessNum,personal_notes:noteEntry});
+    const {data:newJ}=await sb.from('session_journals').insert({
+      client_id:currentClientUser.id,
+      date:sessDate,
+      session_number:sessNum,
+      appointment_id:lastAppt?.id||null,
+      personal_notes:noteEntry,
+      personal_notes_shared:shared
+    }).select().single();
+    journal=newJ;
   }
+
+  // 2. Salvează și ca reflecție separată (în câmpul reflections)
+  if(journal){
+    const existingRefl=journal.reflections||'';
+    const reflEntry=`[${today}] ${text}`;
+    await sb.from('session_journals').update({
+      reflections:existingRefl+(existingRefl?'\n\n---\n\n':'')+reflEntry,
+      reflections_shared:shared
+    }).eq('id',journal.id);
+  }
+
   closeNoteModalDirect();
   notify('✓ Notița salvată!');
 }
@@ -1956,27 +2030,50 @@ async function cpLoadSessions(){
 
 async function cpLoadReflections(){
   if(!currentClientUser)return;
-  const {data:journals}=await sb.from('session_journals').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(20);
+  const {data:journals}=await sb.from('session_journals').select('*')
+    .eq('client_id',currentClientUser.id).order('session_number',{ascending:false});
   const cont=document.getElementById('cp-reflectii-list');
-  const items=[];
-  (journals||[]).forEach(j=>{
-    if(j.reflections)items.push({date:j.date,text:j.reflections,shared:j.reflections_shared,sessNum:j.session_number});
-    if(j.personal_notes)items.push({date:j.date,text:j.personal_notes,shared:j.personal_notes_shared,sessNum:j.session_number,isNote:true});
-  });
-  if(!items.length){cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu ai scris reflecții încă. Apasă butonul de mai sus pentru a începe.</div>';return;}
-  cont.innerHTML=items.slice(0,15).map(item=>`
-    <div class="cp-ritem">
-      <div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">${fmtDate(item.date)} · Ședința #${item.sessNum}</div>
-      <div style="font-size:12px;color:var(--text);line-height:1.65">${(item.text||'').slice(0,200)}${(item.text||'').length>200?'...':''}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-        <span style="font-size:9px;color:${item.shared?'var(--sage)':'var(--text-muted)'};display:flex;align-items:center;gap:3px">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${item.shared?'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>':'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'}
-          </svg>
-          ${item.shared?'Partajat cu '+SETTINGS.name:'Privat'}
-        </span>
-        <span style="font-size:9px;color:var(--text-muted)">${item.isNote?'Notița':'Reflecție'}</span>
+  if(!journals?.length){
+    cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu ai scris reflecții încă. Apasă butonul de mai sus pentru a începe.</div>';
+    return;
+  }
+  // Filtrăm doar jurnalele care au ceva scris
+  const withContent=journals.filter(j=>j.personal_notes||j.reflections);
+  if(!withContent.length){
+    cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu ai scris reflecții încă. Apasă butonul de mai sus pentru a începe.</div>';
+    return;
+  }
+  cont.innerHTML=withContent.map(j=>{
+    const shared=j.reflections_shared||j.personal_notes_shared;
+    const preview=(j.reflections||j.personal_notes||'').slice(0,180).replace(/\[[\d-]+\] /g,'').replace(/\n\n---\n\n/g,' · ');
+    return`<div style="margin-bottom:16px">
+      <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">
+        Ședința #${j.session_number} · ${fmtDate(j.date)}
       </div>
-    </div>`).join('');
+      <div class="cp-ritem" style="cursor:pointer" onclick="openReflectionEditor('${j.id}')">
+        <div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:8px">${preview||'—'}${(j.reflections||j.personal_notes||'').length>180?'...':''}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:9px;color:${shared?'var(--sage)':'var(--text-muted)'};display:flex;align-items:center;gap:3px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              ${shared?'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>':'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'}
+            </svg>
+            ${shared?'Partajat cu '+SETTINGS.name:'Privat'}
+          </span>
+          <span style="font-size:9px;color:var(--sage);font-weight:600">Deschide →</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Editor reflecție inline — deschide fișa ședinței direct
+function openReflectionEditor(journalId){
+  // Găsim jurnalul și deschidem fișa ședinței
+  sb.from('session_journals').select('*').eq('id',journalId).single().then(({data:j})=>{
+    if(!j)return;
+    openSessionJournal(j);
+    cpShowPanel('fisa-sedinta');
+  });
 }
 
 function upd(id,valId,type){
@@ -2052,58 +2149,61 @@ function openSessionJournal(journal){
   const cont=document.getElementById('fisa-sedinta-content');
   const isToday=journal.date===toDS(new Date());
   cont.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div style="margin-bottom:16px">
+      <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${journal.session_number||'—'}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
+    </div>
+
+    <!-- TOGGLE PARTAJARE GLOBAL -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sage-light);border-radius:9px;padding:9px 12px;margin-bottom:14px">
       <div>
-        <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${journal.session_number||'—'}</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
+        <div style="font-size:11px;font-weight:600;color:var(--text)" id="j-share-label">${journal.personal_notes_shared?'Partajat cu '+SETTINGS.name:'Privat — doar tu poți vedea'}</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:1px">Activează pentru a partaja cu terapeutul</div>
       </div>
+      <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;flex-shrink:0">
+        <input type="checkbox" id="share-notes" style="opacity:0;width:0;height:0" ${journal.personal_notes_shared?'checked':''} onchange="updateJournalShareLabel()">
+        <span id="j-toggle-bg" style="position:absolute;inset:0;border-radius:22px;background:${journal.personal_notes_shared?'var(--sage)':'#ccc'};transition:0.2s"></span>
+        <span id="j-toggle-thumb" style="position:absolute;top:3px;left:${journal.personal_notes_shared?'19px':'3px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.25)"></span>
+      </label>
     </div>
 
-    <!-- NOTIȚE PERSONALE -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--text)">📝 Notițe personale</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)">
-          <span>Partajez cu terapeutul</span>
-          <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer">
-            <input type="checkbox" id="share-notes" style="opacity:0;width:0;height:0" ${journal.personal_notes_shared?'checked':''} onchange="toggleShare('notes')">
-            <span id="toggle-notes" style="position:absolute;inset:0;border-radius:20px;background:${journal.personal_notes_shared?'var(--sage)':'#ccc'};transition:0.2s"></span>
-            <span id="thumb-notes" style="position:absolute;top:2px;left:${journal.personal_notes_shared?'18px':'2px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></span>
-          </label>
-        </div>
+    <!-- EDITOR CONTINUU -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--sage-light)">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Notițe personale</div>
       </div>
-      <textarea id="j-personal-notes" style="width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Ce ai observat în tine în timpul ședinței? Ce ți-a rămas în minte?" oninput="autoSaveJournal()">${journal.personal_notes||''}</textarea>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:6px" id="j-save-notes-label">Salvare automată activă</div>
+      <textarea id="j-personal-notes" style="width:100%;min-height:120px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Ce ai observat în tine în timpul ședinței? Ce ți-a rămas în minte?" oninput="autoSaveJournal()">${journal.personal_notes||''}</textarea>
     </div>
 
-    <!-- REFLECȚII -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--text)">💭 Reflecții după ședință</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)">
-          <span>Partajez cu terapeutul</span>
-          <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer">
-            <input type="checkbox" id="share-reflections" style="opacity:0;width:0;height:0" ${journal.reflections_shared?'checked':''} onchange="toggleShare('reflections')">
-            <span id="toggle-reflections" style="position:absolute;inset:0;border-radius:20px;background:${journal.reflections_shared?'var(--sage)':'#ccc'};transition:0.2s"></span>
-            <span id="thumb-reflections" style="position:absolute;top:2px;left:${journal.reflections_shared?'18px':'2px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></span>
-          </label>
-        </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--sage-light)">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Reflecții după ședință</div>
       </div>
-      <textarea id="j-reflections" style="width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Cum te simți după ședința de azi? Ce ai realizat? Ce ai vrea să explorezi mai departe?" oninput="autoSaveJournal()">${journal.reflections||''}</textarea>
+      <textarea id="j-reflections" style="width:100%;min-height:120px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Cum te simți după ședința de azi? Ce ai realizat? Ce ai vrea să explorezi mai departe?" oninput="autoSaveJournal()">${journal.reflections||''}</textarea>
     </div>
 
     <!-- TEMĂ -->
-    <div id="homework-section" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">📚 Tema de la terapeut</div>
-      <div id="homework-content"><div style="font-size:13px;color:var(--text-muted)">Se încarcă tema...</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--sage-light)">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Tema de la terapeut</div>
+      </div>
+      <div id="homework-content" style="padding:12px 14px"><div style="font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
     </div>
 
-    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">Notițele se salvează automat · Poți reveni oricând la această fișă</div>`;
+    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px" id="j-save-status">Salvare automată activă</div>`;
 
-  // Load homework
   loadHomework(journal.date,journal.session_number);
-  // Init toggle visuals
-  ['notes','reflections'].forEach(k=>initToggle(k));
+}
+
+function updateJournalShareLabel(){
+  const shared=document.getElementById('share-notes')?.checked;
+  const lbl=document.getElementById('j-share-label');
+  const bg=document.getElementById('j-toggle-bg');
+  const thumb=document.getElementById('j-toggle-thumb');
+  if(lbl)lbl.textContent=shared?'Partajat cu '+SETTINGS.name:'Privat — doar tu poți vedea';
+  if(bg)bg.style.background=shared?'var(--sage)':'#ccc';
+  if(thumb)thumb.style.left=shared?'19px':'3px';
+  autoSaveJournal();
 }
 
 function initToggle(key){
@@ -2131,11 +2231,12 @@ function autoSaveJournal(){
 
 async function saveJournal(){
   if(!currentJournal||!currentClientUser)return;
+  const shared=document.getElementById('share-notes')?.checked||false;
   const data={
     personal_notes:document.getElementById('j-personal-notes')?.value||'',
-    personal_notes_shared:document.getElementById('share-notes')?.checked||false,
+    personal_notes_shared:shared,
     reflections:document.getElementById('j-reflections')?.value||'',
-    reflections_shared:document.getElementById('share-reflections')?.checked||false,
+    reflections_shared:shared,
     updated_at:new Date().toISOString()
   };
   if(currentJournal.id){
@@ -2150,6 +2251,8 @@ async function saveJournal(){
     }).select().single();
     if(newJ)currentJournal={...currentJournal,...newJ};
   }
+  const statusEl=document.getElementById('j-save-status');
+  if(statusEl){statusEl.textContent='Salvat automat ✓';statusEl.style.color='var(--success)';}
   const labels=document.querySelectorAll('[id^="j-save"]');
   labels.forEach(l=>{l.textContent='Salvat automat ✓';l.style.color='var(--success)';});
 }
