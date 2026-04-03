@@ -1841,10 +1841,12 @@ async function saveQuickNote(){
 async function cpLoadHome(){
   if(!currentClientUser)return;
   const today=toDS(new Date());
-  const {data:appts}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(20);
+  const {data:appts,error:apptError}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(20);
+  console.log('DEBUG cpLoadHome - today:', today, '| client_id:', currentClientUser.id, '| appts:', appts, '| error:', apptError);
   const todayAppt=(appts||[]).find(a=>a.date===today);
   const lastAppt=(appts||[]).find(a=>a.date<today);
   const nextAppt=(appts||[]).filter(a=>a.date>today).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  console.log('DEBUG - todayAppt:', todayAppt, '| lastAppt:', lastAppt, '| nextAppt:', nextAppt);
   const sessBlock=document.getElementById('cp-home-session-block');
 
   if(todayAppt){
