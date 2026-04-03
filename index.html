@@ -934,6 +934,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       </div>
       <div class="cp-ditem" onclick="openCpPage('profil')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilul meu</div>
       <div class="cp-ditem" onclick="openCpPage('documente')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Documentele mele</div>
+      <div class="cp-ditem" onclick="openCpPage('programari')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Programările mele</div>
+      <div class="cp-ditem" onclick="openCpPage('facturi')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Facturile mele</div>
       <div class="cp-ditem" onclick="openCpPage('notificari')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notificări</div>
       <div class="cp-ditem" onclick="openCpPage('mesaj')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Mesaj pentru terapeut</div>
       <div class="cp-ddiv"></div>
@@ -1120,6 +1122,25 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- PAGINA PROGRAMĂRILE MELE -->
+  <div id="cp-page-programari" class="cp-page">
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)">Programările mele</div>
+    <div style="padding:16px">
+      <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Următoarele</div>
+      <div id="cp-prog-viitoare"><div style="text-align:center;padding:16px;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
+      <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;margin-top:16px">Istoricul meu</div>
+      <div id="cp-prog-istoric"><div style="text-align:center;padding:16px;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
+    </div>
+  </div>
+
+  <!-- PAGINA FACTURILE MELE -->
+  <div id="cp-page-facturi" class="cp-page">
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)">Facturile mele</div>
+    <div style="padding:16px">
+      <div id="cp-facturi-list"><div style="text-align:center;padding:16px;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
     </div>
   </div>
 
@@ -2734,10 +2755,105 @@ async function submitSRS(){
 // PAGINI INLINE DIN MENIU
 // ============================================================
 function closeAllCpPages(){
-  ['profil','documente','notificari','mesaj'].forEach(p=>{
+  ['profil','documente','notificari','mesaj','programari','facturi'].forEach(p=>{
     document.getElementById('cp-page-'+p)?.classList.remove('open');
   });
   document.getElementById('cp-confidentialitate').style.display='none';
+}
+
+async function loadProgramariPage(){
+  if(!currentClientUser)return;
+  const today=toDS(new Date());
+  const {data:appts}=await sb.from('appointments').select('*')
+    .eq('client_id',currentClientUser.id).order('date',{ascending:true});
+  const viitoare=(appts||[]).filter(a=>a.date>=today);
+  const istoric=(appts||[]).filter(a=>a.date<today).reverse();
+
+  const vEl=document.getElementById('cp-prog-viitoare');
+  const iEl=document.getElementById('cp-prog-istoric');
+  if(!vEl||!iEl)return;
+
+  function mkApptCard(a,sessNum,isFuture){
+    const badge=isFuture
+      ?`<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e0f7f2;color:#085041">Programată</span>`
+      :`<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#dcfce7;color:#15803d">Efectuată</span>`;
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">Ședința #${sessNum}</div>
+        ${badge}
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px">${fmtDate(a.date)}${a.time?' · '+a.time:''}</div>
+      <div style="font-size:11px;color:var(--text-muted)">${a.type||'Ședință individuală'}${a.duration?' · '+a.duration+' min':''}</div>
+    </div>`;
+  }
+
+  if(viitoare.length){
+    vEl.innerHTML=viitoare.map((a,i)=>{
+      const sessNum=(appts||[]).filter(x=>x.date<=a.date).length;
+      return mkApptCard(a,sessNum,true);
+    }).join('');
+  } else {
+    vEl.innerHTML='<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nu ai programări viitoare.</div>';
+  }
+
+  if(istoric.length){
+    iEl.innerHTML=istoric.map((a)=>{
+      const sessNum=(appts||[]).filter(x=>x.date<=a.date).length;
+      return mkApptCard(a,sessNum,false);
+    }).join('');
+  } else {
+    iEl.innerHTML='<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nicio ședință efectuată încă.</div>';
+  }
+}
+
+async function loadFacturiPage(){
+  if(!currentClientUser)return;
+  const {data:facturi}=await sb.from('invoices').select('*')
+    .eq('client_id',currentClientUser.id).order('date',{ascending:false});
+  const el=document.getElementById('cp-facturi-list');
+  if(!el)return;
+
+  if(!facturi?.length){
+    el.innerHTML='<div style="text-align:center;padding:24px;font-size:13px;color:var(--text-muted)">Nu există facturi înregistrate.</div>';
+    return;
+  }
+
+  // Sumar sus — de plătit
+  const dePlata=facturi.filter(f=>f.status==='unpaid'||f.status==='pending');
+  const totalDePlata=dePlata.reduce((s,f)=>s+(parseFloat(f.amount)||0),0);
+
+  let html='';
+  if(dePlata.length){
+    html+=`<div style="background:#fff8f0;border:1px solid #f5d0a9;border-radius:11px;padding:13px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">De achitat</div>
+      <div style="font-size:22px;font-weight:700;color:#92400e">${totalDePlata.toFixed(2)} RON</div>
+      <div style="font-size:11px;color:#b45309;margin-top:2px">${dePlata.length} factură${dePlata.length>1?'i':''} neachitată${dePlata.length>1?'e':''}</div>
+    </div>`;
+  }
+
+  html+=facturi.map(f=>{
+    const isPaid=f.status==='paid';
+    const isPending=f.status==='pending'||f.status==='unpaid';
+    const statusLabel=isPaid?'Plătită':isPending?'De plătit':'—';
+    const statusStyle=isPaid
+      ?'background:#dcfce7;color:#15803d'
+      :'background:#fff8f0;color:#92400e';
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${f.title||'Factură terapie'}</div>
+        <span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;${statusStyle}">${statusLabel}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:12px;color:var(--text-muted)">${fmtDate(f.date)||'—'}${f.period?' · '+f.period:''}</div>
+          ${f.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${f.description}</div>`:''}
+        </div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">${parseFloat(f.amount||0).toFixed(2)} RON</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=html;
 }
 
 function openCpPage(page){
@@ -2748,6 +2864,8 @@ function openCpPage(page){
   if(page==='profil')loadProfilPage();
   if(page==='documente')loadDocumentePage();
   if(page==='mesaj')loadMesajPage();
+  if(page==='programari')loadProgramariPage();
+  if(page==='facturi')loadFacturiPage();
 }
 function closeCpPage(page){
   document.getElementById('cp-page-'+page)?.classList.remove('open');
