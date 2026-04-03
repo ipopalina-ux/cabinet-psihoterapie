@@ -2440,48 +2440,76 @@ async function loadHomework(date,sessNum){
     .eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(5);
   const therapistHw=hw?.find(h=>h.session_number===sessNum)||hw?.[0];
 
-  // Tema notată de client (journal_entries type=homework)
+  // Completările clientului (journal_entries type=homework)
   const {data:clientHw}=await sb.from('journal_entries').select('*')
     .eq('client_id',currentClientUser.id).eq('session_number',sessNum)
     .eq('type','homework').order('created_at',{ascending:false});
 
   let html='';
 
-  // Dacă terapeutul a trimis temă — o afișăm
+  // CERINȚA — de la terapeut sau lipsă
   if(therapistHw){
     const isCompleted=therapistHw.status==='completed';
-    html+=`<div style="background:var(--sage-light);border-radius:8px;padding:11px 12px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:600;color:var(--sage-dark);margin-bottom:3px">${therapistHw.title}</div>
+    html+=`<div style="background:var(--sage-light);border-radius:9px;padding:11px 13px;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px">Cerința</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:${therapistHw.description||therapistHw.due_date?'6px':'0'}">${therapistHw.title}</div>
       ${therapistHw.description?`<div style="font-size:12px;color:var(--text-muted);line-height:1.5">${therapistHw.description}</div>`:''}
-      ${therapistHw.due_date?`<div style="font-size:11px;color:var(--accent);margin-top:5px">Termen: ${fmtDate(therapistHw.due_date)}</div>`:''}
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-      ${!isCompleted?`<button class="btn btn-primary btn-sm" onclick="markHomeworkDone('${therapistHw.id}')">Marchez ca rezolvată</button>`:'<span style="font-size:11px;color:var(--success);font-weight:600">✓ Rezolvată</span>'}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div style="font-size:10px;color:var(--text-muted)">De la terapeut${therapistHw.due_date?' · Termen: '+fmtDate(therapistHw.due_date):''}</div>
+        ${!isCompleted?`<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="markHomeworkDone('${therapistHw.id}')">Marchez rezolvată</button>`:'<span style="font-size:10px;color:var(--success);font-weight:600">✓ Rezolvată</span>'}
+      </div>
     </div>`;
+  } else {
+    html+=`<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Nicio temă primită. Poți nota tu ce ți-ai propus.</div>`;
   }
 
-  // Câmp nou — clientul poate adăuga propria temă/notă despre temă
-  html+=`<textarea id="j-hw-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="${therapistHw?'Răspunsul meu, ce am lucrat...':'Notează tema sau ce ți-ai propus să lucrezi...'}"></textarea>
-  <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${clientHw?.length?'10px':'0'}">
+  // CÂMP NOU — completare
+  html+=`<textarea id="j-hw-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="${therapistHw?'Ce ai lucrat, ce ai observat...':'Notează ce ți-ai propus...'}"></textarea>
+  <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${clientHw?.length?'12px':'0'}">
     <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('homework')">Salvează</button>
   </div>`;
 
-  // Intrările clientului — ca bule
+  // COMPLETĂRILE MELE — bule editabile
   if(clientHw?.length){
+    html+=`<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Completările mele</div>`;
     html+=clientHw.map(e=>{
       const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
-      return`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px">
-        <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}, ${time}</div>
+      return`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px;cursor:pointer" id="hwbubble-${e.id}" onclick="editHwBubble('${e.id}',this)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+          <div style="font-size:10px;color:var(--text-muted)">${fmtDate(e.created_at?.slice(0,10))}, ${time}</div>
+          <div style="font-size:10px;color:var(--sage)">Editează</div>
+        </div>
         <div style="font-size:13px;color:var(--text);line-height:1.6">${e.text}</div>
       </div>`;
     }).join('');
   }
 
-  if(!therapistHw&&!clientHw?.length){
-    html=`<div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;font-style:italic">Nicio temă primită încă. Poți nota tu ce ți-ai propus.</div>`+html;
-  }
-
   cont.innerHTML=html;
+}
+
+function editHwBubble(id, el){
+  if(el.querySelector('textarea'))return;
+  const originalText=el.querySelector('div:last-child')?.textContent||'';
+  el.innerHTML=`
+    <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">editezi acum</div>
+    <textarea style="width:100%;min-height:60px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none">${originalText}</textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:7px">
+      <button class="btn btn-ghost btn-sm" onclick="loadHomework(currentJournal.date,currentJournal.session_number)">Renunță</button>
+      <button class="btn btn-primary btn-sm" onclick="saveHwBubbleEdit('${id}',this)">Salvează</button>
+    </div>`;
+  el.style.background='var(--card)';
+  el.style.border='1.5px solid var(--sage)';
+  el.querySelector('textarea').focus();
+}
+
+async function saveHwBubbleEdit(id, btn){
+  const el=btn.parentElement.parentElement;
+  const newText=el.querySelector('textarea')?.value?.trim();
+  if(!newText){notify('Textul nu poate fi gol.','var(--warn)');return;}
+  const {error}=await sb.from('journal_entries').update({text:newText}).eq('id',id);
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Editat!');
+  loadHomework(currentJournal.date,currentJournal.session_number);
 }
 
 async function markHomeworkDone(hwId){
