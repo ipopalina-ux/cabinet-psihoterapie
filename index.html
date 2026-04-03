@@ -864,18 +864,22 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         </div>
       </div>
 
-      <!-- REFLECȚII -->
+      <!-- JURNAL PERSONAL -->
       <div id="cp-reflectii" class="client-panel">
         <div class="portal-content-pad">
-          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">Reflecțiile mele</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Spațiul tău personal</div>
-          <div class="cp-rnew" onclick="openNoteModal()">
-            <div class="cp-rni"><svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-            <div style="flex:1"><div style="font-size:12px;font-weight:600;color:#fff">Scrie o reflecție nouă</div><div style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:1px">Ce îți trece prin minte acum?</div></div>
-            <svg style="opacity:0.35;flex-shrink:0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">Jurnalul meu</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:14px">Spațiu liber, doar al tău</div>
+
+          <!-- Câmp nou -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:14px">
+            <textarea id="journal-new-text" style="width:100%;min-height:90px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Scrie orice — un gând, o întrebare, ceva ce simți..."></textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:8px">
+              <button class="btn btn-primary btn-sm" onclick="saveJournalPersonal()">Salvează</button>
+            </div>
           </div>
-          <div class="cp-stitle" style="margin-top:0">Reflecții recente</div>
-          <div id="cp-reflectii-list"><div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
+
+          <!-- Lista intrări -->
+          <div id="cp-jurnal-list"><div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
         </div>
       </div>
 
@@ -910,8 +914,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <div class="client-nav-item" id="cpnav-sedinte" onclick="cpShowPanel('sedinte',this);cpLoadSessions()">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Ședințe
       </div>
-      <div class="client-nav-item" id="cpnav-reflectii" onclick="cpShowPanel('reflectii',this);cpLoadReflections()">
-        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Reflecții
+      <div class="client-nav-item" id="cpnav-reflectii" onclick="cpShowPanel('reflectii',this);cpLoadJurnal()">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Jurnal
       </div>
       <div class="client-nav-item" id="cpnav-nara-ai" onclick="cpShowPanel('nara-ai',this)">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>NARA AI
@@ -1850,12 +1854,10 @@ async function saveQuickNote(){
   if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
   const shared=document.getElementById('cp-note-shared')?.checked||false;
   const today=toDS(new Date());
-  // Găsim numărul ședinței curente
   const {data:appts}=await sb.from('appointments').select('*')
     .eq('client_id',currentClientUser.id).order('date',{ascending:true});
   const allPast=(appts||[]).filter(a=>a.date<=today);
   const sessNum=allPast.length||1;
-  // Inserăm în journal_entries
   const {error}=await sb.from('journal_entries').insert({
     client_id:currentClientUser.id,
     session_number:sessNum,
@@ -1906,7 +1908,12 @@ async function cpLoadHome(){
         <div class="cp-sc-sub" style="margin-top:4px">Atinge pentru a deschide fișa →</div>
       </div>`;
   } else {
-    sessBlock.innerHTML=`<div class="cp-stitle">Ședințele mele</div><div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--text-muted);text-align:center">Nu există programări înregistrate încă.</div>`;
+    sessBlock.innerHTML=`<div class="cp-stitle">Ședințele mele</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Nu ai o ședință programată</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5">Contactează terapeutul pentru a stabili o programare.</div>
+        <div class="cp-scbtn cp-scbtn-teal" style="display:inline-flex" onclick="openCpPage('mesaj')"><svg viewBox="0 0 24 24" width="11" height="11" style="width:11px;height:11px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contactează terapeutul</div>
+      </div>`;
   }
 
   // De completat
@@ -2026,11 +2033,112 @@ async function cpLoadSessions(){
   }).join('');
 }
 
+async function saveJournalPersonal(){
+  const text=document.getElementById('journal-new-text')?.value?.trim();
+  if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
+  const {error}=await sb.from('journal_entries').insert({
+    client_id:currentClientUser.id,
+    session_number:0, // 0 = jurnal personal, nelegat de ședință
+    type:'journal',
+    text,
+    shared:false
+  });
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  document.getElementById('journal-new-text').value='';
+  notify('✓ Salvat în jurnal!');
+  cpLoadJurnal();
+}
+
+async function cpLoadJurnal(){
+  if(!currentClientUser)return;
+  const {data:entries}=await sb.from('journal_entries').select('*')
+    .eq('client_id',currentClientUser.id).eq('type','journal')
+    .order('created_at',{ascending:false});
+  const cont=document.getElementById('cp-jurnal-list');
+  if(!cont)return;
+  if(!entries?.length){
+    cont.innerHTML='<div style="text-align:center;padding:24px 16px"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Jurnalul tău e gol</div><div style="font-size:12px;color:var(--text-muted);line-height:1.6">Scrie primul gând de mai sus — orice, oricând.</div></div>';
+    return;
+  }
+  cont.innerHTML=entries.map(e=>{
+    const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+    const date=fmtDate(e.created_at?.slice(0,10));
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="editJournalBubble('${e.id}',this)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <div style="font-size:10px;color:var(--text-muted)">${date}, ${time}</div>
+        <div style="font-size:10px;color:var(--sage)">Editează</div>
+      </div>
+      <div style="font-size:13px;color:var(--text);line-height:1.65" id="jbubble-text-${e.id}">${e.text}</div>
+    </div>`;
+  }).join('');
+}
+
+function editBubble(id, el){
+  // Dacă e deja în editare, ignorăm
+  if(el.querySelector('textarea'))return;
+  const textEl=el.querySelector(`#bubble-text-${id}`);
+  if(!textEl)return;
+  const originalText=textEl.textContent;
+  el.innerHTML=`
+    <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">editezi acum</div>
+    <textarea style="width:100%;min-height:60px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none">${originalText}</textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:7px">
+      <button class="btn btn-ghost btn-sm" onclick="cancelEditBubble('${id}',this,'${originalText.replace(/'/g,"\\'")}')">Renunță</button>
+      <button class="btn btn-primary btn-sm" onclick="saveBubbleEdit('${id}',this)">Salvează</button>
+    </div>`;
+  el.style.background='var(--card)';
+  el.style.border='1.5px solid var(--sage)';
+  el.querySelector('textarea').focus();
+}
+
+function cancelEditBubble(id, btn, originalText){
+  const el=btn.closest('[onclick]')||btn.parentElement.parentElement;
+  // Reîncărcăm fișa
+  openSessionJournal(currentJournal,fisaOrigin);
+}
+
+async function saveBubbleEdit(id, btn){
+  const el=btn.closest('div[style*="border"]')||btn.parentElement.parentElement;
+  const textarea=el.querySelector('textarea');
+  const newText=textarea?.value?.trim();
+  if(!newText){notify('Textul nu poate fi gol.','var(--warn)');return;}
+  const {error}=await sb.from('journal_entries').update({text:newText}).eq('id',id);
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Editat!');
+  openSessionJournal(currentJournal,fisaOrigin);
+}
+
+function editJournalBubble(id, el){
+  if(el.querySelector('textarea'))return;
+  const textEl=el.querySelector(`#jbubble-text-${id}`);
+  if(!textEl)return;
+  const originalText=textEl.textContent;
+  el.innerHTML=`
+    <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">editezi acum</div>
+    <textarea style="width:100%;min-height:60px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none">${originalText}</textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:7px">
+      <button class="btn btn-ghost btn-sm" onclick="cpLoadJurnal()">Renunță</button>
+      <button class="btn btn-primary btn-sm" onclick="saveJournalBubbleEdit('${id}',this)">Salvează</button>
+    </div>`;
+  el.style.border='1.5px solid var(--sage)';
+  el.querySelector('textarea').focus();
+}
+
+async function saveJournalBubbleEdit(id, btn){
+  const el=btn.parentElement.parentElement;
+  const textarea=el.querySelector('textarea');
+  const newText=textarea?.value?.trim();
+  if(!newText){notify('Textul nu poate fi gol.','var(--warn)');return;}
+  const {error}=await sb.from('journal_entries').update({text:newText}).eq('id',id);
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Editat!');
+  cpLoadJurnal();
+}
+
 async function saveJournalEntry(type){
   if(!currentJournal||!currentClientUser)return;
   let inputId, shareId;
   if(type==='note'){inputId='j-note-new';shareId='share-note-new';}
-  else if(type==='reflection'){inputId='j-refl-new';shareId='share-refl-new';}
   else if(type==='homework'){inputId='j-hw-new';shareId=null;}
   const text=document.getElementById(inputId)?.value?.trim();
   if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
@@ -2209,18 +2317,18 @@ async function openSessionJournal(hint,origin){
     .eq('client_id',currentClientUser.id).eq('session_number',sessNum)
     .order('created_at',{ascending:false});
   const noteEntries=(entries||[]).filter(e=>e.type==='note');
-  const reflEntries=(entries||[]).filter(e=>e.type==='reflection');
   const therapistEntries=(entries||[]).filter(e=>e.type==='therapist_message');
+  const reflEntries=[];
 
-  function mkBubble(e,isRefl){
-    const bg=isRefl?(e.shared?'background:#e0f7f2':'background:var(--sage-light)'):'background:var(--sage-light)';
-    const dateColor=isRefl&&e.shared?'color:var(--sage)':'color:var(--text-muted)';
-    const textColor=isRefl&&e.shared?'color:#0a2420':'color:var(--text)';
+  function mkBubble(e){
     const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
     const date=fmtDate(e.created_at?.slice(0,10));
-    return`<div style="${bg};border-radius:9px;padding:10px 12px;margin-bottom:7px">
-      <div style="font-size:10px;${dateColor};margin-bottom:3px">${date}, ${time}${e.shared?' · Partajat':' · Privat'}</div>
-      <div style="font-size:13px;${textColor};line-height:1.6">${e.text}</div>
+    return`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px;cursor:pointer" onclick="editBubble('${e.id}',this)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <div style="font-size:10px;color:var(--text-muted)">${date}, ${time}${e.shared?' · Partajat':' · Privat'}</div>
+        <div style="font-size:10px;color:var(--sage)">Editează</div>
+      </div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6" id="bubble-text-${e.id}">${e.text}</div>
     </div>`;
   }
 
@@ -2241,34 +2349,19 @@ async function openSessionJournal(hint,origin){
       <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
     </div>
 
-    <!-- NOTIȚE PERSONALE -->
+    <!-- NOTIȚELE MELE -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Notițe personale</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Notițele mele</div>
         ${mkToggle('share-note-new','Privat')}
       </div>
       <div style="padding:10px 12px">
-        <textarea id="j-note-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce ai observat în tine? Ce ți-a rămas în minte?"></textarea>
+        <textarea id="j-note-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce ai observat, ce ți-a rămas în minte..."></textarea>
         <div style="display:flex;justify-content:flex-end;margin-top:7px">
           <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('note')">Salvează</button>
         </div>
       </div>
-      ${noteEntries.length?'<div style="padding:0 12px 10px">'+noteEntries.map(e=>mkBubble(e,false)).join('')+'</div>':''}
-    </div>
-
-    <!-- REFLECȚII -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Reflecții</div>
-        ${mkToggle('share-refl-new','Privat')}
-      </div>
-      <div style="padding:10px 12px">
-        <textarea id="j-refl-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Cum te simți? Ce ai realizat? Ce ai vrea să explorezi?"></textarea>
-        <div style="display:flex;justify-content:flex-end;margin-top:7px">
-          <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('reflection')">Salvează</button>
-        </div>
-      </div>
-      ${reflEntries.length?'<div style="padding:0 12px 10px">'+reflEntries.map(e=>mkBubble(e,true)).join('')+'</div>':''}
+      ${noteEntries.length?'<div style="padding:0 12px 10px">'+noteEntries.map(e=>mkBubble(e)).join('')+'</div>':''}
     </div>
 
     <!-- MESAJ TERAPEUT -->
