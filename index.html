@@ -2766,8 +2766,19 @@ async function loadProgramariPage(){
   const today=toDS(new Date());
   const {data:appts}=await sb.from('appointments').select('*')
     .eq('client_id',currentClientUser.id).order('date',{ascending:true});
-  const viitoare=(appts||[]).filter(a=>a.date>=today);
-  const istoric=(appts||[]).filter(a=>a.date<today).reverse();
+  const now=new Date();
+  function isSessionPast(a){
+    if(a.date<today)return true;
+    if(a.date===today){
+      const [h,m]=(a.time||'00:00').split(':').map(Number);
+      const end=new Date();
+      end.setHours(h,m+(a.duration||50)+30,0,0);
+      return now>end;
+    }
+    return false;
+  }
+  const viitoare=(appts||[]).filter(a=>!isSessionPast(a));
+  const istoric=(appts||[]).filter(a=>isSessionPast(a)).reverse();
 
   const vEl=document.getElementById('cp-prog-viitoare');
   const iEl=document.getElementById('cp-prog-istoric');
