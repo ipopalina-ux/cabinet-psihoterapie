@@ -1850,11 +1850,19 @@ function _renderTabAzi(c,appointments,journalEntries,clientId){
 
   // Notițe ședință
   html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:12px;margin-bottom:6px">Notițe ședință</div>
-  <textarea id="cd-note-text" style="width:100%;min-height:90px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Scrie rapid în timpul ședinței..." oninput="cdAutoSaveNote('${clientId}',${currentSessNum})"></textarea>
-  <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:16px">
-    <button class="btn btn-primary btn-sm" onclick="cdSaveNoteNow('${clientId}',${currentSessNum})">Salvează notițele</button>
+  <div id="cd-note-card" style="display:none;background:var(--sage-light);border-radius:8px;padding:10px 12px;margin-bottom:10px;cursor:pointer" onclick="cdOpenNoteEditor('${clientId}',${currentSessNum})">
+    <div style="font-size:10px;color:var(--sage);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between">
+      <span>Notițe salvate</span><span style="font-size:10px;color:var(--sage)">Editează →</span>
+    </div>
+    <div id="cd-note-preview" style="font-size:12px;color:var(--text);line-height:1.6"></div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:center;padding:0 16px">
+  <div id="cd-note-editor" style="display:block">
+    <textarea id="cd-note-text" style="width:100%;min-height:90px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Scrie rapid în timpul ședinței..."></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:10px">
+      <button class="btn btn-primary btn-sm" onclick="cdSaveNoteNow('${clientId}',${currentSessNum})">Salvează notițele</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;padding:0 4px;margin-bottom:8px">
     <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddHomeworkForClient('${clientId}',${currentSessNum})">+ Temă nouă</button>
     <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openAddApptForClient('${clientId}')">Programează</button>
   </div>`;
@@ -1862,8 +1870,16 @@ function _renderTabAzi(c,appointments,journalEntries,clientId){
   // Load existing note
   setTimeout(async()=>{
     const {data:note}=await sb.from('session_notes').select('notes').eq('client_id',clientId).eq('date',toDS(new Date())).single();
-    const el=document.getElementById('cd-note-text');
-    if(el&&note?.notes)el.value=note.notes;
+    if(note?.notes){
+      const card=document.getElementById('cd-note-card');
+      const editor=document.getElementById('cd-note-editor');
+      const preview=document.getElementById('cd-note-preview');
+      const ta=document.getElementById('cd-note-text');
+      if(card)card.style.display='block';
+      if(editor)editor.style.display='none';
+      if(preview)preview.textContent=note.notes;
+      if(ta)ta.value=note.notes;
+    }
   },100);
 
   return html;
@@ -2032,11 +2048,26 @@ async function cdSaveTherapistData(clientId){
 let cdNoteTimer=null;
 async function cdSaveNoteNow(clientId,sessNum){
   const notes=document.getElementById('cd-note-text')?.value||'';
+  if(!notes.trim()){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
   const today=toDS(new Date());
   const {data:existing}=await sb.from('session_notes').select('id').eq('client_id',clientId).eq('date',today).single();
   if(existing){await sb.from('session_notes').update({notes,updated_at:new Date().toISOString()}).eq('id',existing.id);}
   else{await sb.from('session_notes').insert({client_id:clientId,date:today,type:'Ședință individuală',notes,session_number:sessNum});}
+  // Transformă în card verde
+  const card=document.getElementById('cd-note-card');
+  const editor=document.getElementById('cd-note-editor');
+  const preview=document.getElementById('cd-note-preview');
+  if(card){card.style.display='block';if(preview)preview.textContent=notes;}
+  if(editor)editor.style.display='none';
   notify('✓ Notițe salvate!');
+}
+
+function cdOpenNoteEditor(clientId,sessNum){
+  const card=document.getElementById('cd-note-card');
+  const editor=document.getElementById('cd-note-editor');
+  if(card)card.style.display='none';
+  if(editor)editor.style.display='block';
+  document.getElementById('cd-note-text')?.focus();
 }
 
 async function cdAutoSaveNote(clientId,sessNum){
