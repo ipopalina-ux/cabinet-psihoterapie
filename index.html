@@ -1875,6 +1875,17 @@ async function cpLoadHome(){
         <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.role?SETTINGS.role.toLowerCase()+' ':''} ${SETTINGS.name}</div>
         <div class="cp-sc-sub" style="margin-top:4px">Atinge pentru a deschide fișa →</div>
       </div>`;
+  } else if(nextAppt){
+    sessBlock.innerHTML=`
+      <div class="cp-stitle">Următoarea ședință</div>
+      <div class="cp-sesscard">
+        <div class="cp-sc-top">
+          <div class="cp-sc-lbl">${fmtDate(nextAppt.date)}</div>
+          <span class="cp-badge-next">Programată</span>
+        </div>
+        <div class="cp-sc-title">cu ${SETTINGS.role?SETTINGS.role.toLowerCase()+' ':''} ${SETTINGS.name}</div>
+        <div class="cp-sc-sub" style="margin-top:4px">${nextAppt.time?nextAppt.time+' · ':''}${nextAppt.type||'Ședință individuală'}</div>
+      </div>`;
   } else {
     sessBlock.innerHTML=`<div class="cp-stitle">Ședințele mele</div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px">
