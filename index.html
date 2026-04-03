@@ -217,7 +217,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .cp-ritem{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:7px}
 
 /* INLINE PAGES */
-.cp-page{display:none;position:fixed;inset:0 0 64px 0;background:var(--warm);z-index:150;overflow-y:auto;flex-direction:column}
+.cp-page{display:none;position:fixed;top:52px;left:0;right:0;bottom:64px;background:var(--warm);z-index:150;overflow-y:auto;flex-direction:column}
 .cp-page.open{display:flex}
 .cp-page-header{background:var(--sage-dark);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .cp-page-back{background:rgba(255,255,255,0.1);border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer;font-size:12px;font-family:inherit}
@@ -973,15 +973,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
   <!-- PAGINA PROFILUL MEU -->
   <div id="cp-page-profil" class="cp-page">
-    <div class="cp-page-header">
-      <button class="cp-page-back" onclick="closeCpPage('profil')">← Înapoi</button>
-      <div class="cp-page-title">Profilul meu</div>
-      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-      </button>
-    </div>
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)">Profilul meu</div>
     <div class="cp-page-body">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:12px;text-align:center">
         <div id="cp-profil-avatar" style="width:60px;height:60px;border-radius:50%;background:var(--sage-dark);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin:0 auto 10px"></div>
@@ -1010,15 +1002,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
   <!-- PAGINA DOCUMENTELE MELE -->
   <div id="cp-page-documente" class="cp-page">
-    <div class="cp-page-header">
-      <button class="cp-page-back" onclick="closeCpPage('documente')">← Înapoi</button>
-      <div class="cp-page-title">Documentele mele</div>
-      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-      </button>
-    </div>
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)">Documentele mele</div>
     <div class="cp-page-body">
 
       <!-- GDPR -->
@@ -1125,15 +1109,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
   <!-- PAGINA NOTIFICĂRI -->
   <div id="cp-page-notificari" class="cp-page">
-    <div class="cp-page-header">
-      <button class="cp-page-back" onclick="closeCpPage('notificari')">← Înapoi</button>
-      <div class="cp-page-title">Notificări</div>
-      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-      </button>
-    </div>
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)">Notificări</div>
     <div class="cp-page-body">
       <div id="cp-notif-list">
         <div style="text-align:center;padding:40px 20px">
@@ -1149,15 +1125,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
   <!-- PAGINA MESAJ TERAPEUT -->
   <div id="cp-page-mesaj" class="cp-page">
-    <div class="cp-page-header">
-      <button class="cp-page-back" onclick="closeCpPage('mesaj')">← Înapoi</button>
-      <div class="cp-page-title" id="cp-mesaj-title">Mesaj pentru terapeut</div>
-      <button onclick="openCpMenu()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5px;padding:8px;margin-left:auto">
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-        <span style="display:block;width:13px;height:1.5px;background:rgba(255,255,255,0.75);border-radius:2px"></span>
-      </button>
-    </div>
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);background:var(--card)" id="cp-mesaj-title">Mesaj pentru terapeut</div>
     <div style="flex:1;overflow-y:auto;padding:16px" id="cp-mesaj-body">
       <div id="cp-mesaj-list" style="display:flex;flex-direction:column;gap:8px;padding-bottom:8px">
         <div style="text-align:center;padding:30px 20px;font-size:13px;color:var(--text-muted)">Se încarcă conversația...</div>
@@ -1172,7 +1140,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   </div>
 
   <!-- PAGINA CONFIDENȚIALITATE -->
-  <div id="cp-confidentialitate" style="display:none;position:fixed;inset:0 0 64px 0;background:var(--warm);z-index:150;overflow-y:auto">
+  <div id="cp-confidentialitate" style="display:none;position:fixed;top:52px;left:0;right:0;bottom:64px;background:var(--warm);z-index:150;overflow-y:auto">
     <div style="background:var(--sage-dark);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <button onclick="document.getElementById('cp-confidentialitate').style.display='none'" style="background:rgba(255,255,255,0.1);border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer;font-size:12px">← Înapoi</button>
       <div style="font-size:14px;font-weight:700;color:#fff">Confidențialitate</div>
