@@ -1838,6 +1838,11 @@ async function saveQuickNote(){
   notify('✓ Notița salvată!');
 }
 
+async function openAgenda(sessNum){
+  // Deschide fișa ședinței viitoare pentru a nota ce vrea să discute
+  openSessionJournal({session_number:sessNum},'sedinte');
+}
+
 async function cpLoadHome(){
   if(!currentClientUser)return;
   const today=toDS(new Date());
@@ -1926,8 +1931,23 @@ async function cpLoadHome(){
   const {data:therapistMsgs}=await sb.from('journal_entries').select('*').eq('client_id',c.id).eq('type','therapist_message').order('created_at',{ascending:false}).limit(3);
   const msgBlock=document.getElementById('cp-home-therapist-block');
   if(msgBlock){
+    let blockHtml='';
+    // Card "De discutat" dacă există ședință viitoare
+    if(nextAppt){
+      const nextSessNum=(appts||[]).filter(a=>a.date<=nextAppt.date).length;
+      const {data:agendaItems}=await sb.from('journal_entries').select('*')
+        .eq('client_id',c.id).eq('session_number',nextSessNum).eq('type','note')
+        .order('created_at',{ascending:false}).limit(3);
+      blockHtml+=`<div class="cp-stitle">Ședința #${nextSessNum} · ${fmtDate(nextAppt.date)}</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:8px;cursor:pointer" onclick="openAgenda(${nextSessNum})">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">De discutat</div>
+          ${agendaItems?.length
+            ?agendaItems.map(e=>`<div style="font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:3px">· ${e.text.slice(0,80)}${e.text.length>80?'...':''}</div>`).join('')
+            :'<div style="font-size:11px;color:var(--text-muted);font-style:italic">Notează ce vrei să aduci în ședință →</div>'}
+        </div>`;
+    }
     if(therapistMsgs?.length){
-      msgBlock.innerHTML=`<div class="cp-stitle">Mesaj de la terapeut</div>`+
+      blockHtml+=`<div class="cp-stitle">Mesaj de la terapeut</div>`+
         therapistMsgs.map(m=>`
           <div style="background:var(--card);border:1px solid var(--border);border-left:2.5px solid var(--sage);border-radius:10px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px">
             <div style="flex:1;min-width:0">
@@ -1936,9 +1956,8 @@ async function cpLoadHome(){
             </div>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="opacity:0.4;flex-shrink:0;margin-top:2px"><polyline points="9 18 15 12 9 6"/></svg>
           </div>`).join('');
-    } else {
-      msgBlock.innerHTML='';
     }
+    msgBlock.innerHTML=blockHtml;
   }
   if(!required.length&&!soft.length){completatBlock.innerHTML='';return;}
   let html=`<div class="cp-stitle">De completat</div><div class="cp-completat">`;
@@ -2006,19 +2025,26 @@ async function cpLoadSessions(){
   // Sessions list
   const cont=document.getElementById('cp-sessions-list');
   if(!appts?.length){cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu există programări înregistrate.</div>';return;}
-  // afișăm descendent (recent first) dar păstrăm numărul corect (cronologic)
   const reversed=[...appts].reverse();
   cont.innerHTML=reversed.map((a,i)=>{
-    const sessNum=appts.length-i; // cel mai recent = cel mai mare număr
+    const sessNum=appts.length-i;
     const isToday=a.date===today;
+    const isPast=a.date<today;
+    const isFuture=a.date>today;
     const hasMeas=orsMeas.find(m=>m.session_number===sessNum);
-    return`<div class="cp-sitem${isToday?' today':''}" onclick="openSessionJournal({date:'${a.date}',session_number:${sessNum}},'sedinte')">
+    let badge='';
+    if(isToday)badge='<span class="cp-badge-today">Azi</span>';
+    else if(isPast)badge='<span class="cp-badge-done">Efectuată</span>';
+    else badge='<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e0f7f2;color:#0a7a6e">Programată</span>';
+    return`<div class="cp-sitem${isToday?' today':''}" onclick="${isFuture?'openAgenda('+sessNum+')':'openSessionJournal({date:\''+a.date+'\',session_number:'+sessNum+'},\'sedinte\')'}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
         <div><div class="cp-si-num">Ședința #${sessNum}</div><div class="cp-si-date">${fmtDate(a.date)}${a.type?' · '+a.type:''}</div></div>
-        ${isToday?'<span class="cp-badge-today">Azi</span>':'<span class="cp-badge-done">Completă</span>'}
+        ${badge}
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap">
-        ${hasMeas?`<span class="cp-tag cp-tag-ors">ORS ${hasMeas.total}</span>`:`<span class="cp-tag cp-tag-ors" style="opacity:0.5">ORS de completat</span>`}
+        ${isFuture
+          ?'<span style="font-size:9px;padding:2px 7px;border-radius:5px;background:#faf8f5;color:#7a6050;border:1px solid #e8e0d8">De discutat →</span>'
+          :hasMeas?`<span class="cp-tag cp-tag-ors">ORS ${hasMeas.total}</span>`:'<span class="cp-tag cp-tag-ors" style="opacity:0.5">ORS de completat</span>'}
       </div>
     </div>`;
   }).join('');
