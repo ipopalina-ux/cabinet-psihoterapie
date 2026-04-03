@@ -1957,39 +1957,51 @@ async function cpLoadSessions(){
 
   // Update subtitle
   const sub=document.getElementById('cp-sedinte-sub');
-  if(sub)sub.textContent=(appts?.length||0)+' ședințe · '+SETTINGS.name;
+  const nrSed=appts?.length||0;
+  const sedLabel=nrSed===1?'1 ședință':''+nrSed+' ședințe';
+  const therapistLabel='cu '+(SETTINGS.role?SETTINGS.role+' ':'')+SETTINGS.name;
+  if(sub)sub.textContent=sedLabel+' · '+therapistLabel;
 
   // Render ORS graph
   const orsMeas=(measurements||[]);
   const graphEl=document.getElementById('cp-ors-graph-svg');
   const trendEl=document.getElementById('cp-ors-trend');
-  if(orsMeas.length>=2){
+  if(orsMeas.length>=1){
     const vals=orsMeas.map(m=>parseFloat(m.total));
-    const last=vals[vals.length-1];const prev=vals[vals.length-2];
-    const diff=(last-prev).toFixed(1);
-    if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#3b82f6">${last}</span><span style="font-size:11px;color:${diff>=0?'#15803d':'var(--danger)'};font-weight:700">${diff>=0?'↑':'↓'} ${Math.abs(diff)}</span>`;
+    const last=vals[vals.length-1];
+    // Trend — doar dacă avem cel puțin 2 puncte
+    if(vals.length>=2){
+      const prev=vals[vals.length-2];
+      const diff=(last-prev).toFixed(1);
+      if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#3b82f6">${last}</span><span style="font-size:11px;color:${diff>=0?'#15803d':'var(--danger)'};font-weight:700">${diff>=0?'↑':'↓'} ${Math.abs(diff)}</span>`;
+    } else {
+      if(trendEl)trendEl.innerHTML=`<span style="font-size:13px;font-weight:700;color:#3b82f6">${last}</span><span style="font-size:10px;color:var(--text-muted);margin-left:4px">/ 40</span>`;
+    }
     if(graphEl){
-      const w=240,h=74,pad=8;const minV=Math.min(...vals,20);const maxV=Math.max(...vals,40);
-      const xStep=(w-pad*2)/(vals.length-1||1);
+      const w=240,h=74,pad=8;
+      const minV=Math.min(...vals,20);const maxV=Math.max(...vals,40);
+      // Pentru un singur punct, xStep=0, îl centrăm
+      const xStep=vals.length>1?(w-pad*2)/(vals.length-1):0;
+      const xOffset=vals.length===1?(w/2):pad;
       const yScale=(h-pad*2)/(maxV-minV||1);
-      const pts=vals.map((v,i)=>`${pad+i*xStep},${h-pad-(v-minV)*yScale}`);
-      const pthLine=pts.join(' ');
+      const pts=vals.map((v,i)=>`${vals.length===1?xOffset:pad+i*xStep},${h-pad-(v-minV)*yScale}`);
       const prag=h-pad-(25-minV)*yScale;
-      const areaPath=`M${pts[0]} L${pts.join(' L')} L${pad+(vals.length-1)*xStep},${h-2} L${pad},${h-2} Z`;
       const uid='og'+Math.random().toString(36).slice(2,6);
+      // Area path — só com 2+ pontos
+      const areaPath=vals.length>1?`M${pts[0]} L${pts.join(' L')} L${pad+(vals.length-1)*xStep},${h-2} L${pad},${h-2} Z`:'';
       graphEl.innerHTML=`<svg width="100%" height="74" viewBox="0 0 240 74" xmlns="http://www.w3.org/2000/svg">
         <defs><linearGradient id="${uid}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.15"/><stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0"/></linearGradient></defs>
         <line x1="0" y1="${prag}" x2="240" y2="${prag}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
         <text x="4" y="${prag-2}" font-size="7" fill="#94a3b8" font-family="system-ui">25</text>
-        <path d="${areaPath}" fill="url(#${uid})"/>
-        <polyline points="${pthLine}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        ${pts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="${i===pts.length-1?4:2.5}" fill="${i===pts.length-1?'#3b82f6':'#fff'}" stroke="#3b82f6" stroke-width="1.5"/>`).join('')}
-        ${vals.map((v,i)=>`<text x="${pad+i*xStep}" y="72" font-size="7" fill="${i===vals.length-1?'#3b82f6':'#94a3b8'}" font-family="system-ui" text-anchor="middle" font-weight="${i===vals.length-1?'700':'400'}">Ș${orsMeas[i].session_number}</text>`).join('')}
+        ${areaPath?`<path d="${areaPath}" fill="url(#${uid})"/>`:''}
+        ${vals.length>1?`<polyline points="${pts.join(' ')}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`:''}
+        ${pts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="5" fill="#3b82f6" stroke="#fff" stroke-width="2"/>`).join('')}
+        ${vals.map((v,i)=>`<text x="${pts[i].split(',')[0]}" y="72" font-size="7" fill="#3b82f6" font-family="system-ui" text-anchor="middle" font-weight="700">Ș${orsMeas[i].session_number}</text>`).join('')}
       </svg>`;
     }
   } else {
     if(trendEl)trendEl.innerHTML='';
-    if(graphEl)graphEl.innerHTML='<div style="text-align:center;padding:16px;font-size:11px;color:var(--text-muted)">Completează ORS la mai multe ședințe pentru a vedea evoluția.</div>';
+    if(graphEl)graphEl.innerHTML='<div style="text-align:center;padding:16px;font-size:11px;color:var(--text-muted)">Completează ORS la prima ședință pentru a vedea graficul.</div>';
   }
 
   // Sessions list
