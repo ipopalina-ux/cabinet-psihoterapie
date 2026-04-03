@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NARA — Spațiul tău terapeutic</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -140,9 +140,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .total-box-interp{font-size:11px;font-weight:500;margin-top:3px}
 
 /* CLIENT PORTAL */
-.portal-shell{display:flex;flex-direction:column;height:calc(100vh - 44px);overflow:hidden}
-.portal-header{background:var(--sage-dark);padding:10px 15px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.portal-body{flex:1;overflow-y:auto;background:var(--warm);padding-bottom:64px}
+.portal-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.portal-header{background:var(--sage-dark);padding:10px 15px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:fixed;top:0;left:0;right:0;z-index:190;height:52px;box-sizing:border-box}
+.portal-body{flex:1;overflow-y:auto;background:var(--warm);padding-bottom:64px;padding-top:52px}
 .portal-body::-webkit-scrollbar{display:none}
 .portal-nav{display:flex;background:var(--card);border-top:1px solid var(--border);flex-shrink:0;position:fixed;bottom:0;left:0;right:0;z-index:200;box-shadow:0 -2px 12px rgba(0,0,0,0.08)}
 .client-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 3px 7px;cursor:pointer;font-size:9px;color:var(--text-muted);gap:3px;transition:all 0.15s;border-top:2px solid transparent}
