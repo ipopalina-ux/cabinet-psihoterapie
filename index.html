@@ -1842,13 +1842,25 @@ async function cpLoadHome(){
   if(!currentClientUser)return;
   const today=toDS(new Date());
   const {data:appts}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(20);
-  const todayAppt=(appts||[]).find(a=>a.date===today);
-  const lastAppt=(appts||[]).find(a=>a.date<today);
+  const todayApptRaw=(appts||[]).find(a=>a.date===today);
+  // Dacă ședința de azi a terminat (ora + durată + 30min buffer), o tratăm ca "ultima ședință"
+  let todayAppt=null;
+  let todayApptPast=false;
+  if(todayApptRaw){
+    const now=new Date();
+    const [h,m]=(todayApptRaw.time||'00:00').split(':').map(Number);
+    const sessionEnd=new Date();
+    sessionEnd.setHours(h,m+( todayApptRaw.duration||50)+30,0,0);
+    if(now>sessionEnd){todayApptPast=true;}
+    else{todayAppt=todayApptRaw;}
+  }
+  const lastAppt=todayApptPast?todayApptRaw:(appts||[]).find(a=>a.date<today);
   const nextAppt=(appts||[]).filter(a=>a.date>today).sort((a,b)=>a.date.localeCompare(b.date))[0];
   const sessBlock=document.getElementById('cp-home-session-block');
 
   if(todayAppt){
     const sessNum=(appts||[]).filter(a=>a.date<=today).length;
+    const nextBadge=nextAppt?`<span class="cp-badge-next">Urmează ${fmtDate(nextAppt.date)}</span>`:'';
     sessBlock.innerHTML=`
       <div class="cp-stitle">Ședința de azi</div>
       <div class="cp-sesscard today" onclick="openSessionJournal({date:'${today}',session_number:${sessNum}},'home')" style="cursor:pointer">
@@ -1859,7 +1871,7 @@ async function cpLoadHome(){
         <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.role?SETTINGS.role.toLowerCase()+' ':''} ${SETTINGS.name}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
           <div class="cp-scbtn cp-scbtn-ors" onclick="event.stopPropagation();cpShowPanel('ors')"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>ORS</div>
-          <span style="font-size:10px;color:var(--text-muted)">Atinge pentru a deschide fișa →</span>
+          ${nextBadge}
         </div>
       </div>`;
   } else if(lastAppt){
