@@ -216,6 +216,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .cp-rni svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:1.8}
 .cp-ritem{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:7px}
 
+/* INLINE PAGES */
+.cp-page{display:none;position:fixed;inset:0;background:var(--warm);z-index:150;overflow-y:auto;flex-direction:column}
+.cp-page.open{display:flex}
+.cp-page-header{background:var(--sage-dark);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.cp-page-back{background:rgba(255,255,255,0.1);border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer;font-size:12px;font-family:inherit}
+.cp-page-title{font-size:14px;font-weight:700;color:#fff}
+.cp-page-body{padding:16px;flex:1}
+.cp-msg-bubble{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:8px}
+.cp-msg-sent{background:var(--sage-dark);border-radius:12px;padding:13px;margin-bottom:8px}
+.cp-msg-input-row{display:flex;gap:8px;align-items:flex-end;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;position:sticky;bottom:0}
+.cp-msg-input-row textarea{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;line-height:1.5;font-family:inherit;color:var(--text);background:var(--warm);outline:none;resize:none;min-height:42px;max-height:100px}
+.cp-msg-send{width:38px;height:38px;border-radius:10px;background:var(--sage);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cp-msg-send svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5}
+
 /* DRAWER MENU */
 .cp-overlay{position:fixed;inset:0;background:rgba(7,61,54,0.55);z-index:200;display:flex;justify-content:flex-end}
 .cp-drawer{width:220px;background:var(--card);height:100%;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,0.15)}
@@ -913,10 +927,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         <div style="font-size:13px;font-weight:700;color:var(--text)" id="cp-menu-name">—</div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:1px" id="cp-menu-email">—</div>
       </div>
-      <div class="cp-ditem"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilul meu</div>
-      <div class="cp-ditem"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Documentele mele</div>
-      <div class="cp-ditem"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notificări</div>
-      <div class="cp-ditem"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Mesaj pentru terapeut</div>
+      <div class="cp-ditem" onclick="openCpPage('profil')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilul meu</div>
+      <div class="cp-ditem" onclick="openCpPage('documente')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Documentele mele</div>
+      <div class="cp-ditem" onclick="openCpPage('notificari')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notificări</div>
+      <div class="cp-ditem" onclick="openCpPage('mesaj')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Mesaj pentru terapeut</div>
       <div class="cp-ddiv"></div>
       <div class="cp-ditem" onclick="showConfidentialitate()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Confidențialitate</div>
       <div class="cp-ddiv"></div>
@@ -937,6 +951,108 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
         <button class="btn btn-ghost" onclick="closeNoteModalDirect()">Renunță</button>
         <button class="btn btn-primary" onclick="saveQuickNote()">Salvează</button>
       </div>
+    </div>
+  </div>
+
+  <!-- PAGINA PROFILUL MEU -->
+  <div id="cp-page-profil" class="cp-page">
+    <div class="cp-page-header">
+      <button class="cp-page-back" onclick="closeCpPage('profil')">← Înapoi</button>
+      <div class="cp-page-title">Profilul meu</div>
+    </div>
+    <div class="cp-page-body">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:12px;text-align:center">
+        <div id="cp-profil-avatar" style="width:60px;height:60px;border-radius:50%;background:var(--sage-dark);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin:0 auto 10px"></div>
+        <div id="cp-profil-name" style="font-size:17px;font-weight:700;color:var(--text)">—</div>
+        <div id="cp-profil-email" style="font-size:12px;color:var(--text-muted);margin-top:3px">—</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px">Datele mele</div>
+        <div class="fg"><label>Prenume</label><input type="text" id="pp-first" placeholder="Prenume"></div>
+        <div class="fg"><label>Nume</label><input type="text" id="pp-last" placeholder="Nume"></div>
+        <div class="fg"><label>Telefon</label><input type="tel" id="pp-phone" placeholder="07xx xxx xxx"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px">
+          <button class="btn btn-primary" onclick="saveProfilClient()">Salvează</button>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px">Schimbă parola</div>
+        <div class="fg"><label>Parola nouă</label><input type="password" id="pp-pass-new" placeholder="Minimum 6 caractere"></div>
+        <div class="fg"><label>Confirmă parola nouă</label><input type="password" id="pp-pass-confirm" placeholder="Repetă parola"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px">
+          <button class="btn btn-primary" onclick="changeParolaClient()">Schimbă parola</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGINA DOCUMENTELE MELE -->
+  <div id="cp-page-documente" class="cp-page">
+    <div class="cp-page-header">
+      <button class="cp-page-back" onclick="closeCpPage('documente')">← Înapoi</button>
+      <div class="cp-page-title">Documentele mele</div>
+    </div>
+    <div class="cp-page-body">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">📋 Consimțământ GDPR</div>
+          <span id="doc-gdpr-status" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700">—</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Consimțământul tău privind prelucrarea datelor cu caracter personal, conform GDPR.</div>
+        <div id="doc-gdpr-date" style="font-size:11px;color:var(--text-muted);margin-top:8px"></div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">📄 Contract terapeutic</div>
+          <span id="doc-contract-status" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700">—</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Contractul de prestare servicii psihologice/psihoterapeutice.</div>
+        <div id="doc-contract-date" style="font-size:11px;color:var(--text-muted);margin-top:8px"></div>
+        <div id="doc-contract-sign-btn" class="hidden" style="margin-top:10px">
+          <button class="btn btn-primary btn-sm" onclick="signContractClient()">✍ Semnează contractul</button>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📁 Fișa personală</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Datele completate la înregistrare — diagnostic, medicație, istoric terapeutic.</div>
+        <div id="doc-fisa-content" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGINA NOTIFICĂRI -->
+  <div id="cp-page-notificari" class="cp-page">
+    <div class="cp-page-header">
+      <button class="cp-page-back" onclick="closeCpPage('notificari')">← Înapoi</button>
+      <div class="cp-page-title">Notificări</div>
+    </div>
+    <div class="cp-page-body">
+      <div id="cp-notif-list">
+        <div style="text-align:center;padding:40px 20px">
+          <div style="font-size:32px;margin-bottom:10px">🔔</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Nicio notificare nouă</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Vei primi notificări despre programări, teme noi și mesaje de la terapeut.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGINA MESAJ TERAPEUT -->
+  <div id="cp-page-mesaj" class="cp-page">
+    <div class="cp-page-header">
+      <button class="cp-page-back" onclick="closeCpPage('mesaj')">← Înapoi</button>
+      <div class="cp-page-title" id="cp-mesaj-title">Mesaj pentru terapeut</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px" id="cp-mesaj-body">
+      <div id="cp-mesaj-list" style="display:flex;flex-direction:column;gap:8px;padding-bottom:8px">
+        <div style="text-align:center;padding:30px 20px;font-size:13px;color:var(--text-muted)">Se încarcă conversația...</div>
+      </div>
+    </div>
+    <div class="cp-msg-input-row">
+      <textarea id="cp-mesaj-input" placeholder="Scrie un mesaj..." rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button class="cp-msg-send" onclick="sendMesajTerapeut()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
     </div>
   </div>
 
@@ -1627,25 +1743,6 @@ async function saveQuickNote(){
   notify('✓ Notița salvată!');
 }
 
-function sendAiMessage(){
-  const input=document.getElementById('cp-ai-input-field');
-  const text=input?.value?.trim();
-  if(!text)return;
-  const chat=document.getElementById('cp-ai-chat');
-  // Add user message
-  const userMsg=document.createElement('div');
-  userMsg.style.cssText='background:var(--sage-dark);color:#fff;border-radius:10px 10px 2px 10px;padding:10px 12px;font-size:12px;line-height:1.6;align-self:flex-end;max-width:85%;margin-left:auto';
-  userMsg.textContent=text;
-  chat.appendChild(userMsg);
-  input.value='';
-  // Placeholder AI response
-  const aiMsg=document.createElement('div');
-  aiMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;line-height:1.6;max-width:85%;color:var(--sage-dark)';
-  aiMsg.textContent='Îți mulțumesc că ai împărtășit asta. Această funcționalitate va fi disponibilă în curând.';
-  chat.appendChild(aiMsg);
-  chat.scrollIntoView({behavior:'smooth',block:'end'});
-}
-
 async function cpLoadHome(){
   if(!currentClientUser)return;
   const today=toDS(new Date());
@@ -1656,8 +1753,8 @@ async function cpLoadHome(){
   const sessBlock=document.getElementById('cp-home-session-block');
 
   if(todayAppt){
-    // Ziua ședinței
-    const sessNum=(appts||[]).indexOf(todayAppt)+1;
+    // Ziua ședinței — numărul e câte programări au fost până azi inclusiv
+    const sessNum=(appts||[]).filter(a=>a.date<=today).length;
     sessBlock.innerHTML=`
       <div class="cp-stitle">Ședința de azi</div>
       <div class="cp-sesscard today">
@@ -1673,8 +1770,8 @@ async function cpLoadHome(){
         </div>
       </div>`;
   } else if(lastAppt){
-    // Între ședințe
-    const sessNum=(appts||[]).indexOf(lastAppt)+1;
+    // Între ședințe — numărul ședinței din trecut
+    const sessNum=(appts||[]).filter(a=>a.date<=lastAppt.date).length;
     const nextBadge=nextAppt?`<span class="cp-badge-next">Urmează ${fmtDate(nextAppt.date)}</span>`:'';
     sessBlock.innerHTML=`
       <div class="cp-stitle">Ultima ședință</div>
@@ -1698,27 +1795,28 @@ async function cpLoadHome(){
   const c=currentClientUser;
   const completatBlock=document.getElementById('cp-home-completat-block');
   const required=[];const soft=[];
-  if(!c.gdpr_signed)required.push({title:'Consimțământ GDPR nesemnat',btn:'Semnează'});
-  if(!c.contract_signed)required.push({title:'Contract terapeutic nesemnat',btn:'Semnează'});
+  if(!c.gdpr_signed)required.push({title:'Consimțământ GDPR nesemnat',btn:'Semnează',action:"openCpPage('documente')"});
+  if(!c.contract_signed)required.push({title:'Contract terapeutic nesemnat',btn:'Semnează',action:"signContractClient()"});
   // Check homework
   const {data:hw}=await sb.from('homework').select('*').eq('client_id',c.id).neq('status','completed').order('date',{ascending:false}).limit(3);
-  (hw||[]).forEach(h=>soft.push({title:`Temă: ${h.title}`,btn:'Completează'}));
+  (hw||[]).forEach(h=>soft.push({title:`Temă: ${h.title}`,btn:'Completează',action:`openSessionJournal({date:'${toDS(new Date())}',session_number:${currentClientUser.session_count||1}});cpShowPanel('fisa-sedinta')`}));
   // Check reflections for last session
   if(lastAppt){
-    const {data:j}=await sb.from('session_journals').select('reflections').eq('client_id',c.id).eq('session_number',(appts||[]).indexOf(lastAppt)+1).single();
-    if(!j?.reflections)soft.push({title:`Reflecție după ședința #${(appts||[]).indexOf(lastAppt)+1}`,btn:'Scrie'});
+    const sessNum=(appts||[]).filter(a=>a.date<=lastAppt.date).length;
+    const {data:j}=await sb.from('session_journals').select('reflections').eq('client_id',c.id).eq('session_number',sessNum).single();
+    if(!j?.reflections)soft.push({title:`Reflecție după ședința #${sessNum}`,btn:'Scrie',action:"cpShowPanel('reflectii',document.getElementById('cpnav-reflectii'))"});
   }
   if(!required.length&&!soft.length){completatBlock.innerHTML='';return;}
   let html=`<div class="cp-stitle">De completat</div><div class="cp-completat">`;
-  required.forEach(item=>{html+=`<div class="cp-citem"><div class="cp-citem-dot"></div><div class="cp-citem-title">${item.title}</div><div class="cp-citem-btn">${item.btn}</div></div>`;});
-  soft.slice(0,3).forEach(item=>{html+=`<div class="cp-csoft"><div class="cp-csoft-dot"></div><div class="cp-csoft-title">${item.title}</div><div class="cp-csoft-btn">${item.btn}</div></div>`;});
+  required.forEach(item=>{html+=`<div class="cp-citem"><div class="cp-citem-dot"></div><div class="cp-citem-title">${item.title}</div><div class="cp-citem-btn" onclick="${item.action}">${item.btn}</div></div>`;});
+  soft.slice(0,3).forEach(item=>{html+=`<div class="cp-csoft"><div class="cp-csoft-dot"></div><div class="cp-csoft-title">${item.title}</div><div class="cp-csoft-btn" onclick="${item.action}">${item.btn}</div></div>`;});
   html+='</div>';
   completatBlock.innerHTML=html;
 }
 
 async function cpLoadSessions(){
   if(!currentClientUser)return;
-  const {data:appts}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:false});
+  const {data:appts}=await sb.from('appointments').select('*').eq('client_id',currentClientUser.id).order('date',{ascending:true});
   const {data:measurements}=await sb.from('measurements').select('*').eq('client_id',currentClientUser.id).eq('type','ors').order('session_number');
   const today=toDS(new Date());
 
@@ -1762,8 +1860,10 @@ async function cpLoadSessions(){
   // Sessions list
   const cont=document.getElementById('cp-sessions-list');
   if(!appts?.length){cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu există programări înregistrate.</div>';return;}
-  cont.innerHTML=appts.map((a,i)=>{
-    const sessNum=appts.length-i;
+  // afișăm descendent (recent first) dar păstrăm numărul corect (cronologic)
+  const reversed=[...appts].reverse();
+  cont.innerHTML=reversed.map((a,i)=>{
+    const sessNum=appts.length-i; // cel mai recent = cel mai mare număr
     const isToday=a.date===today;
     const hasMeas=orsMeas.find(m=>m.session_number===sessNum);
     return`<div class="cp-sitem${isToday?' today':''}" onclick="openSessionJournal({date:'${a.date}',session_number:${sessNum}});cpShowPanel('fisa-sedinta')">
@@ -2051,6 +2151,249 @@ async function submitSRS(){
   else{await sb.from('measurements').insert({client_id:currentClientUser.id,type:'srs',session_number:sessNum,date:today,score_v1:vals[0],score_v2:vals[1],score_v3:vals[2],score_v4:vals[3],total});}
   notify('✓ SRS trimis!','#6d28d9');setTimeout(()=>{cpShowPanel('home');cpLoadHome();},1000);
 }
+
+// ============================================================
+// PAGINI INLINE DIN MENIU
+// ============================================================
+function openCpPage(page){
+  document.getElementById('cp-menu-overlay').classList.add('hidden');
+  const el=document.getElementById('cp-page-'+page);
+  if(!el)return;
+  el.classList.add('open');
+  if(page==='profil')loadProfilPage();
+  if(page==='documente')loadDocumentePage();
+  if(page==='mesaj')loadMesajPage();
+}
+function closeCpPage(page){
+  document.getElementById('cp-page-'+page)?.classList.remove('open');
+}
+
+async function loadProfilPage(){
+  if(!currentClientUser)return;
+  const c=currentClientUser;
+  document.getElementById('cp-profil-avatar').textContent=(c.first_name[0]+(c.last_name?.[0]||'')).toUpperCase();
+  document.getElementById('cp-profil-name').textContent=c.first_name+' '+c.last_name;
+  document.getElementById('cp-profil-email').textContent=c.email||'';
+  document.getElementById('pp-first').value=c.first_name||'';
+  document.getElementById('pp-last').value=c.last_name||'';
+  document.getElementById('pp-phone').value=c.phone||'';
+  document.getElementById('pp-pass-new').value='';
+  document.getElementById('pp-pass-confirm').value='';
+}
+
+async function saveProfilClient(){
+  if(!currentClientUser)return;
+  const first=document.getElementById('pp-first').value.trim();
+  const last=document.getElementById('pp-last').value.trim();
+  const phone=document.getElementById('pp-phone').value.trim();
+  if(!first){notify('Prenumele este obligatoriu.','var(--danger)');return;}
+  await sb.from('clients').update({first_name:first,last_name:last,phone}).eq('id',currentClientUser.id);
+  currentClientUser={...currentClientUser,first_name:first,last_name:last,phone};
+  document.getElementById('cp-greeting').textContent='Bună, '+first+'!';
+  document.getElementById('cp-menu-name').textContent=first+' '+last;
+  document.getElementById('cp-menu-avatar').textContent=(first[0]+(last?.[0]||'')).toUpperCase();
+  document.getElementById('cp-profil-name').textContent=first+' '+last;
+  document.getElementById('cp-profil-avatar').textContent=(first[0]+(last?.[0]||'')).toUpperCase();
+  notify('✓ Profil actualizat!');
+}
+
+async function changeParolaClient(){
+  const p1=document.getElementById('pp-pass-new').value;
+  const p2=document.getElementById('pp-pass-confirm').value;
+  if(!p1||p1.length<6){notify('Parola trebuie să aibă minimum 6 caractere.','var(--danger)');return;}
+  if(p1!==p2){notify('Parolele nu coincid.','var(--danger)');return;}
+  const {data:user}=await sb.from('users').select('id').eq('client_id',currentClientUser.id).single();
+  if(!user){notify('Eroare la găsirea contului.','var(--danger)');return;}
+  await sb.from('users').update({password_hash:p1}).eq('id',user.id);
+  document.getElementById('pp-pass-new').value='';
+  document.getElementById('pp-pass-confirm').value='';
+  notify('✓ Parolă schimbată cu succes!');
+}
+
+async function loadDocumentePage(){
+  if(!currentClientUser)return;
+  const c=currentClientUser;
+  // GDPR status
+  const gdprEl=document.getElementById('doc-gdpr-status');
+  if(c.gdpr_signed){
+    gdprEl.textContent='✓ Semnat';gdprEl.style.background='#dcfce7';gdprEl.style.color='#15803d';
+    const {data:gdpr}=await sb.from('gdpr_consents').select('created_at').eq('client_id',c.id).single();
+    if(gdpr)document.getElementById('doc-gdpr-date').textContent='Semnat la '+fmtDate(gdpr.created_at?.slice(0,10));
+  } else {
+    gdprEl.textContent='⚠ Nesemnat';gdprEl.style.background='#fef3c7';gdprEl.style.color='#92400e';
+  }
+  // Contract status
+  const conEl=document.getElementById('doc-contract-status');
+  const signBtn=document.getElementById('doc-contract-sign-btn');
+  if(c.contract_signed){
+    conEl.textContent='✓ Semnat';conEl.style.background='#dcfce7';conEl.style.color='#15803d';
+    signBtn.classList.add('hidden');
+    document.getElementById('doc-contract-date').textContent='Contract semnat';
+  } else {
+    conEl.textContent='⚠ Nesemnat';conEl.style.background='#fef3c7';conEl.style.color='#92400e';
+    signBtn.classList.remove('hidden');
+  }
+  // Fișă
+  const {data:fisa}=await sb.from('fise').select('*').eq('client_id',c.id).single();
+  const fc=document.getElementById('doc-fisa-content');
+  if(fisa){
+    fc.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="info-item"><div class="info-label">Data nașterii</div><div class="info-value">${fmtDate(fisa.dob)||'—'}</div></div>
+      <div class="info-item"><div class="info-label">Telefon</div><div class="info-value">${c.phone||'—'}</div></div>
+      <div class="info-item"><div class="info-label">Ocupație</div><div class="info-value">${fisa.job||'—'}</div></div>
+      <div class="info-item"><div class="info-label">Stare civilă</div><div class="info-value">${fisa.civil_status||'—'}</div></div>
+    </div>`;
+  } else {
+    fc.innerHTML='<div style="font-size:12px;color:var(--text-muted)">Fișa nu a fost completată.</div>';
+  }
+}
+
+async function signContractClient(){
+  if(!currentClientUser)return;
+  if(!confirm('Confirmi semnarea contractului terapeutic?'))return;
+  await sb.from('clients').update({contract_signed:true}).eq('id',currentClientUser.id);
+  currentClientUser={...currentClientUser,contract_signed:true};
+  notify('✓ Contract semnat!');
+  loadDocumentePage();
+  cpLoadHome();
+}
+
+// ============================================================
+// MESAJ TERAPEUT
+// ============================================================
+const MESSAGES_TABLE='messages'; // asigură-te că tabela există în Supabase
+
+async function loadMesajPage(){
+  if(!currentClientUser)return;
+  document.getElementById('cp-mesaj-title').textContent='Mesaj pentru '+SETTINGS.name;
+  const listEl=document.getElementById('cp-mesaj-list');
+  listEl.innerHTML='<div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted)">Se încarcă...</div>';
+  const {data:msgs}=await sb.from(MESSAGES_TABLE).select('*')
+    .eq('client_id',currentClientUser.id)
+    .order('created_at',{ascending:true})
+    .limit(50);
+  if(!msgs?.length){
+    listEl.innerHTML='<div style="text-align:center;padding:30px 20px"><div style="font-size:28px;margin-bottom:8px">💬</div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Nicio conversație încă</div><div style="font-size:11px;color:var(--text-muted);line-height:1.6">Poți trimite un mesaj terapeutului tău oricând.</div></div>';
+    return;
+  }
+  listEl.innerHTML=msgs.map(m=>{
+    const isClient=m.sender==='client';
+    return`<div style="display:flex;justify-content:${isClient?'flex-end':'flex-start'}">
+      <div style="max-width:80%;background:${isClient?'var(--sage-dark)':'var(--card)'};border:${isClient?'none':'1px solid var(--border)'};border-radius:${isClient?'12px 12px 2px 12px':'12px 12px 12px 2px'};padding:10px 12px">
+        <div style="font-size:12px;color:${isClient?'#fff':'var(--text)'};line-height:1.6">${m.message}</div>
+        <div style="font-size:9px;color:${isClient?'rgba(255,255,255,0.45)':'var(--text-muted)'};margin-top:4px;text-align:right">${fmtDate(m.created_at?.slice(0,10))}</div>
+      </div>
+    </div>`;
+  }).join('');
+  // scroll to bottom
+  const body=document.getElementById('cp-mesaj-body');
+  setTimeout(()=>body.scrollTop=body.scrollHeight,50);
+}
+
+async function sendMesajTerapeut(){
+  const input=document.getElementById('cp-mesaj-input');
+  const text=input?.value?.trim();
+  if(!text||!currentClientUser)return;
+  input.value='';
+  input.style.height='auto';
+  const {error}=await sb.from(MESSAGES_TABLE).insert({
+    client_id:currentClientUser.id,
+    sender:'client',
+    message:text,
+    read:false
+  });
+  if(error){notify('Eroare la trimitere. Încearcă din nou.','var(--danger)');input.value=text;return;}
+  loadMesajPage();
+}
+
+// ============================================================
+// NARA AI — ANTHROPIC API
+// ============================================================
+let aiConversationHistory=[];
+
+async function sendAiMessage(){
+  const input=document.getElementById('cp-ai-input-field');
+  const text=input?.value?.trim();
+  if(!text)return;
+  const chat=document.getElementById('cp-ai-chat');
+  input.value='';
+
+  // User bubble
+  const userMsg=document.createElement('div');
+  userMsg.style.cssText='background:var(--sage-dark);color:#fff;border-radius:10px 10px 2px 10px;padding:10px 12px;font-size:12px;line-height:1.6;align-self:flex-end;max-width:85%;margin-left:auto';
+  userMsg.textContent=text;
+  chat.appendChild(userMsg);
+
+  // Typing indicator
+  const typing=document.createElement('div');
+  typing.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;max-width:85%;color:var(--sage-dark);display:flex;align-items:center;gap:4px';
+  typing.innerHTML='<span style="opacity:0.6;font-size:11px;font-style:italic">NARA scrie...</span>';
+  chat.appendChild(typing);
+  chat.scrollIntoView({behavior:'smooth',block:'end'});
+
+  // Build context
+  aiConversationHistory.push({role:'user',content:text});
+
+  try{
+    const systemPrompt=`Ești NARA AI, un companion terapeutic digital creat pentru a însoți clienții între ședințele de psihoterapie. Terapeutul clientului este ${SETTINGS.name}, ${SETTINGS.role}.
+
+Rolul tău:
+- Ești un spațiu de reflecție și explorare interioară, NU un terapeut
+- Pui întrebări deschise, reflective, care ajută clientul să-și exploreze experiența
+- Ești cald, prezent și necritic
+- Nu oferi sfaturi directe, nu diagnostichezi, nu înlocuiești terapeutul
+- Dacă detectezi limbaj de criză (vrea să se rănească, suicid, urgență), răspunzi cu căldură și îndrumi spre terapeut sau 112
+- Vorbești în română, la persoana a doua singular (tu)
+- Răspunsurile tale sunt scurte (2-4 propoziții maxim), concentrându-te pe o singură idee sau întrebare
+- Nu pui mai mult de o întrebare pe rând
+
+Clientul se numește ${currentClientUser?.first_name||''}. Răspunde natural, empatic și cu prezență.`;
+
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        system:systemPrompt,
+        messages:aiConversationHistory
+      })
+    });
+    const data=await response.json();
+    const aiText=data.content?.[0]?.text||'Îmi pare rău, am întâmpinat o problemă. Încearcă din nou.';
+    aiConversationHistory.push({role:'assistant',content:aiText});
+
+    typing.remove();
+    const aiMsg=document.createElement('div');
+    aiMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;line-height:1.6;max-width:85%;color:var(--sage-dark)';
+    aiMsg.textContent=aiText;
+    chat.appendChild(aiMsg);
+    chat.scrollIntoView({behavior:'smooth',block:'end'});
+  } catch(e){
+    typing.remove();
+    const errMsg=document.createElement('div');
+    errMsg.style.cssText='background:rgba(255,255,255,0.65);border:1px solid rgba(10,122,110,0.15);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;max-width:85%;color:var(--sage-dark);font-style:italic;opacity:0.7';
+    errMsg.textContent='Momentan nu mă pot conecta. Încearcă din nou în câteva secunde.';
+    chat.appendChild(errMsg);
+    aiConversationHistory.pop(); // remove failed user message
+  }
+}
+
+// Allow Enter to send AI message (Shift+Enter = newline)
+document.addEventListener('DOMContentLoaded',()=>{
+  const aiInput=document.getElementById('cp-ai-input-field');
+  if(aiInput){
+    aiInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();}
+    });
+  }
+  const msgInput=document.getElementById('cp-mesaj-input');
+  if(msgInput){
+    msgInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMesajTerapeut();}
+    });
+  }
+});
 
 init();
 </script>
