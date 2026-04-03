@@ -488,17 +488,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       </div>
       <nav class="nav">
         <div class="nav-section">General</div>
-        <div class="nav-item active" onclick=\"tNav('dashboard',this,false)\">◈ Panou principal</div>
-        <div class="nav-item" onclick=\"tNav('calendar',this,false)\">◷ Calendar</div>
+        <div class="nav-item active" onclick="tNav('dashboard',this,false)">◈ Panou principal</div>
+        <div class="nav-item" onclick="tNav('calendar',this,false)">◷ Calendar</div>
         <div class="nav-section">Clinică</div>
-        <div class="nav-item" onclick=\"tNav('clients',this,false)\">◉ Clienți</div>
-        <div class="nav-item" onclick=\"tNav('notes',this,false)\">◎ Notițe ședință</div>
+        <div class="nav-item" onclick="tNav('clients',this,false)">◉ Clienți</div>
+        <div class="nav-item" onclick="tNav('notes',this,false)">◎ Notițe ședință</div>
         <div class="nav-section">Administrativ</div>
-        <div class="nav-item" onclick=\"tNav('contracts',this,false)\">◧ Contracte & GDPR</div>
-        <div class="nav-item" onclick=\"tNav('invoices',this,false)\">◈ Facturi</div>
+        <div class="nav-item" onclick="tNav('contracts',this,false)">◧ Contracte & GDPR</div>
+        <div class="nav-item" onclick="tNav('invoices',this,false)">◈ Facturi</div>
         <div class="nav-section">Configurare</div>
-        <div class="nav-item" onclick=\"tNav('invite',this,false)\">🔗 Link invitație</div>
-        <div class="nav-item" onclick=\"tNav('settings',this,false)\">⚙ Setări cabinet</div>
+        <div class="nav-item" onclick="tNav('invite',this,false)">🔗 Link invitație</div>
+        <div class="nav-item" onclick="tNav('settings',this,false)">⚙ Setări cabinet</div>
       </nav>
       <div class="sidebar-footer">
         <div style="display:flex;align-items:center;gap:9px">
@@ -1768,7 +1768,7 @@ async function showClientDetail(id){
           <div style="font-size:15px;font-weight:700;color:var(--text)">${c.first_name} ${c.last_name}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #${appointments?.length||0} · ${c.status==='active'?'Activ':'În așteptare'}</div>
         </div>
-        ${lastOrs?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">${firstOrs&&firstOrs.id!==lastOrs.id?firstOrs.total+' → ':''} ${lastOrs.total}${orsTrend}</span>`:''}
+        ${lastOrs?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">${firstOrs&&firstOrs.id!==lastOrs.id?firstOrs.total+' → '+lastOrs.total:lastOrs.total}${orsTrend}</span>`:''}
       </div>
     </div>
 
@@ -1877,7 +1877,7 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
     const orsVals=orsMeas.map(m=>parseFloat(m.total));
     const srsVals=(srsMeas||[]).map(m=>parseFloat(m.total));
     const maxSess=Math.max(orsMeas.length,(srsMeas||[]).length);
-    const w=300,h=80,pad=20,refY=28; // prag referință ORS=28
+    const w=300,h=80,pad=20,refY=24; // prag referință ORS=24
     const xStep=(w-pad*2)/Math.max(maxSess-1,1);
 
     const mkPath=(vals,color)=>{
@@ -1907,7 +1907,7 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
       <div style="display:flex;gap:12px;margin-top:4px">
         <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:var(--sage);border-radius:2px"></div>ORS</div>
         ${srsVals.length?`<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#8b5cf6;border-radius:2px"></div>SRS</div>`:''}
-        <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#aaa"><div style="width:8px;height:1px;background:#aaa;border-radius:2px"></div>Prag referință (28)</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#aaa"><div style="width:8px;height:1px;background:#aaa;border-radius:2px"></div>Prag referință (24)</div>
       </div>
     </div>`;
   }
