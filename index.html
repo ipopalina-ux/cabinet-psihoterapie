@@ -2435,46 +2435,69 @@ async function loadHomework(date,sessNum){
   const cont=document.getElementById('homework-content');
   if(!cont)return;
 
-  // Tema de la terapeut (tabela homework)
+  // Tema de la terapeut
   const {data:hw}=await sb.from('homework').select('*')
     .eq('client_id',currentClientUser.id).order('date',{ascending:false}).limit(5);
-  const therapistHw=hw?.find(h=>h.session_number===sessNum)||hw?.[0];
+  const therapistHw=hw?.find(h=>h.session_number===sessNum)||null;
 
-  // Completările clientului (journal_entries type=homework)
+  // Cerința scrisă de client
+  const {data:goalEntries}=await sb.from('journal_entries').select('*')
+    .eq('client_id',currentClientUser.id).eq('session_number',sessNum)
+    .eq('type','homework_goal').order('created_at',{ascending:false}).limit(1);
+  const clientGoal=goalEntries?.[0]||null;
+
+  // Completările clientului
   const {data:clientHw}=await sb.from('journal_entries').select('*')
     .eq('client_id',currentClientUser.id).eq('session_number',sessNum)
     .eq('type','homework').order('created_at',{ascending:false});
 
   let html='';
 
-  // CERINȚA — de la terapeut sau lipsă
+  // ── CERINȚA ──
   if(therapistHw){
     const isCompleted=therapistHw.status==='completed';
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:11px 13px;margin-bottom:12px">
       <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px">Cerința</div>
-      <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:${therapistHw.description||therapistHw.due_date?'6px':'0'}">${therapistHw.title}</div>
-      ${therapistHw.description?`<div style="font-size:12px;color:var(--text-muted);line-height:1.5">${therapistHw.description}</div>`:''}
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+      <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px">${therapistHw.title}</div>
+      ${therapistHw.description?`<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">${therapistHw.description}</div>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;color:var(--text-muted)">De la terapeut${therapistHw.due_date?' · Termen: '+fmtDate(therapistHw.due_date):''}</div>
-        ${!isCompleted?`<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="markHomeworkDone('${therapistHw.id}')">Marchez rezolvată</button>`:'<span style="font-size:10px;color:var(--success);font-weight:600">✓ Rezolvată</span>'}
+        ${!isCompleted
+          ?`<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="markHomeworkDone('${therapistHw.id}')">Marchez rezolvată</button>`
+          :'<span style="font-size:10px;color:var(--success);font-weight:600">✓ Rezolvată</span>'}
       </div>
     </div>`;
+  } else if(clientGoal){
+    html+=`<div style="background:var(--sage-light);border-radius:9px;padding:11px 13px;margin-bottom:12px" id="goal-display">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Cerința</div>
+        <div style="font-size:10px;color:var(--sage);cursor:pointer" onclick="editGoal('${clientGoal.id}')">Editează</div>
+      </div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6">${clientGoal.text}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px">Notată de tine</div>
+    </div>`;
   } else {
-    html+=`<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Nicio temă primită. Poți nota tu ce ți-ai propus.</div>`;
+    html+=`<div style="margin-bottom:12px">
+      <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Cerința</div>
+      <textarea id="j-goal-text" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce ți-ai propus să lucrezi?"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px">
+        <button class="btn btn-ghost btn-sm" onclick="saveGoal()">Salvează cerința</button>
+      </div>
+    </div>`;
   }
 
-  // CÂMP NOU — completare
-  html+=`<textarea id="j-hw-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="${therapistHw?'Ce ai lucrat, ce ai observat...':'Notează ce ți-ai propus...'}"></textarea>
+  // ── CÂMP COMPLETARE NOUĂ ──
+  html+=`<textarea id="j-hw-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="${therapistHw||clientGoal?'Ce ai lucrat, ce ai observat...':'Adaugă completarea ta...'}"></textarea>
   <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${clientHw?.length?'12px':'0'}">
     <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('homework')">Salvează</button>
   </div>`;
 
-  // COMPLETĂRILE MELE — bule editabile
+  // ── COMPLETĂRILE MELE ──
   if(clientHw?.length){
     html+=`<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Completările mele</div>`;
     html+=clientHw.map(e=>{
       const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
-      return`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px;cursor:pointer" id="hwbubble-${e.id}" onclick="editHwBubble('${e.id}',this)">
+      return`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px;cursor:pointer" onclick="editHwBubble('${e.id}',this)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
           <div style="font-size:10px;color:var(--text-muted)">${fmtDate(e.created_at?.slice(0,10))}, ${time}</div>
           <div style="font-size:10px;color:var(--sage)">Editează</div>
@@ -2487,7 +2510,45 @@ async function loadHomework(date,sessNum){
   cont.innerHTML=html;
 }
 
-function editHwBubble(id, el){
+async function saveGoal(){
+  if(!currentJournal||!currentClientUser)return;
+  const text=document.getElementById('j-goal-text')?.value?.trim();
+  if(!text){notify('Scrie cerința înainte de a salva.','var(--warn)');return;}
+  const {error}=await sb.from('journal_entries').insert({
+    client_id:currentClientUser.id,
+    session_number:currentJournal.session_number||1,
+    type:'homework_goal',text,shared:false
+  });
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Cerință salvată!');
+  loadHomework(currentJournal.date,currentJournal.session_number);
+}
+
+async function editGoal(id){
+  const cont=document.getElementById('goal-display');
+  if(!cont)return;
+  const textEl=cont.querySelectorAll('div')[2];
+  const originalText=textEl?.textContent||'';
+  cont.innerHTML=`
+    <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Cerința · editezi acum</div>
+    <textarea style="width:100%;min-height:60px;padding:7px 9px;border:1.5px solid var(--sage);border-radius:8px;font-size:13px;line-height:1.6;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none">${originalText}</textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:7px">
+      <button class="btn btn-ghost btn-sm" onclick="loadHomework(currentJournal.date,currentJournal.session_number)">Renunță</button>
+      <button class="btn btn-primary btn-sm" onclick="saveGoalEdit('${id}',this)">Salvează</button>
+    </div>`;
+  cont.querySelector('textarea').focus();
+}
+
+async function saveGoalEdit(id,btn){
+  const newText=btn.parentElement.parentElement.querySelector('textarea')?.value?.trim();
+  if(!newText){notify('Textul nu poate fi gol.','var(--warn)');return;}
+  const {error}=await sb.from('journal_entries').update({text:newText}).eq('id',id);
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Cerință actualizată!');
+  loadHomework(currentJournal.date,currentJournal.session_number);
+}
+
+function editHwBubble(id,el){
   if(el.querySelector('textarea'))return;
   const originalText=el.querySelector('div:last-child')?.textContent||'';
   el.innerHTML=`
@@ -2502,15 +2563,15 @@ function editHwBubble(id, el){
   el.querySelector('textarea').focus();
 }
 
-async function saveHwBubbleEdit(id, btn){
-  const el=btn.parentElement.parentElement;
-  const newText=el.querySelector('textarea')?.value?.trim();
+async function saveHwBubbleEdit(id,btn){
+  const newText=btn.parentElement.parentElement.querySelector('textarea')?.value?.trim();
   if(!newText){notify('Textul nu poate fi gol.','var(--warn)');return;}
   const {error}=await sb.from('journal_entries').update({text:newText}).eq('id',id);
   if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
   notify('✓ Editat!');
   loadHomework(currentJournal.date,currentJournal.session_number);
 }
+
 
 async function markHomeworkDone(hwId){
   await sb.from('homework').update({status:'completed'}).eq('id',hwId);
