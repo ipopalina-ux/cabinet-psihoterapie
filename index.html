@@ -993,30 +993,106 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       <div class="cp-page-title">Documentele mele</div>
     </div>
     <div class="cp-page-body">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:13px;font-weight:700;color:var(--text)">📋 Consimțământ GDPR</div>
-          <span id="doc-gdpr-status" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700">—</span>
+
+      <!-- GDPR -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:12px;overflow:hidden">
+        <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDocSection('gdpr')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:20px">📋</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Consimțământ GDPR</div>
+              <div id="doc-gdpr-date" style="font-size:10px;color:var(--text-muted);margin-top:1px">—</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="doc-gdpr-status" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700">—</span>
+            <svg id="doc-gdpr-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Consimțământul tău privind prelucrarea datelor cu caracter personal, conform GDPR.</div>
-        <div id="doc-gdpr-date" style="font-size:11px;color:var(--text-muted);margin-top:8px"></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:13px;font-weight:700;color:var(--text)">📄 Contract terapeutic</div>
-          <span id="doc-contract-status" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700">—</span>
+        <div id="doc-gdpr-body" style="display:none;border-top:1px solid var(--border);padding:16px">
+          <div style="background:var(--sage-light);border-radius:8px;padding:13px;font-size:11px;color:var(--text);line-height:1.75;max-height:300px;overflow-y:auto;margin-bottom:12px;border:1px solid var(--border)">
+            <strong>INFORMARE PRIVIND PRELUCRAREA DATELOR CU CARACTER PERSONAL</strong><br>
+            <em>conform Regulamentului (UE) 2016/679 (GDPR) și Legii nr. 190/2018</em><br><br>
+            <strong>Operatorul</strong> este cabinetul individual de psihologie reprezentat de terapeutul care ți-a transmis linkul de înregistrare.<br><br>
+            <strong>Datele colectate:</strong> date de identificare (nume, dată naștere), date de contact (email, telefon), date privind sănătatea și starea psihologică (diagnostic, medicație, istoricul terapeutic, notițele de ședință, scalele ORS/SRS).<br><br>
+            <strong>Scopul:</strong> Furnizarea serviciilor psihologice/psihoterapeutice, în baza consimțământului tău explicit (art. 9 alin. 2 lit. a GDPR).<br><br>
+            <strong>Durata stocării:</strong> Pe durata relației terapeutice și 5 ani ulterior, conform obligațiilor Colegiului Psihologilor din România.<br><br>
+            <strong>Drepturile tale:</strong> Acces, rectificare, ștergere, portabilitate, restricționare, opoziție. Poți retrage consimțământul oricând. Plângeri: ANSPDCP — dataprotection.ro.<br><br>
+            <strong>Datele nu sunt transmise terților</strong>, cu excepția cazurilor prevăzute de lege.
+          </div>
+          <div id="doc-gdpr-signed-info" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;font-size:12px;color:#15803d">
+            ✓ Ai semnat acest consimțământ. Poți solicita o copie terapeutului tău.
+          </div>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Contractul de prestare servicii psihologice/psihoterapeutice.</div>
-        <div id="doc-contract-date" style="font-size:11px;color:var(--text-muted);margin-top:8px"></div>
-        <div id="doc-contract-sign-btn" class="hidden" style="margin-top:10px">
-          <button class="btn btn-primary btn-sm" onclick="signContractClient()">✍ Semnează contractul</button>
+      </div>
+
+      <!-- CONTRACT -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:12px;overflow:hidden">
+        <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDocSection('contract')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:20px">📄</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Contract terapeutic</div>
+              <div id="doc-contract-date" style="font-size:10px;color:var(--text-muted);margin-top:1px">—</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="doc-contract-status" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700">—</span>
+            <svg id="doc-contract-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+        <div id="doc-contract-body" style="display:none;border-top:1px solid var(--border);padding:16px">
+          <div style="background:var(--sage-light);border-radius:8px;padding:13px;font-size:11px;color:var(--text);line-height:1.75;max-height:300px;overflow-y:auto;margin-bottom:14px;border:1px solid var(--border)" id="doc-contract-text">
+            <strong>CONTRACT DE PRESTARE SERVICII PSIHOLOGICE / PSIHOTERAPEUTICE</strong><br><br>
+            <strong>Între:</strong><br>
+            Prestator: <span id="ct-therapist-name">—</span>, <span id="ct-therapist-role">—</span><br>
+            Beneficiar: <span id="ct-client-name">—</span><br><br>
+            <strong>1. Obiectul contractului</strong><br>
+            Prestatorul se obligă să furnizeze servicii de psihoterapie / consiliere psihologică Beneficiarului, în conformitate cu standardele profesionale și deontologice ale Colegiului Psihologilor din România.<br><br>
+            <strong>2. Durata</strong><br>
+            Contractul este valabil pe durata relației terapeutice, putând fi reziliat de oricare parte cu 1 ședință preaviz.<br><br>
+            <strong>3. Confidențialitate</strong><br>
+            Toate informațiile din cadrul ședințelor sunt strict confidențiale, cu excepțiile prevăzute de lege (risc iminent de vătămare, obligații legale de raportare).<br><br>
+            <strong>4. Tarif și programare</strong><br>
+            Tariful per ședință este stabilit de comun acord. Anularea se face cu minimum 24h înainte.<br><br>
+            <strong>5. Responsabilitate</strong><br>
+            Psihoterapia nu este un substitut pentru îngrijiri medicale de urgență. În situații de criză, Beneficiarul va contacta serviciile de urgență (112).<br><br>
+            Prin semnarea acestui contract, ambele părți confirmă că au citit, înțeles și sunt de acord cu termenii de mai sus.
+          </div>
+          <div id="doc-contract-unsigned" class="hidden">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Semnătura ta</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Desenează semnătura în spațiul de mai jos folosind mouse-ul sau touchpadul:</div>
+            <canvas id="signature-canvas" width="100%" height="160" style="border:1.5px solid var(--border);border-radius:10px;background:#fafafa;cursor:crosshair;touch-action:none;display:block;width:100%"></canvas>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+              <button class="btn btn-ghost btn-sm" onclick="clearSignature()">✕ Șterge semnătura</button>
+              <div style="flex:1"></div>
+              <button class="btn btn-primary" onclick="saveContractSignature()">✍ Confirmă și semnează</button>
+            </div>
+          </div>
+          <div id="doc-contract-signed-info" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px">
+            <div style="font-size:12px;color:#15803d;font-weight:600;margin-bottom:6px">✓ Contract semnat</div>
+            <img id="doc-contract-sig-img" src="" alt="Semnătura" style="max-width:200px;border:1px solid #bbf7d0;border-radius:6px;background:#fff;padding:4px">
+          </div>
         </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📁 Fișa personală</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Datele completate la înregistrare — diagnostic, medicație, istoric terapeutic.</div>
-        <div id="doc-fisa-content" style="margin-top:12px"></div>
+
+      <!-- FIȘĂ PERSONALĂ -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden">
+        <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDocSection('fisa')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:20px">📁</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">Fișa personală</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:1px">Date completate la înregistrare</div>
+            </div>
+          </div>
+          <svg id="doc-fisa-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="doc-fisa-body" style="display:none;border-top:1px solid var(--border);padding:16px">
+          <div id="doc-fisa-content"></div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -2213,49 +2289,162 @@ async function changeParolaClient(){
 async function loadDocumentePage(){
   if(!currentClientUser)return;
   const c=currentClientUser;
+
+  // Populate contract names
+  const ctThName=document.getElementById('ct-therapist-name');
+  const ctThRole=document.getElementById('ct-therapist-role');
+  const ctClName=document.getElementById('ct-client-name');
+  if(ctThName)ctThName.textContent=SETTINGS.name;
+  if(ctThRole)ctThRole.textContent=SETTINGS.role;
+  if(ctClName)ctClName.textContent=c.first_name+' '+c.last_name;
+
   // GDPR status
   const gdprEl=document.getElementById('doc-gdpr-status');
+  const gdprSigned=document.getElementById('doc-gdpr-signed-info');
   if(c.gdpr_signed){
     gdprEl.textContent='✓ Semnat';gdprEl.style.background='#dcfce7';gdprEl.style.color='#15803d';
     const {data:gdpr}=await sb.from('gdpr_consents').select('created_at').eq('client_id',c.id).single();
-    if(gdpr)document.getElementById('doc-gdpr-date').textContent='Semnat la '+fmtDate(gdpr.created_at?.slice(0,10));
+    const dateEl=document.getElementById('doc-gdpr-date');
+    if(gdpr&&dateEl)dateEl.textContent='Semnat la '+fmtDate(gdpr.created_at?.slice(0,10));
+    if(gdprSigned)gdprSigned.style.display='block';
   } else {
     gdprEl.textContent='⚠ Nesemnat';gdprEl.style.background='#fef3c7';gdprEl.style.color='#92400e';
+    const dateEl=document.getElementById('doc-gdpr-date');
+    if(dateEl)dateEl.textContent='Necesită semnare';
   }
+
   // Contract status
   const conEl=document.getElementById('doc-contract-status');
-  const signBtn=document.getElementById('doc-contract-sign-btn');
+  const conUnsigned=document.getElementById('doc-contract-unsigned');
+  const conSignedInfo=document.getElementById('doc-contract-signed-info');
+  const conDateEl=document.getElementById('doc-contract-date');
   if(c.contract_signed){
     conEl.textContent='✓ Semnat';conEl.style.background='#dcfce7';conEl.style.color='#15803d';
-    signBtn.classList.add('hidden');
-    document.getElementById('doc-contract-date').textContent='Contract semnat';
+    if(conDateEl)conDateEl.textContent='Contract semnat';
+    if(conUnsigned)conUnsigned.classList.add('hidden');
+    if(conSignedInfo){
+      conSignedInfo.style.display='block';
+      const savedSig=localStorage.getItem('nara_sig_'+c.id);
+      const sigImg=document.getElementById('doc-contract-sig-img');
+      if(savedSig&&sigImg){sigImg.src=savedSig;sigImg.style.display='block';}
+      else if(sigImg)sigImg.style.display='none';
+    }
   } else {
     conEl.textContent='⚠ Nesemnat';conEl.style.background='#fef3c7';conEl.style.color='#92400e';
-    signBtn.classList.remove('hidden');
+    if(conDateEl)conDateEl.textContent='Necesită semnare';
+    if(conUnsigned)conUnsigned.classList.remove('hidden');
+    if(conSignedInfo)conSignedInfo.style.display='none';
   }
-  // Fișă
+
+  // Fișă personală
   const {data:fisa}=await sb.from('fise').select('*').eq('client_id',c.id).single();
   const fc=document.getElementById('doc-fisa-content');
   if(fisa){
-    fc.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div class="info-item"><div class="info-label">Data nașterii</div><div class="info-value">${fmtDate(fisa.dob)||'—'}</div></div>
-      <div class="info-item"><div class="info-label">Telefon</div><div class="info-value">${c.phone||'—'}</div></div>
-      <div class="info-item"><div class="info-label">Ocupație</div><div class="info-value">${fisa.job||'—'}</div></div>
-      <div class="info-item"><div class="info-label">Stare civilă</div><div class="info-value">${fisa.civil_status||'—'}</div></div>
-    </div>`;
+    fc.innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-row">
+          <div class="fg"><label>Data nașterii</label><input type="text" id="fisa-dob" value="${fmtDate(fisa.dob)||''}" style="background:var(--warm)" readonly></div>
+          <div class="fg"><label>Telefon</label><input type="tel" id="fisa-phone" value="${c.phone||''}" placeholder="07xx xxx xxx"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Ocupație</label><input type="text" id="fisa-job" value="${fisa.job||''}" placeholder="—"></div>
+          <div class="fg"><label>Stare civilă</label>
+            <select id="fisa-civil">
+              <option ${fisa.civil_status==='Necăsătorit/ă'?'selected':''}>Necăsătorit/ă</option>
+              <option ${fisa.civil_status==='Căsătorit/ă'?'selected':''}>Căsătorit/ă</option>
+              <option ${fisa.civil_status==='Divorțat/ă'?'selected':''}>Divorțat/ă</option>
+              <option ${fisa.civil_status==='Văduv/ă'?'selected':''}>Văduv/ă</option>
+              <option ${fisa.civil_status==='Parteneriat'?'selected':''}>Parteneriat</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label>Diagnostic medical (dacă există)</label><textarea id="fisa-diag" style="min-height:60px">${fisa.medical_diagnosis||''}</textarea></div>
+        <div class="fg"><label>Medicație curentă</label><textarea id="fisa-meds" style="min-height:60px">${fisa.medication||''}</textarea></div>
+        <div class="fg"><label>Experiențe terapeutice anterioare</label><textarea id="fisa-prev" style="min-height:60px">${fisa.previous_therapy||''}</textarea></div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="saveFisaClient('${fisa.id}')">Salvează modificările</button>
+        </div>
+      </div>`;
   } else {
-    fc.innerHTML='<div style="font-size:12px;color:var(--text-muted)">Fișa nu a fost completată.</div>';
+    fc.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:8px 0">Fișa nu a fost completată la înregistrare.</div>';
   }
 }
 
-async function signContractClient(){
+function toggleDocSection(section){
+  const body=document.getElementById('doc-'+section+'-body');
+  const arrow=document.getElementById('doc-'+section+'-arrow');
+  if(!body)return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  if(arrow)arrow.style.transform=isOpen?'rotate(0deg)':'rotate(90deg)';
+  if(section==='contract'&&!isOpen&&currentClientUser&&!currentClientUser.contract_signed){
+    setTimeout(()=>initSignatureCanvas(),150);
+  }
+}
+
+// ---- CANVAS SEMNĂTURĂ ----
+let signatureCanvas=null;let sigCtx=null;let sigDrawing=false;let sigHasData=false;
+
+function initSignatureCanvas(){
+  const canvas=document.getElementById('signature-canvas');
+  if(!canvas)return;
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width||320;
+  canvas.height=160;
+  signatureCanvas=canvas;
+  sigCtx=canvas.getContext('2d');
+  sigCtx.strokeStyle='#0a2420';sigCtx.lineWidth=2.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';
+  sigHasData=false;
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    if(e.touches){return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};}
+    return{x:e.clientX-r.left,y:e.clientY-r.top};
+  }
+  canvas.onmousedown=canvas.ontouchstart=(e)=>{e.preventDefault();sigDrawing=true;sigCtx.beginPath();const p=getPos(e);sigCtx.moveTo(p.x,p.y);};
+  canvas.onmousemove=canvas.ontouchmove=(e)=>{e.preventDefault();if(!sigDrawing)return;const p=getPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();sigHasData=true;};
+  canvas.onmouseup=canvas.ontouchend=()=>{sigDrawing=false;};
+  canvas.onmouseleave=()=>{sigDrawing=false;};
+}
+
+function clearSignature(){
+  if(!sigCtx||!signatureCanvas)return;
+  sigCtx.clearRect(0,0,signatureCanvas.width,signatureCanvas.height);
+  sigHasData=false;
+}
+
+async function saveContractSignature(){
+  if(!sigHasData){notify('Desenează semnătura înainte de a continua.','var(--warn)');return;}
   if(!currentClientUser)return;
-  if(!confirm('Confirmi semnarea contractului terapeutic?'))return;
+  const sigData=signatureCanvas.toDataURL('image/png');
+  localStorage.setItem('nara_sig_'+currentClientUser.id,sigData);
   await sb.from('clients').update({contract_signed:true}).eq('id',currentClientUser.id);
   currentClientUser={...currentClientUser,contract_signed:true};
-  notify('✓ Contract semnat!');
+  notify('✓ Contract semnat cu succes!');
   loadDocumentePage();
   cpLoadHome();
+}
+
+async function saveFisaClient(fisaId){
+  if(!currentClientUser)return;
+  const phone=document.getElementById('fisa-phone')?.value?.trim();
+  await sb.from('fise').update({
+    job:document.getElementById('fisa-job')?.value?.trim()||'',
+    civil_status:document.getElementById('fisa-civil')?.value||'',
+    medical_diagnosis:document.getElementById('fisa-diag')?.value?.trim()||'',
+    medication:document.getElementById('fisa-meds')?.value?.trim()||'',
+    previous_therapy:document.getElementById('fisa-prev')?.value?.trim()||''
+  }).eq('id',fisaId);
+  if(phone){
+    await sb.from('clients').update({phone}).eq('id',currentClientUser.id);
+    currentClientUser={...currentClientUser,phone};
+  }
+  notify('✓ Fișă actualizată!');
+}
+
+async function signContractClient(){
+  // Deschide pagina documente și expandează secțiunea contract
+  openCpPage('documente');
+  setTimeout(()=>toggleDocSection('contract'),300);
 }
 
 // ============================================================
