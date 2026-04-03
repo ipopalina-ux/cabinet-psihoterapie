@@ -767,7 +767,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
   <!-- APP după login -->
   <div id="cp-app" class="hidden portal-shell">
     <div class="portal-header">
-      <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="cpShowPanel('home',document.getElementById('cpnav-home'))">
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="closeAllCpPages();cpShowPanel('home',document.getElementById('cpnav-home'))">
         <svg width="26" height="26" viewBox="0 0 80 80"><defs><linearGradient id="cpa1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a6475"/><stop offset="100%" style="stop-color:#2ec4d6"/></linearGradient><linearGradient id="cpa2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0a7a6e"/><stop offset="100%" style="stop-color:#1dd8b0"/></linearGradient></defs><ellipse cx="40" cy="22" rx="8" ry="16" fill="url(#cpa1)" opacity="0.9"/><ellipse cx="58" cy="40" rx="16" ry="8" fill="url(#cpa1)" opacity="0.65"/><ellipse cx="40" cy="58" rx="8" ry="16" fill="url(#cpa2)" opacity="0.5"/><ellipse cx="22" cy="40" rx="16" ry="8" fill="url(#cpa2)" opacity="0.75"/><circle cx="40" cy="40" r="14" fill="rgba(255,255,255,0.1)"/></svg>
         <div><div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.1em">NARA</div><div style="font-size:8px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em">Spațiul tău terapeutic</div></div>
       </div>
@@ -908,16 +908,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
     <!-- BARA DE JOS FIXĂ -->
     <div class="portal-nav">
-      <div class="client-nav-item active" id="cpnav-home" onclick="cpShowPanel('home',this)">
+      <div class="client-nav-item active" id="cpnav-home" onclick="closeAllCpPages();cpShowPanel('home',this)">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Acasă
       </div>
-      <div class="client-nav-item" id="cpnav-sedinte" onclick="cpShowPanel('sedinte',this);cpLoadSessions()">
+      <div class="client-nav-item" id="cpnav-sedinte" onclick="closeAllCpPages();cpShowPanel('sedinte',this);cpLoadSessions()">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Ședințe
       </div>
-      <div class="client-nav-item" id="cpnav-reflectii" onclick="cpShowPanel('reflectii',this);cpLoadJurnal()">
+      <div class="client-nav-item" id="cpnav-reflectii" onclick="closeAllCpPages();cpShowPanel('reflectii',this);cpLoadJurnal()">
         <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Jurnal
       </div>
-      <div class="client-nav-item" id="cpnav-nara-ai" onclick="cpShowPanel('nara-ai',this)">
+      <div class="client-nav-item" id="cpnav-nara-ai" onclick="closeAllCpPages();cpShowPanel('nara-ai',this)">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>NARA AI
       </div>
     </div>
@@ -2624,6 +2624,13 @@ async function submitSRS(){
 // ============================================================
 // PAGINI INLINE DIN MENIU
 // ============================================================
+function closeAllCpPages(){
+  ['profil','documente','notificari','mesaj'].forEach(p=>{
+    document.getElementById('cp-page-'+p)?.classList.remove('open');
+  });
+  document.getElementById('cp-confidentialitate').style.display='none';
+}
+
 function openCpPage(page){
   document.getElementById('cp-menu-overlay').classList.add('hidden');
   const el=document.getElementById('cp-page-'+page);
