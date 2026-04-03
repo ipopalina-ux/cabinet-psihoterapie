@@ -2639,6 +2639,7 @@ async function saveProfilClient(){
   document.getElementById('cp-profil-name').textContent=first+' '+last;
   document.getElementById('cp-profil-avatar').textContent=(first[0]+(last?.[0]||'')).toUpperCase();
   notify('✓ Profil actualizat!');
+  closeCpPage('profil');
 }
 
 async function changeParolaClient(){
@@ -2652,6 +2653,7 @@ async function changeParolaClient(){
   document.getElementById('pp-pass-new').value='';
   document.getElementById('pp-pass-confirm').value='';
   notify('✓ Parolă schimbată cu succes!');
+  closeCpPage('profil');
 }
 
 async function loadDocumentePage(){
@@ -2807,6 +2809,7 @@ async function saveFisaClient(fisaId){
     currentClientUser={...currentClientUser,phone};
   }
   notify('✓ Fișă actualizată!');
+  closeCpPage('documente');
 }
 
 async function signContractClient(){
