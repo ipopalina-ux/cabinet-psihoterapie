@@ -2869,6 +2869,11 @@ async function loadFacturiPage(){
 
 function openCpPage(page){
   document.getElementById('cp-menu-overlay').classList.add('hidden');
+  // Închidem orice pagină deschisă înainte
+  ['profil','documente','notificari','mesaj','programari','facturi'].forEach(p=>{
+    document.getElementById('cp-page-'+p)?.classList.remove('open');
+  });
+  document.getElementById('cp-confidentialitate').style.display='none';
   const el=document.getElementById('cp-page-'+page);
   if(!el)return;
   el.classList.add('open');
