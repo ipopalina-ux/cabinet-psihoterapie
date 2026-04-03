@@ -2083,7 +2083,7 @@ async function cpLoadSessions(){
     if(isToday)badge='<span class="cp-badge-today">Azi</span>';
     else if(isPast)badge='<span class="cp-badge-done">Efectuată</span>';
     else badge='<span style="font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700;background:#e0f7f2;color:#0a7a6e">Programată</span>';
-    return`<div class="cp-sitem${isToday?' today':''}" onclick="${isFuture?'openAgenda('+sessNum+')':'openSessionJournal({date:\''+a.date+'\',session_number:'+sessNum+'},\'sedinte\')'}">
+    return`<div class="cp-sitem${isToday?' today':''}" onclick="openSessionJournal({date:'${a.date}',session_number:${sessNum}},'sedinte')">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
         <div><div class="cp-si-num">Ședința #${sessNum}</div><div class="cp-si-date">${fmtDate(a.date)}${a.type?' · '+a.type:''}</div></div>
         ${badge}
