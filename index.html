@@ -792,6 +792,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
             <div class="cp-qnote-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
           <div id="cp-home-session-block"></div>
+          <div id="cp-home-therapist-block"></div>
           <div id="cp-home-completat-block"></div>
         </div>
       </div>
@@ -1849,37 +1850,19 @@ async function saveQuickNote(){
   if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
   const shared=document.getElementById('cp-note-shared')?.checked||false;
   const today=toDS(new Date());
-
-  // Găsim ședința curentă
+  // Găsim numărul ședinței curente
   const {data:appts}=await sb.from('appointments').select('*')
     .eq('client_id',currentClientUser.id).order('date',{ascending:true});
   const allPast=(appts||[]).filter(a=>a.date<=today);
-  const lastAppt=allPast[allPast.length-1];
   const sessNum=allPast.length||1;
-  const sessDate=lastAppt?.date||today;
-
-  // Fetch jurnalul existent
-  const {data:existing}=await sb.from('session_journals').select('*')
-    .eq('client_id',currentClientUser.id).eq('session_number',sessNum).single();
-
-  const noteEntry=`[${today}] ${text}`;
-  const newNotes=(existing?.personal_notes||'')+(existing?.personal_notes?'\n\n':'')+noteEntry;
-  const newRefl=(existing?.reflections||'')+(existing?.reflections?'\n\n---\n\n':'')+noteEntry;
-
-  // Upsert — insert dacă nu există, update dacă există
-  const {data:saved,error}=await sb.from('session_journals').upsert({
-    ...(existing?.id?{id:existing.id}:{}),
+  // Inserăm în journal_entries
+  const {error}=await sb.from('journal_entries').insert({
     client_id:currentClientUser.id,
     session_number:sessNum,
-    date:sessDate,
-    appointment_id:lastAppt?.id||null,
-    personal_notes:newNotes,
-    personal_notes_shared:shared,
-    reflections:newRefl,
-    reflections_shared:shared,
-    updated_at:new Date().toISOString()
-  },{onConflict:'client_id,session_number'}).select().single();
-
+    type:'note',
+    text,
+    shared
+  });
   if(error){notify('Eroare la salvare: '+error.message,'var(--danger)');return;}
   closeNoteModalDirect();
   notify('✓ Notița salvată!');
@@ -1938,8 +1921,26 @@ async function cpLoadHome(){
   // Check reflections for last session
   if(lastAppt){
     const sessNum=(appts||[]).filter(a=>a.date<=lastAppt.date).length;
-    const {data:j}=await sb.from('session_journals').select('reflections').eq('client_id',c.id).eq('session_number',sessNum).single();
-    if(!j?.reflections)soft.push({title:`Reflecție după ședința #${sessNum}`,btn:'Scrie',action:"cpShowPanel('reflectii',document.getElementById('cpnav-reflectii'))"});
+    const {data:reflEntries}=await sb.from('journal_entries').select('id').eq('client_id',c.id).eq('session_number',sessNum).eq('type','reflection').limit(1);
+    if(!reflEntries?.length)soft.push({title:`Reflecție după ședința #${sessNum}`,btn:'Scrie',action:"cpShowPanel('reflectii',document.getElementById('cpnav-reflectii'))"});
+  }
+  // Mesaj de la terapeut — afișăm în Acasă
+  const {data:therapistMsgs}=await sb.from('journal_entries').select('*').eq('client_id',c.id).eq('type','therapist_message').order('created_at',{ascending:false}).limit(3);
+  const msgBlock=document.getElementById('cp-home-therapist-block');
+  if(msgBlock){
+    if(therapistMsgs?.length){
+      msgBlock.innerHTML=`<div class="cp-stitle">Mesaj de la terapeut</div>`+
+        therapistMsgs.map(m=>`
+          <div style="background:var(--card);border:1px solid var(--border);border-left:2.5px solid var(--sage);border-radius:10px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;color:var(--text);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.text}</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:3px">${fmtDate(m.created_at?.slice(0,10))} · Ședința #${m.session_number}</div>
+            </div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="opacity:0.4;flex-shrink:0;margin-top:2px"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>`).join('');
+    } else {
+      msgBlock.innerHTML='';
+    }
   }
   if(!required.length&&!soft.length){completatBlock.innerHTML='';return;}
   let html=`<div class="cp-stitle">De completat</div><div class="cp-completat">`;
@@ -2025,51 +2026,73 @@ async function cpLoadSessions(){
   }).join('');
 }
 
+async function saveJournalEntry(type){
+  if(!currentJournal||!currentClientUser)return;
+  const inputId=type==='note'?'j-note-new':'j-refl-new';
+  const shareId=type==='note'?'share-note-new':'share-refl-new';
+  const text=document.getElementById(inputId)?.value?.trim();
+  if(!text){notify('Scrie ceva înainte de a salva.','var(--warn)');return;}
+  const shared=document.getElementById(shareId)?.checked||false;
+  const {error}=await sb.from('journal_entries').insert({
+    client_id:currentClientUser.id,
+    session_number:currentJournal.session_number||1,
+    type,text,shared
+  });
+  if(error){notify('Eroare: '+error.message,'var(--danger)');return;}
+  notify('✓ Salvat!');
+  // Refresh fișa
+  openSessionJournal(currentJournal,fisaOrigin);
+}
+
 async function cpLoadReflections(){
   if(!currentClientUser)return;
-  const {data:journals}=await sb.from('session_journals').select('*')
-    .eq('client_id',currentClientUser.id).order('session_number',{ascending:false});
+  const {data:entries}=await sb.from('journal_entries').select('*')
+    .eq('client_id',currentClientUser.id)
+    .in('type',['note','reflection'])
+    .order('session_number',{ascending:false})
+    .order('created_at',{ascending:false});
   const cont=document.getElementById('cp-reflectii-list');
-  if(!journals?.length){
+  if(!entries?.length){
     cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu ai scris reflecții încă. Apasă butonul de mai sus pentru a începe.</div>';
     return;
   }
-  // Filtrăm doar jurnalele care au ceva scris
-  const withContent=journals.filter(j=>j.personal_notes||j.reflections);
-  if(!withContent.length){
-    cont.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted)">Nu ai scris reflecții încă. Apasă butonul de mai sus pentru a începe.</div>';
-    return;
-  }
-  cont.innerHTML=withContent.map(j=>{
-    const shared=j.reflections_shared||j.personal_notes_shared;
-    const preview=(j.reflections||j.personal_notes||'').slice(0,180).replace(/\[[\d-]+\] /g,'').replace(/\n\n---\n\n/g,' · ');
-    return`<div style="margin-bottom:16px">
-      <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">
-        Ședința #${j.session_number} · ${fmtDate(j.date)}
+  // Grupăm pe session_number
+  const bySess={};
+  entries.forEach(e=>{
+    if(!bySess[e.session_number])bySess[e.session_number]=[];
+    bySess[e.session_number].push(e);
+  });
+  const sessNums=Object.keys(bySess).sort((a,b)=>b-a);
+  cont.innerHTML=sessNums.map(sn=>{
+    const items=bySess[sn];
+    return`<div style="margin-bottom:18px">
+      <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;cursor:pointer" onclick="openSessionJournal({session_number:${sn}},'reflectii')">
+        Ședința #${sn} · ${fmtDate(items[0].created_at?.slice(0,10))} ›
       </div>
-      <div class="cp-ritem" style="cursor:pointer" onclick="openReflectionEditor('${j.id}')">
-        <div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:8px">${preview||'—'}${(j.reflections||j.personal_notes||'').length>180?'...':''}</div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:9px;color:${shared?'var(--sage)':'var(--text-muted)'};display:flex;align-items:center;gap:3px">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              ${shared?'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>':'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'}
-            </svg>
-            ${shared?'Partajat cu '+SETTINGS.name:'Privat'}
-          </span>
-          <span style="font-size:9px;color:var(--sage);font-weight:600">Deschide →</span>
-        </div>
-      </div>
+      ${items.map(e=>{
+        const isRefl=e.type==='reflection';
+        const bg=isRefl&&e.shared?'background:#e0f7f2':'background:var(--card)';
+        const border=isRefl&&e.shared?'border:1px solid rgba(10,122,110,0.2)':'border:1px solid var(--border)';
+        const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+        return`<div class="cp-ritem" style="${bg};${border};cursor:pointer;margin-bottom:7px" onclick="openSessionJournal({session_number:${sn}},'reflectii')">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">${fmtDate(e.created_at?.slice(0,10))}, ${time} · ${e.type==='note'?'Notița':'Reflecție'}</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.65">${(e.text||'').slice(0,180)}${e.text?.length>180?'...':''}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
+            <span style="font-size:9px;color:${e.shared?'var(--sage)':'var(--text-muted)'}">
+              ${e.shared?'Partajat cu '+SETTINGS.name:'Privat'}
+            </span>
+            <span style="font-size:9px;color:var(--sage);font-weight:600">Deschide →</span>
+          </div>
+        </div>`;
+      }).join('')}
     </div>`;
   }).join('');
 }
 
-// Editor reflecție inline — deschide fișa ședinței direct
 function openReflectionEditor(journalId){
-  // Găsim jurnalul și deschidem fișa ședinței
   sb.from('session_journals').select('*').eq('id',journalId).single().then(({data:j})=>{
     if(!j)return;
-    openSessionJournal(j);
-    cpShowPanel('fisa-sedinta');
+    openSessionJournal(j,'reflectii');
   });
 }
 
@@ -2178,20 +2201,42 @@ async function openSessionJournal(hint,origin){
   }
   currentJournal=journal;
   const isToday=journal.date===toDS(new Date());
-  // Helper pentru toggle inline
-  const mkToggle=(id,checked,label)=>`
-    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted)">
-      <span id="${id}-lbl">${checked?'Partajat cu '+SETTINGS.name:label}</span>
+  const sessNum=journal.session_number||1;
+
+  // Fetch intrările din journal_entries pentru această ședință
+  const {data:entries}=await sb.from('journal_entries').select('*')
+    .eq('client_id',currentClientUser.id).eq('session_number',sessNum)
+    .order('created_at',{ascending:false});
+  const noteEntries=(entries||[]).filter(e=>e.type==='note');
+  const reflEntries=(entries||[]).filter(e=>e.type==='reflection');
+  const therapistEntries=(entries||[]).filter(e=>e.type==='therapist_message');
+
+  function mkBubble(e,isRefl){
+    const bg=isRefl?(e.shared?'background:#e0f7f2':'background:var(--sage-light)'):'background:var(--sage-light)';
+    const dateColor=isRefl&&e.shared?'color:var(--sage)':'color:var(--text-muted)';
+    const textColor=isRefl&&e.shared?'color:#0a2420':'color:var(--text)';
+    const time=new Date(e.created_at).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+    const date=fmtDate(e.created_at?.slice(0,10));
+    return`<div style="${bg};border-radius:9px;padding:10px 12px;margin-bottom:7px">
+      <div style="font-size:10px;${dateColor};margin-bottom:3px">${date}, ${time}${e.shared?' · Partajat':' · Privat'}</div>
+      <div style="font-size:13px;${textColor};line-height:1.6">${e.text}</div>
+    </div>`;
+  }
+
+  function mkToggle(id,label){
+    return`<div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted)">
+      <span id="${id}-lbl">${label}</span>
       <label style="position:relative;display:inline-block;width:34px;height:19px;cursor:pointer;flex-shrink:0">
-        <input type="checkbox" id="${id}" style="opacity:0;width:0;height:0" ${checked?'checked':''} onchange="toggleSection('${id}')">
-        <span id="${id}-bg" style="position:absolute;inset:0;border-radius:19px;background:${checked?'var(--sage)':'#ccc'};transition:0.2s"></span>
-        <span id="${id}-thumb" style="position:absolute;top:2px;left:${checked?'17px':'2px'};width:15px;height:15px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
+        <input type="checkbox" id="${id}" style="opacity:0;width:0;height:0" onchange="toggleSection('${id}')">
+        <span id="${id}-bg" style="position:absolute;inset:0;border-radius:19px;background:#ccc;transition:0.2s"></span>
+        <span id="${id}-thumb" style="position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
       </label>
     </div>`;
+  }
 
   cont.innerHTML=`
     <div style="margin-bottom:16px">
-      <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${journal.session_number||'—'}</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text)">Ședința #${sessNum}</div>
       <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${fmtDate(journal.date)}${isToday?' · <strong style="color:var(--sage)">Astăzi</strong>':''}</div>
     </div>
 
@@ -2199,31 +2244,49 @@ async function openSessionJournal(hint,origin){
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Notițe personale</div>
-        ${mkToggle('share-notes',journal.personal_notes_shared,'Privat')}
+        ${mkToggle('share-note-new','Privat')}
       </div>
-      <textarea id="j-personal-notes" style="width:100%;min-height:100px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Ce ai observat în tine în timpul ședinței? Ce ți-a rămas în minte?" oninput="autoSaveJournal()">${journal.personal_notes||''}</textarea>
+      <div style="padding:10px 12px">
+        <textarea id="j-note-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce ai observat în tine? Ce ți-a rămas în minte?"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:7px">
+          <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('note')">Salvează</button>
+        </div>
+      </div>
+      ${noteEntries.length?'<div style="padding:0 12px 10px">'+noteEntries.map(e=>mkBubble(e,false)).join('')+'</div>':''}
     </div>
 
     <!-- REFLECȚII -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Reflecții după ședință</div>
-        ${mkToggle('share-reflections',journal.reflections_shared,'Privat')}
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Reflecții</div>
+        ${mkToggle('share-refl-new','Privat')}
       </div>
-      <textarea id="j-reflections" style="width:100%;min-height:100px;padding:12px 14px;border:none;font-size:13px;line-height:1.75;font-family:inherit;resize:vertical;color:var(--text);background:var(--card);outline:none" placeholder="Cum te simți după ședința de azi? Ce ai realizat? Ce ai vrea să explorezi mai departe?" oninput="autoSaveJournal()">${journal.reflections||''}</textarea>
+      <div style="padding:10px 12px">
+        <textarea id="j-refl-new" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Cum te simți? Ce ai realizat? Ce ai vrea să explorezi?"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:7px">
+          <button class="btn btn-primary btn-sm" onclick="saveJournalEntry('reflection')">Salvează</button>
+        </div>
+      </div>
+      ${reflEntries.length?'<div style="padding:0 12px 10px">'+reflEntries.map(e=>mkBubble(e,true)).join('')+'</div>':''}
     </div>
+
+    <!-- MESAJ TERAPEUT -->
+    ${therapistEntries.length?`<div style="background:var(--card);border:1px solid var(--border);border-left:2.5px solid var(--sage);border-radius:11px;overflow:hidden;margin-bottom:12px">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light)">
+        <div style="font-size:10px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">Mesaj de la terapeut</div>
+      </div>
+      <div style="padding:10px 12px">${therapistEntries.map(e=>`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:7px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}</div><div style="font-size:13px;color:var(--text);line-height:1.6">${e.text}</div></div>`).join('')}</div>
+    </div>`:''}
 
     <!-- TEMĂ -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="padding:10px 14px;border-bottom:1px solid var(--sage-light)">
-        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Tema de la terapeut</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">Temă</div>
       </div>
       <div id="homework-content" style="padding:12px 14px"><div style="font-size:13px;color:var(--text-muted)">Se încarcă...</div></div>
-    </div>
+    </div>`;
 
-    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px" id="j-save-status">Salvare automată activă</div>`;
-
-  loadHomework(journal.date,journal.session_number);
+  loadHomework(journal.date,sessNum);
 }
 
 function toggleSection(id){
