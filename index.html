@@ -1903,7 +1903,7 @@ async function cpLoadHome(){
           <div class="cp-sc-lbl">${fmtDate(today)}</div>
           <span class="cp-badge-today">Azi</span>
         </div>
-        <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.name}</div>
+        <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.role?SETTINGS.role.toLowerCase()+' ':''} ${SETTINGS.name}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
           <div class="cp-scbtn cp-scbtn-ors" onclick="event.stopPropagation();cpShowPanel('ors')"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>ORS</div>
           <span style="font-size:10px;color:var(--text-muted)">Atinge pentru a deschide fișa →</span>
@@ -1919,8 +1919,8 @@ async function cpLoadHome(){
           <div class="cp-sc-lbl">${fmtDate(lastAppt.date)}</div>
           ${nextBadge}
         </div>
-        <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.name}</div>
-        <div class="cp-sc-sub" style="margin-top:4px">Ședință ${lastAppt.type||'individuală'} · Atinge pentru a deschide fișa →</div>
+        <div class="cp-sc-title">Ședința #${sessNum} cu ${SETTINGS.role?SETTINGS.role.toLowerCase()+' ':''} ${SETTINGS.name}</div>
+        <div class="cp-sc-sub" style="margin-top:4px">Atinge pentru a deschide fișa →</div>
       </div>`;
   } else {
     sessBlock.innerHTML=`<div class="cp-stitle">Ședințele mele</div><div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--text-muted);text-align:center">Nu există programări înregistrate încă.</div>`;
@@ -1959,7 +1959,7 @@ async function cpLoadSessions(){
   const sub=document.getElementById('cp-sedinte-sub');
   const nrSed=appts?.length||0;
   const sedLabel=nrSed===1?'1 ședință':''+nrSed+' ședințe';
-  const therapistLabel='cu '+(SETTINGS.role?SETTINGS.role+' ':'')+SETTINGS.name;
+  const therapistLabel='cu '+(SETTINGS.role?SETTINGS.role.toLowerCase()+' ':'')+SETTINGS.name;
   if(sub)sub.textContent=sedLabel+' · '+therapistLabel;
 
   // Render ORS graph
