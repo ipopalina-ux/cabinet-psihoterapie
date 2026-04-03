@@ -72,6 +72,30 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .content{padding:20px 22px;flex:1}
 .panel{display:none;flex-direction:column;min-height:calc(100vh - 44px)}
 .panel.active{display:flex}
+/* Mobile therapist nav */
+.t-mobile-header{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--sage-dark);z-index:190;align-items:center;justify-content:space-between;padding:0 15px}
+.t-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--card);border-top:1px solid var(--border);z-index:200;flex-direction:row}
+.t-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--text-muted);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.t-nav-item.active{color:var(--sage)}
+.t-nav-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.t-menu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:250}
+.t-menu-overlay.open{display:block}
+.t-menu-drawer{position:fixed;top:0;right:0;bottom:0;width:75%;max-width:280px;background:var(--sage-dark);z-index:260;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.25s ease}
+.t-menu-overlay.open .t-menu-drawer{transform:translateX(0)}
+.t-menu-item{display:flex;align-items:center;gap:12px;padding:13px 20px;color:rgba(255,255,255,0.75);font-size:14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06)}
+.t-menu-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;min-height:calc(100vh - 116px);margin-top:52px;margin-bottom:64px}
+  .sidebar{display:none}
+  .mode-bar{display:none}
+  .t-mobile-header{display:flex}
+  .t-mobile-nav{display:flex}
+  .topbar{padding:10px 14px}
+  .page-title{font-size:15px}
+  .content{padding:12px 14px}
+  .panel{min-height:auto}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
@@ -372,6 +396,76 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 
 <!-- THERAPIST -->
 <div id="view-therapist" class="view hidden">
+
+  <!-- MOBILE HEADER -->
+  <div class="t-mobile-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="24" height="24" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="22" rx="8" ry="16" fill="#4a7c6f" opacity="0.9"/>
+        <ellipse cx="58" cy="40" rx="16" ry="8" fill="#4a7c6f" opacity="0.65"/>
+        <ellipse cx="40" cy="58" rx="8" ry="16" fill="#7abcad" opacity="0.8"/>
+        <ellipse cx="22" cy="40" rx="16" ry="8" fill="#7abcad" opacity="0.75"/>
+      </svg>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.08em">NARA</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em">Panou terapeut</div>
+      </div>
+    </div>
+    <button onclick="tOpenMenu()" style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:9px">
+      <span style="display:block;width:14px;height:1.5px;background:rgba(255,255,255,0.8);border-radius:2px"></span>
+      <span style="display:block;width:14px;height:1.5px;background:rgba(255,255,255,0.8);border-radius:2px"></span>
+      <span style="display:block;width:14px;height:1.5px;background:rgba(255,255,255,0.8);border-radius:2px"></span>
+    </button>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <div class="t-mobile-nav">
+    <div class="t-nav-item active" id="tnav-dashboard" onclick="tNav('dashboard',null,true)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Acasă
+    </div>
+    <div class="t-nav-item" id="tnav-calendar" onclick="tNav('calendar',null,true)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
+    </div>
+    <div class="t-nav-item" id="tnav-clients" onclick="tNav('clients',null,true)">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clienți
+    </div>
+    <div class="t-nav-item" id="tnav-notes" onclick="tNav('notes',null,true)">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Notițe
+    </div>
+  </div>
+
+  <!-- HAMBURGER OVERLAY -->
+  <div class="t-menu-overlay" id="t-menu-overlay" onclick="tCloseMenu(event)">
+    <div class="t-menu-drawer">
+      <div style="padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.08)">
+        <div style="font-size:13px;font-weight:700;color:#fff">Meniu</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px" id="t-menu-username">Alina Pop</div>
+      </div>
+      <div style="flex:1;overflow-y:auto">
+        <div class="t-menu-item" onclick="tNav('contracts',null,true);tCloseMenu()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Contracte & GDPR
+        </div>
+        <div class="t-menu-item" onclick="tNav('invoices',null,true);tCloseMenu()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Facturi
+        </div>
+        <div class="t-menu-item" onclick="tNav('invite',null,true);tCloseMenu()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Link invitație
+        </div>
+        <div class="t-menu-item" onclick="tNav('settings',null,true);tCloseMenu()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Setări cabinet
+        </div>
+        <div class="t-menu-item" onclick="logout()" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.08)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,100,100,0.8)" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span style="color:rgba(255,100,100,0.8)">Deconectare</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="app">
     <aside class="sidebar">
       <div class="logo" style="display:flex;align-items:center;gap:11px;padding:16px 18px">
@@ -390,17 +484,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
       </div>
       <nav class="nav">
         <div class="nav-section">General</div>
-        <div class="nav-item active" onclick="tNav('dashboard',this)">◈ Panou principal</div>
-        <div class="nav-item" onclick="tNav('calendar',this)">◷ Calendar</div>
+        <div class="nav-item active" onclick=\"tNav('dashboard',this,false)\">◈ Panou principal</div>
+        <div class="nav-item" onclick=\"tNav('calendar',this,false)\">◷ Calendar</div>
         <div class="nav-section">Clinică</div>
-        <div class="nav-item" onclick="tNav('clients',this)">◉ Clienți</div>
-        <div class="nav-item" onclick="tNav('notes',this)">◎ Notițe ședință</div>
+        <div class="nav-item" onclick=\"tNav('clients',this,false)\">◉ Clienți</div>
+        <div class="nav-item" onclick=\"tNav('notes',this,false)\">◎ Notițe ședință</div>
         <div class="nav-section">Administrativ</div>
-        <div class="nav-item" onclick="tNav('contracts',this)">◧ Contracte & GDPR</div>
-        <div class="nav-item" onclick="tNav('invoices',this)">◈ Facturi</div>
+        <div class="nav-item" onclick=\"tNav('contracts',this,false)\">◧ Contracte & GDPR</div>
+        <div class="nav-item" onclick=\"tNav('invoices',this,false)\">◈ Facturi</div>
         <div class="nav-section">Configurare</div>
-        <div class="nav-item" onclick="tNav('invite',this)">🔗 Link invitație</div>
-        <div class="nav-item" onclick="tNav('settings',this)">⚙ Setări cabinet</div>
+        <div class="nav-item" onclick=\"tNav('invite',this,false)\">🔗 Link invitație</div>
+        <div class="nav-item" onclick=\"tNav('settings',this,false)\">⚙ Setări cabinet</div>
       </nav>
       <div class="sidebar-footer">
         <div style="display:flex;align-items:center;gap:9px">
@@ -1529,17 +1623,40 @@ async function init(){
   }
 }
 
-function tNav(p,el){
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');
+function tNav(p,el,fromMobile){
+  // Desktop sidebar
+  if(!fromMobile){
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    if(el)el.classList.add('active');
+  }
+  // Mobile bottom nav
+  ['dashboard','calendar','clients','notes'].forEach(t=>{
+    const navEl=document.getElementById('tnav-'+t);
+    if(navEl)navEl.classList.toggle('active',t===p);
+  });
   document.querySelectorAll('.panel').forEach(x=>{x.style.display='none';x.classList.remove('active')});
-  const t=document.getElementById('t-'+p);t.style.display='flex';t.classList.add('active');
+  const t=document.getElementById('t-'+p);if(!t)return;
+  t.style.display='flex';t.classList.add('active');
   if(p==='dashboard')renderDash();
   if(p==='calendar')renderCalendar();
-  if(p==='clients'){loadClients().then(()=>{renderClientList();document.getElementById('client-detail-view').style.display='none';document.getElementById('clients-list-view').style.display=''});}
+  if(p==='clients'){loadClients().then(()=>{renderClientList();document.getElementById('client-detail-view').style.display='none';document.getElementById('clients-list-view').style.display='';});}
   if(p==='notes')populateNoteClients();
   if(p==='contracts')renderContracts();
   if(p==='invoices')renderInvoices();
   if(p==='settings')applySettings(SETTINGS);
+}
+
+function tOpenMenu(){
+  document.getElementById('t-menu-overlay').classList.add('open');
+  // Update username in menu
+  const nameEl=document.getElementById('t-menu-username');
+  if(nameEl&&SETTINGS.name)nameEl.textContent=SETTINGS.name;
+}
+
+function tCloseMenu(e){
+  if(!e||e.target===document.getElementById('t-menu-overlay')||!e.target){
+    document.getElementById('t-menu-overlay').classList.remove('open');
+  }
 }
 
 async function renderDash(){
