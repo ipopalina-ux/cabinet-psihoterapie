@@ -1768,7 +1768,7 @@ async function showClientDetail(id){
           <div style="font-size:15px;font-weight:700;color:var(--text)">${c.first_name} ${c.last_name}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #${appointments?.length||0} · ${c.status==='active'?'Activ':'În așteptare'}</div>
         </div>
-        ${lastOrs?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">${firstOrs&&firstOrs.id!==lastOrs.id?firstOrs.total+' → '+lastOrs.total:lastOrs.total}${orsTrend}</span>`:''}
+        ${lastOrs?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">${firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend}</span>`:''}
       </div>
     </div>
 
@@ -1900,7 +1900,7 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
       <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Evoluție ORS / SRS</div>
       <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto">
         <line x1="${pad}" y1="${refYpx}" x2="${w-pad}" y2="${refYpx}" stroke="#aaa" stroke-width="1" stroke-dasharray="4,3"/>
-        <text x="${w-pad+3}" y="${refYpx+4}" font-size="7" fill="#aaa" font-family="system-ui">28</text>
+        <text x="${w-pad+3}" y="${refYpx+4}" font-size="7" fill="#aaa" font-family="system-ui">24</text>
         ${mkPath(orsVals,'var(--sage)')}
         ${srsVals.length?mkPath(srsVals,'#8b5cf6'):''}
       </svg>
