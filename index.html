@@ -1707,20 +1707,22 @@ function renderClientList(){
   const active=clients.filter(c=>c.status==='active'||c.status==='waiting');
   const inactive=clients.filter(c=>c.status!=='active'&&c.status!=='waiting');
 
-  const mkRow=(c,isInactive)=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);${isInactive?'opacity:0.55':''}">
-      <div onclick="showClientDetail('${c.id}')" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent">
-        <div style="width:38px;height:38px;border-radius:50%;background:${isInactive?'var(--border)':'var(--sage-light)'};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${isInactive?'var(--text-muted)':'var(--sage-dark)'};flex-shrink:0">${ini(c.first_name,c.last_name)}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:500;color:var(--text)">${c.first_name} ${c.last_name}</div>
-        </div>
-      </div>
-      <div onclick="toggleClientStatus('${c.id}','${c.status}')" style="cursor:pointer;flex-shrink:0" title="${isInactive?'Activează':'Dezactivează'}">
-        <div style="width:42px;height:24px;border-radius:12px;background:${isInactive?'#ccc':'var(--sage)'};position:relative;transition:background 0.2s">
-          <div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;${isInactive?'left:3px':'right:3px'};transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>
-        </div>
-      </div>
-    </div>`;
+  const mkRow=(c,isInactive)=>{
+    const bg=isInactive?'var(--border)':'var(--sage-light)';
+    const col=isInactive?'var(--text-muted)':'var(--sage-dark)';
+    const toggleBg=isInactive?'#ccc':'var(--sage)';
+    const togglePos=isInactive?'left:3px':'right:3px';
+    const op=isInactive?'opacity:0.55':'';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);'+op+'">'
+      +'<div onclick="showClientDetail(\'' +c.id+ '\')" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent">'
+      +'<div style="width:38px;height:38px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+col+';flex-shrink:0">'+ini(c.first_name,c.last_name)+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;color:var(--text)">'+c.first_name+' '+c.last_name+'</div></div>'
+      +'</div>'
+      +'<div onclick="toggleClientStatus(\'' +c.id+ '\',\'' +c.status+ '\')" style="cursor:pointer;flex-shrink:0">'
+      +'<div style="width:42px;height:24px;border-radius:12px;background:'+toggleBg+';position:relative;transition:background 0.2s">'
+      +'<div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;'+togglePos+';transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>'
+      +'</div></div></div>';
+  };
 
   let html=active.map(c=>mkRow(c,false)).join('');
 
@@ -4096,7 +4098,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
-init();
+try{init();}catch(e){
+  document.body.innerHTML='<div style="padding:40px;font-family:sans-serif;background:#fff;color:#333"><h2>Eroare JS</h2><pre style="white-space:pre-wrap;font-size:12px">'+e.message+'\n'+e.stack+'</pre></div>';
+}
 </script>
 </body>
 </html>
