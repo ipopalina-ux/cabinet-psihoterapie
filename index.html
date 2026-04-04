@@ -2045,7 +2045,14 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
       <div style="margin-bottom:10px">
         <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">${label}</div>
         <div style="font-size:12px;color:var(--text);line-height:1.6;background:var(--sage-light);border-radius:7px;padding:8px 10px">${clinicalInterview[k]}</div>
-      </div>`).join('')||'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Interviu fara raspunsuri completate.</div>'
+      </div>`).join('')+`
+      <div style="margin-top:4px;border-top:0.5px solid var(--border);padding-top:12px">
+        <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Interpretare NARA AI</div>
+        <div id="cd-interview-ai" style="font-size:12px;color:var(--text);line-height:1.65;min-height:36px;margin-bottom:8px">
+          <span style="color:var(--text-muted);font-style:italic">Apasă pentru o interpretare clinică bazată pe profilul BASIC ID.</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateInterviewInterpretation('${clientId}','${encodeURIComponent(JSON.stringify(clinicalInterview))}')">✦ Generează interpretare</button>
+      </div>`
     :'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Niciun interviu clinic completat.</div>';
   html+=mkSect('evaluari','Evaluări clinice · Lazarus BASIC ID',clinicalInterview?'Completat':'Fără evaluări',!!clinicalInterview,intBody);
 
@@ -2106,6 +2113,36 @@ async function viewContractContent(clientId){
     </div>
   </div>`;
   document.body.appendChild(div.firstElementChild);
+}
+
+async function generateInterviewInterpretation(clientId, interviewJson){
+  const cont=document.getElementById('cd-interview-ai');
+  if(!cont)return;
+  cont.innerHTML='<span style="color:var(--text-muted);font-style:italic">Generez interpretare...</span>';
+  const c=cachedClients.find(x=>x.id===clientId);
+  let interview={};
+  try{interview=JSON.parse(decodeURIComponent(interviewJson));}catch(e){}
+
+  const lazarusLabels={reason:'Motivul prezentării',duration:'Durata',past_episodes:'Episoade anterioare',symptoms:'Simptome',impact:'Impact',factors:'Factori',goals:'Obiective',behavior:'Comportamente',behavior_excess:'Comportamente exces/deficit',affect:'Afect/emoții',affect_triggers:'Declanșatori emoționali',sensation:'Senzații fizice',imagery:'Imagini mentale',cognition:'Cogniții',interpersonal:'Relații interpersonale',substances:'Substanțe',sleep_appetite:'Somn și apetit'};
+
+  const interviewText=Object.entries(interview).filter(([k,v])=>lazarusLabels[k]&&v).map(([k,v])=>`${lazarusLabels[k]}: ${v}`).join('\n');
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        messages:[{role:'user',content:`Ești NARA AI, asistent pentru psihoterapeuți. Pe baza profilului BASIC ID al lui Lazarus completat de clientul ${c?.first_name} ${c?.last_name}, oferă o interpretare clinică concisă (4-6 propoziții). Identifică patternurile principale, ipotezele de lucru și posibilele direcții terapeutice. Fii factual și clinic.\n\nProfilul BASIC ID:\n${interviewText}`}]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'Eroare la generare.';
+    cont.innerHTML=`<div style="background:var(--sage-light);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--text);line-height:1.65">${text}</div>`;
+  }catch(e){
+    cont.innerHTML='<span style="color:var(--danger)">Eroare la conectare AI.</span>';
+  }
 }
 
 async function generateClientSummary(clientId){
