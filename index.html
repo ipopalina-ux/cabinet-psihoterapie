@@ -1811,10 +1811,22 @@ async function setPriority(clientId,priority){
 }
 
 async function navigateToClient(clientId){
-  tNav('clients', null, true);
+  // Switch panel manually - bypass tNav which resets client-detail-view
+  document.querySelectorAll('.panel').forEach(x=>{x.style.display='none';x.classList.remove('active');});
+  const panel=document.getElementById('t-clients');
+  if(panel){panel.style.display='flex';panel.classList.add('active');}
+  // Update nav indicators
+  ['dashboard','calendar','clients','notes'].forEach(t=>{
+    const el=document.getElementById('tnav-'+t);
+    if(el)el.classList.toggle('active',t==='clients');
+  });
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  const clientsNav=document.querySelector('.nav-item[onclick*="clients"]');
+  if(clientsNav)clientsNav.classList.add('active');
+  // Load clients if needed
   if(!cachedClients.length) await loadClients();
-  renderClientList();
-  setTimeout(()=>showClientDetail(clientId), 50);
+  // Go directly to client detail - skip renderClientList
+  showClientDetail(clientId);
 }
 
 async function toggleClientStatus(clientId, currentStatus){
