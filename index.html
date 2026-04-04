@@ -1780,7 +1780,7 @@ async function showClientDetail(id){
           <div style="font-size:15px;font-weight:700;color:var(--text)">${c.first_name} ${c.last_name}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #${appointments?.length||0} · ${c.status==='active'?'Activ':'În așteptare'}</div>
         </div>
-        ${lastOrs?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">${firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend}</span>`:''}
+        "+(lastOrs?'<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">'+( firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend)+'</span>':'')+"
       </div>
     </div>
 
@@ -1934,7 +1934,7 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
       </svg>
       <div style="display:flex;gap:12px;margin-top:4px">
         <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:var(--sage);border-radius:2px"></div>ORS</div>
-        ${srsVals.length?`<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#8b5cf6;border-radius:2px"></div>SRS</div>`:''}
+        ${srsVals.length?'<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#8b5cf6;border-radius:2px"></div>SRS</div>':''}
         <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#aaa"><div style="width:8px;height:1px;background:#aaa;border-radius:2px"></div>Prag referință (24)</div>
       </div>
     </div>`;
@@ -1952,12 +1952,12 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
           <div style="font-size:11px;color:var(--text-muted);margin-top:1px">${fmtDate(s.date)} · ${s.type||'Individuală'}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          ${ors?`<span style="font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${ors.total}</span>`:''}
+          "+(ors?'<span style="font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS '+ors.total+'</span>':'')+"
           <svg id="arrow-${s.id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
       <div id="sess-${s.id}" style="display:none;border-top:1px solid var(--border);padding:11px 13px">
-        ${s.notes?`<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">${s.notes}</div>`:'<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>'}
+        "+(s.notes?'<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">'+s.notes+'</div>':'<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>')+" 
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn btn-ghost btn-sm" onclick="generateAiSummary('${s.id}','${s.notes?.replace(/'/g,"\\'").replace(/\n/g,' ')||''}')">✦ Rezumat AI</button>
           <button class="btn btn-ghost btn-sm" onclick="openFullSession('${s.id}','${s.date}',${sessNum},window.currentClientId)">Vezi fișa completă →</button>
@@ -1996,7 +1996,7 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
       <div onclick="cdToggleSection('${id}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:11px;font-weight:600;color:var(--text)">${title}</span>
-          ${badge?`<span style="font-size:9px;font-weight:500;color:${badgeOk?'var(--success)':'var(--warn)'}">${badge}</span>`:''}
+          "+(badge?('<span style="font-size:9px;font-weight:500;color:'+(badgeOk?'var(--success)':'var(--warn)')+'">'+badge+'</span>'):'')+"
         </div>
         <svg id="arrow-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
@@ -2009,25 +2009,25 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
       <span style="font-size:12px;color:var(--text)">GDPR</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:11px;font-weight:600;color:${c.gdpr_signed?'var(--success)':'var(--warn)'}">${c.gdpr_signed?'✓ Semnat':'Nesemnat'}</span>
-        ${c.gdpr_signed?`<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewGdprContent('${clientId}')">Vezi</button>`:''}
+        "+(c.gdpr_signed?'<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewGdprContent(\''+clientId+'\')">' +'Vezi</button>':'')+"
       </div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0">
       <span style="font-size:12px;color:var(--text)">Contract terapeutic</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:11px;font-weight:600;color:${c.contract_signed?'var(--success)':'var(--warn)'}">${c.contract_signed?'✓ Semnat':'Nesemnat'}</span>
-        ${c.contract_signed?`<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewContractContent('${clientId}')">Vezi</button>`:''}
+        "+(c.contract_signed?'<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewContractContent(\''+clientId+'\')">'+'Vezi</button>':'')+"
       </div>
     </div>`);
 
   // Date personale
   const fisaBody=fisa?`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-      ${[['Data nasterii',fmtDate(fisa.dob)],['Telefon',c.phone||'-'],['Ocupatie',fisa.job||'-'],['Stare civila',fisa.civil_status||'-']].map(([l,v])=>`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">${l}</div><div style="font-size:12px;color:var(--text)">${v}</div></div>`).join('')}
+      "+(([["Data nasterii",fmtDate(fisa.dob)],["Telefon",c.phone||"-"],["Ocupatie",fisa.job||"-"],["Stare civila",fisa.civil_status||"-"]]).map(([lbl,val])=>'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">'+lbl+'</div><div style="font-size:12px;color:var(--text)">'+val+'</div></div>').join(''))+"
     </div>
-    ${fisa.medical_diagnosis?`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">${fisa.medical_diagnosis}</div></div>`:''}
-    ${fisa.medication?`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicatie</div><div style="font-size:12px;color:var(--text)">${fisa.medication}</div></div>`:''}
-    ${fisa.previous_therapy?`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Terapie anterioara</div><div style="font-size:12px;color:var(--text)">${fisa.previous_therapy}</div></div>`:''}
+    "+(fisa.medical_diagnosis?'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">'+fisa.medical_diagnosis+'</div></div>':'')+"
+    "+(fisa.medication?'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicatie</div><div style="font-size:12px;color:var(--text)">'+fisa.medication+'</div></div>':'')+"
+    "+(fisa.previous_therapy?'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Terapie anterioara</div><div style="font-size:12px;color:var(--text)">'+fisa.previous_therapy+'</div></div>':'')+"
   `:'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fisa nu a fost completata de client.</div>';
   html+=mkSect('personal','Date personale',c.fisa_complete?'Complete':'Incomplete',c.fisa_complete,fisaBody);
 
@@ -2094,7 +2094,7 @@ async function viewGdprContent(clientId){
       </div>
       <div style="background:var(--sage-light);border-radius:8px;padding:10px 12px;margin-bottom:10px">
         <div style="font-size:12px;color:var(--text)">✓ GDPR semnat de client</div>
-        ${gdpr?.ip_address?`<div style="font-size:10px;color:var(--text-muted);margin-top:3px">IP: ${gdpr.ip_address}</div>`:''}
+        "+(gdpr?.ip_address?'<div style="font-size:10px;color:var(--text-muted);margin-top:3px">IP: '+gdpr.ip_address+'</div>':'')+"
       </div>
       <div style="font-size:12px;color:var(--text);line-height:1.7">Clientul a citit și acceptat politica de prelucrare a datelor cu caracter personal conform GDPR, inclusiv prelucrarea datelor sensibile privind sănătatea psihologică în scopul furnizării serviciilor terapeutice.</div>
     </div>
@@ -2293,88 +2293,84 @@ function closeFullSessModal(id){
 
 async function openFullSession(sessionId, date, sessNum, clientId){
   const c=cachedClients.find(x=>x.id===clientId);
-  // Fetch toate datele ședinței
   const [{data:note},{data:entries},{data:measurements}]=await Promise.all([
     sb.from('session_notes').select('*').eq('id',sessionId).single(),
     sb.from('journal_entries').select('*').eq('client_id',clientId).eq('session_number',sessNum).order('created_at',{ascending:true}),
     sb.from('measurements').select('*').eq('client_id',clientId).eq('session_number',sessNum)
   ]);
-
   const ors=measurements?.find(m=>m.type==='ors');
   const srs=measurements?.find(m=>m.type==='srs');
   const clientNotes=(entries||[]).filter(e=>e.type==='note');
   const agendaItems=(entries||[]).filter(e=>e.type==='agenda');
   const hwGoal=(entries||[]).find(e=>e.type==='homework_goal');
   const hwItems=(entries||[]).filter(e=>e.type==='homework');
+  const modalId='full-sess-modal-'+sessionId;
 
-  const div=document.createElement('div');
-  div.innerHTML=`<div id="full-sess-modal-${sessionId}" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target===this)closeFullSessModal('${sessionId}')">
-    <div style="background:var(--card);border-radius:14px 14px 0 0;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+  let html='';
+  html+='<div id="'+modalId+'" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target.id===\''+modalId+'\')closeFullSessModal(\''+sessionId+'\')">';
+  html+='<div style="background:var(--card);border-radius:14px 14px 0 0;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">';
+  html+='<div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:1">';
+  html+='<div>';
+  html+='<div style="font-size:14px;font-weight:700;color:var(--text)">Ședința #'+sessNum+'</div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-top:1px">'+fmtDate(date)+' · '+(c?c.first_name+' '+c.last_name:'')+'</div>';
+  html+='</div>';
+  html+='<div style="display:flex;align-items:center;gap:8px">';
+  if(ors)html+='<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS '+ors.total+'</span>';
+  if(srs)html+='<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:#ede9fe;color:#4c1d95">SRS '+srs.total+'</span>';
+  html+='<button onclick="closeFullSessModal(\''+sessionId+'\')" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>';
+  html+='</div></div>';
+  html+='<div style="padding:14px 16px">';
 
-      <!-- Header -->
-      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:1">
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text)">Ședința #${sessNum}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px">${fmtDate(date)} · ${c?.first_name} ${c?.last_name}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          ${ors?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${ors.total}</span>`:''}
-          ${srs?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:#ede9fe;color:#4c1d95">SRS ${srs.total}</span>`:''}
-          <button onclick="closeFullSessModal('${sessionId}')" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
-        </div>
-      </div>
+  if(agendaItems.length){
+    html+='<div style="margin-bottom:14px">';
+    html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">De discutat</div>';
+    agendaItems.forEach(function(e){html+='<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px;font-size:12px;color:var(--text);line-height:1.5">'+e.text+'</div>';});
+    html+='</div>';
+  }
 
-      <div style="padding:14px 16px">
+  html+='<div style="margin-bottom:14px">';
+  html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Notițele terapeutului</div>';
+  if(note&&note.notes){html+='<div style="background:var(--sage-light);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.7">'+note.notes.replace(/\n/g,'<br>')+'</div>';}
+  else{html+='<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fără notițe.</div>';}
+  html+='</div>';
 
-        <!-- De discutat -->
-        ${agendaItems.length?`<div style="margin-bottom:14px">
-          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">De discutat — notat de client</div>
-          ${agendaItems.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px;font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>`).join('')}
-        </div>`:''}
+  if(clientNotes.length){
+    html+='<div style="margin-bottom:14px">';
+    html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Notițele clientului</div>';
+    clientNotes.forEach(function(e){
+      html+='<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px">';
+      html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">'+fmtDate(e.created_at?e.created_at.slice(0,10):'')+(e.shared?' · Partajat':' · Privat')+'</div>';
+      html+='<div style="font-size:12px;color:var(--text);line-height:1.5">'+e.text+'</div></div>';
+    });
+    html+='</div>';
+  }
 
-        <!-- Notițele terapeutului -->
-        <div style="margin-bottom:14px">
-          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Notițele terapeutului</div>
-          ${note?.notes?`<div style="background:var(--sage-light);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.7">${note.notes.replace(/\n/g,'<br>')}</div>`:'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fără notițe.</div>'}
-        </div>
+  if(hwGoal||hwItems.length){
+    html+='<div style="margin-bottom:14px">';
+    html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Temă</div>';
+    if(hwGoal){html+='<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:6px"><div style="font-size:10px;color:var(--sage);margin-bottom:3px">Cerința</div><div style="font-size:12px;color:var(--text)">'+hwGoal.text+'</div></div>';}
+    hwItems.forEach(function(e){
+      html+='<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px">';
+      html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">'+fmtDate(e.created_at?e.created_at.slice(0,10):'')+'</div>';
+      html+='<div style="font-size:12px;color:var(--text);line-height:1.5">'+e.text+'</div></div>';
+    });
+    html+='</div>';
+  }
 
-        <!-- Notițele clientului -->
-        ${clientNotes.length?`<div style="margin-bottom:14px">
-          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Notițele clientului</div>
-          ${clientNotes.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px">
-            <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}${e.shared?' · Partajat':' · Privat'}</div>
-            <div style="font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>
-          </div>`).join('')}
-        </div>`:''}
+  var notesForAi=(note&&note.notes?note.notes:'').replace(/'/g,'').replace(/\n/g,' ');
+  html+='<div style="border-top:1px solid var(--border);padding-top:12px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+  html+='<div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">Rezumat NARA AI</div>';
+  html+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateAiSummaryModal(\''+sessionId+'\',\''+notesForAi+'\')">✦ Generează</button>';
+  html+='</div>';
+  html+='<div id="full-sess-ai-'+sessionId+'" style="font-size:12px;color:var(--text-muted);font-style:italic">Apasă Generează pentru un rezumat al acestei ședințe.</div>';
+  html+='</div></div></div>';
 
-        <!-- Tema -->
-        ${hwGoal||hwItems.length?`<div style="margin-bottom:14px">
-          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Temă</div>
-          ${hwGoal?`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:6px">
-            <div style="font-size:10px;color:var(--sage);margin-bottom:3px">Cerința</div>
-            <div style="font-size:12px;color:var(--text)">${hwGoal.text}</div>
-          </div>`:''}
-          ${hwItems.length?`<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Completări client</div>`:''}
-          ${hwItems.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px">
-            <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}</div>
-            <div style="font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>
-          </div>`).join('')}
-        </div>`:''}
-
-        <!-- Rezumat AI -->
-        <div style="border-top:1px solid var(--border);padding-top:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">Rezumat NARA AI</div>
-            <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateAiSummaryModal('${sessionId}','${(note?.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">✦ Generează</button>
-          </div>
-          <div id="full-sess-ai-${sessionId}" style="font-size:12px;color:var(--text-muted);font-style:italic">Apasă Generează pentru un rezumat al acestei ședințe.</div>
-        </div>
-
-      </div>
-    </div>
-  </div>`;
+  var div=document.createElement('div');
+  div.innerHTML=html;
   document.body.appendChild(div.firstElementChild);
 }
+
 
 async function generateAiSummaryModal(sessionId, notes){
   const cont=document.getElementById('full-sess-ai-'+sessionId);
@@ -2457,7 +2453,7 @@ async function openHomeworkModal(clientId,sessNum){
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:14px">
       <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Cerința</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6">${cerintaText}</div>
-      ${therapistHw?.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${therapistHw.description}</div>`:''}
+      "+(therapistHw?.description?'<div style="font-size:11px;color:var(--text-muted);margin-top:4px">'+therapistHw.description+'</div>':'')+"
       <div style="font-size:10px;color:var(--sage);margin-top:5px">${therapistHw?'De la terapeut':'Notată de client'}</div>
     </div>`;
   } else {
@@ -2943,10 +2939,10 @@ async function cpLoadSessions(){
         <defs><linearGradient id="${uid}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f;stop-opacity:0.15"/><stop offset="100%" style="stop-color:#4a7c6f;stop-opacity:0"/></linearGradient></defs>
         <line x1="0" y1="${prag}" x2="240" y2="${prag}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
         <text x="4" y="${prag-2}" font-size="7" fill="#94a3b8" font-family="system-ui">25</text>
-        ${areaPath?`<path d="${areaPath}" fill="url(#${uid})"/>`:''}
-        ${vals.length>1?`<polyline points="${pts.join(' ')}" fill="none" stroke="#4a7c6f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`:''}
-        ${pts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="5" fill="#4a7c6f" stroke="#fff" stroke-width="2"/>`).join('')}
-        ${vals.map((v,i)=>`<text x="${pts[i].split(',')[0]}" y="72" font-size="7" fill="#4a7c6f" font-family="system-ui" text-anchor="middle" font-weight="700">Ș${orsMeas[i].session_number}</text>`).join('')}
+        "+(areaPath?'<path d="'+areaPath+'" fill="url(#'+uid+')"/>':'')+"
+        "+(vals.length>1?'<polyline points="'+pts.join(' ')+'" fill="none" stroke="#4a7c6f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>':'')+"
+        "+pts.map((p,i)=>'<circle cx="'+p.split(',')[0]+'" cy="'+p.split(',')[1]+'" r="5" fill="#4a7c6f" stroke="#fff" stroke-width="2"/>').join('')+"
+        "+vals.map((v,i)=>'<text x="'+pts[i].split(',')[0]+'" y="72" font-size="7" fill="#4a7c6f" font-family="system-ui" text-anchor="middle" font-weight="700">Ș'+orsMeas[i].session_number+'</text>').join('')+"
       </svg>`;
     }
   } else {
@@ -3307,10 +3303,10 @@ async function openSessionJournal(hint,origin){
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="display:flex;border-bottom:1px solid var(--sage-light)">
         <div id="ftab-agenda" onclick="switchFisaTab('agenda')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--sage);border-bottom:2px solid var(--sage);display:flex;align-items:center;justify-content:center;gap:4px">
-          De discutat${agendaCount?`<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">${agendaCount}</span>`:''}
+          'De discutat'+(agendaCount?'<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">'+agendaCount+'</span>':'')
         </div>
         <div id="ftab-note" onclick="switchFisaTab('note')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px">
-          Notițe${noteCount?`<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">${noteCount}</span>`:''}
+          'Notițe'+(noteCount?'<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">'+noteCount+'</span>':'')
         </div>
         <div id="ftab-tema" onclick="switchFisaTab('tema')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">
           Temă
@@ -3319,7 +3315,7 @@ async function openSessionJournal(hint,origin){
 
       <!-- TAB DE DISCUTAT -->
       <div id="ftab-content-agenda" style="padding:12px">
-        ${therapistEntries.length?`<div style="background:var(--sage-light);border-left:2.5px solid var(--sage);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:10px">${therapistEntries.map(e=>`<div style="font-size:12px;color:var(--text);line-height:1.6">${e.text}</div><div style="font-size:10px;color:var(--text-muted);margin-top:3px">${fmtDate(e.created_at?.slice(0,10))} · Mesaj terapeut</div>`).join('')}</div>`:''}
+        "+(therapistEntries.length?'<div style="background:var(--sage-light);border-left:2.5px solid var(--sage);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:10px">'+therapistEntries.map(e=>'<div style="font-size:12px;color:var(--text);line-height:1.6">'+e.text+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:3px">'+fmtDate(e.created_at?.slice(0,10))+' · Mesaj terapeut</div>').join('')+'</div>':'')+\"
         <textarea id="j-agenda-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce vrei să aduci în ședință?"></textarea>
         <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${agendaCount?'10px':'0'}">
           <button class="btn btn-primary btn-sm" onclick="saveFisaTabEntry('agenda')">Salvează</button>
@@ -3453,7 +3449,7 @@ async function loadHomework(date,sessNum){
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:11px 13px;margin-bottom:12px">
       <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px">Cerința</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px">${therapistHw.title}</div>
-      ${therapistHw.description?`<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">${therapistHw.description}</div>`:''}
+      "+(therapistHw.description?'<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">'+therapistHw.description+'</div>':'')+"
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;color:var(--text-muted)">De la terapeut${therapistHw.due_date?' · Termen: '+fmtDate(therapistHw.due_date):''}</div>
         ${!isCompleted
@@ -3721,7 +3717,7 @@ async function loadFacturiPage(){
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:12px;color:var(--text-muted)">${fmtDate(f.date)||'—'}${f.period?' · '+f.period:''}</div>
-          ${f.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${f.description}</div>`:''}
+          "+(f.description?'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+f.description+'</div>':'')+"
         </div>
         <div style="font-size:15px;font-weight:700;color:var(--text)">${parseFloat(f.amount||0).toFixed(2)} RON</div>
       </div>
