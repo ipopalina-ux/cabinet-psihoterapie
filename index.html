@@ -1688,7 +1688,7 @@ async function renderDash(){
     const c=clients.find(x=>x.id===a.client_id);
     const prioColors={'orange':'#fed7aa','red':'#fecaca'};
     const borderCol=c?.priority?prioColors[c.priority]:'var(--sage-light)';
-    return`<div onclick="navigateToClient('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?`<div style="width:8px;height:8px;border-radius:50%;background:${prioColors[c.priority]};flex-shrink:0"></div>`:''}</div>`;
+    return`<div onclick="navigateToClient('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?('<div style="width:8px;height:8px;border-radius:50%;background:'+prioColors[c.priority]+';flex-shrink:0"></div>'):''}</div>`;
   }).join('');}
   else da.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div>';
   const ds=document.getElementById('dash-scales');
@@ -1809,21 +1809,13 @@ async function setPriority(clientId,priority){
 }
 
 async function navigateToClient(clientId){
-  // First switch to clients panel via mobile nav (works on both mobile and desktop)
-  document.querySelectorAll('.panel').forEach(x=>{x.style.display='none';x.classList.remove('active');});
-  const panel=document.getElementById('t-clients');
-  if(panel){panel.style.display='block';panel.classList.add('active');}
-  // Update nav indicators
-  ['dashboard','calendar','clients','notes'].forEach(t=>{
-    const el=document.getElementById('tnav-'+t);
-    if(el)el.classList.toggle('active',t==='clients');
-  });
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-  // Make sure clients are loaded
-  if(!cachedClients.length)await loadClients();
+  // Use tNav to switch properly
+  tNav('clients', null, true);
+  // Wait for clients to load if needed
+  if(!cachedClients.length) await loadClients();
   renderClientList();
-  // Show detail
-  showClientDetail(clientId);
+  // Small delay to ensure DOM is ready
+  requestAnimationFrame(()=>showClientDetail(clientId));
 }
 
 async function toggleClientStatus(clientId, currentStatus){
@@ -2175,7 +2167,7 @@ async function viewGdprContent(clientId){
       </div>
       <div style="background:var(--sage-light);border-radius:8px;padding:10px 12px;margin-bottom:10px">
         <div style="font-size:12px;color:var(--text)">✓ GDPR semnat de client</div>
-        ${gdpr?.ip_address?`<div style="font-size:10px;color:var(--text-muted);margin-top:3px">IP: ${gdpr.ip_address}</div>`:''}
+        ${gdpr?.ip_address?('<div style="font-size:10px;color:var(--text-muted);margin-top:3px">IP: '+gdpr.ip_address+'</div>'):'' }
       </div>
       <div style="font-size:12px;color:var(--text);line-height:1.7">Clientul a citit și acceptat politica de prelucrare a datelor cu caracter personal conform GDPR, inclusiv prelucrarea datelor sensibile privind sănătatea psihologică în scopul furnizării serviciilor terapeutice.</div>
     </div>
@@ -2534,7 +2526,7 @@ async function openHomeworkModal(clientId,sessNum){
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:14px">
       <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Cerința</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6">${cerintaText}</div>
-      ${therapistHw?.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${therapistHw.description}</div>`:''}
+      ${therapistHw?.description?('<div style="font-size:11px;color:var(--text-muted);margin-top:4px">'+therapistHw.description+'</div>'):'' }
       <div style="font-size:10px;color:var(--sage);margin-top:5px">${therapistHw?'De la terapeut':'Notată de client'}</div>
     </div>`;
   } else {
@@ -3397,10 +3389,10 @@ async function openSessionJournal(hint,origin){
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="display:flex;border-bottom:1px solid var(--sage-light)">
         <div id="ftab-agenda" onclick="switchFisaTab('agenda')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--sage);border-bottom:2px solid var(--sage);display:flex;align-items:center;justify-content:center;gap:4px">
-          De discutat${agendaCount?`<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">${agendaCount}</span>`:''}
+          De discutat${agendaCount?('<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">'+agendaCount+'</span>'):'' }
         </div>
         <div id="ftab-note" onclick="switchFisaTab('note')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px">
-          Notițe${noteCount?`<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">${noteCount}</span>`:''}
+          Notițe${noteCount?('<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">'+noteCount+'</span>'):'' }
         </div>
         <div id="ftab-tema" onclick="switchFisaTab('tema')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">
           Temă
@@ -3543,7 +3535,7 @@ async function loadHomework(date,sessNum){
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:11px 13px;margin-bottom:12px">
       <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px">Cerința</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px">${therapistHw.title}</div>
-      ${therapistHw.description?`<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">${therapistHw.description}</div>`:''}
+      ${therapistHw.description?('<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">'+therapistHw.description+'</div>'):'' }
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;color:var(--text-muted)">De la terapeut${therapistHw.due_date?' · Termen: '+fmtDate(therapistHw.due_date):''}</div>
         ${!isCompleted
@@ -3811,7 +3803,7 @@ async function loadFacturiPage(){
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:12px;color:var(--text-muted)">${fmtDate(f.date)||'—'}${f.period?' · '+f.period:''}</div>
-          ${f.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${f.description}</div>`:''}
+          ${f.description?('<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+f.description+'</div>'):'' }
         </div>
         <div style="font-size:15px;font-weight:700;color:var(--text)">${parseFloat(f.amount||0).toFixed(2)} RON</div>
       </div>
