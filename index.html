@@ -1739,13 +1739,14 @@ async function showClientDetail(id){
   const det=document.getElementById('client-detail-view');det.style.display='block';
 
   // Fetch all data in parallel
-  const [{data:sessions},{data:measurements},{data:fisa},{data:appointments},{data:journalEntries},{data:therapistData}]=await Promise.all([
+  const [{data:sessions},{data:measurements},{data:fisa},{data:appointments},{data:journalEntries},{data:therapistData},{data:clinicalInterview}]=await Promise.all([
     sb.from('session_notes').select('*').eq('client_id',id).order('date',{ascending:false}),
     sb.from('measurements').select('*').eq('client_id',id).order('session_number'),
     sb.from('fise').select('*').eq('client_id',id).single(),
     sb.from('appointments').select('*').eq('client_id',id).order('date',{ascending:false}),
     sb.from('journal_entries').select('*').eq('client_id',id).order('created_at',{ascending:false}),
-    sb.from('clients').select('therapist_objective,client_objective,case_summary,work_plan,observations').eq('id',id).single()
+    sb.from('clients').select('therapist_objective,client_objective,case_summary,work_plan,observations').eq('id',id).single(),
+    sb.from('clinical_interviews').select('*').eq('client_id',id).single()
   ]);
 
   const orsMeas=(measurements||[]).filter(x=>x.type==='ors');
@@ -1792,7 +1793,7 @@ async function showClientDetail(id){
 
     <!-- TAB CLIENT -->
     <div id="cdcontent-client" style="display:none;padding:12px 14px">
-      ${_renderTabClient(c,fisa,therapistData)}
+      ${_renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,id)}
     </div>
 
     <!-- TAB PLAN -->
@@ -1956,44 +1957,138 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
   return html;
 }
 
-function _renderTabClient(c,fisa,therapistData){
+function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,clientId){
   let html='';
+
+  // Obiective
   html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv client</div>
-  <textarea id="cd-client-obj" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.client_objective?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:12px;transition:background 0.3s" placeholder="Ce dorește clientul să obțină..." oninput="cdSaveTherapistData('${c.id}')">${therapistData?.client_objective||''}</textarea>
+  <textarea id="cd-client-obj" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.client_objective?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:12px;transition:background 0.3s" placeholder="Ce dorește clientul să obțină..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.client_objective||''}</textarea>
 
   <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv terapeutic</div>
-  <textarea id="cd-therap-obj" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.therapist_objective?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:12px;transition:background 0.3s" placeholder="Obiectivul terapeutic..." oninput="cdSaveTherapistData('${c.id}')">${therapistData?.therapist_objective||''}</textarea>
+  <textarea id="cd-therap-obj" style="width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.therapist_objective?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:12px;transition:background 0.3s" placeholder="Obiectivul terapeutic..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.therapist_objective||''}</textarea>
 
   <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Rezumat parcurs</div>
-  <textarea id="cd-summary" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.case_summary?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:14px;transition:background 0.3s" placeholder="Ce am lucrat până acum..." oninput="cdSaveTherapistData('${c.id}')">${therapistData?.case_summary||''}</textarea>`;
+  <textarea id="cd-summary" style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.case_summary?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:14px;transition:background 0.3s" placeholder="Ce am lucrat până acum..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.case_summary||''}</textarea>`;
 
+  // Fișă personală — colapsabilă
   if(fisa){
-    html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Fișă personală</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
-      ${[['Data nașterii',fmtDate(fisa.dob)],['Telefon',c.phone||'—'],['Ocupație',fisa.job||'—'],['Stare civilă',fisa.civil_status||'—']].map(([l,v])=>`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">${l}</div><div style="font-size:12px;color:var(--text)">${v}</div></div>`).join('')}
-      ${fisa.medical_diagnosis?`<div style="grid-column:1/-1;background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">${fisa.medical_diagnosis}</div></div>`:''}
-      ${fisa.medication?`<div style="grid-column:1/-1;background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicație</div><div style="font-size:12px;color:var(--text)">${fisa.medication}</div></div>`:''}
+    const basicFields=[
+      ['Data nașterii',fmtDate(fisa.dob)],
+      ['Telefon',c.phone||'—'],
+      ['Ocupație',fisa.job||'—'],
+      ['Stare civilă',fisa.civil_status||'—']
+    ].filter(([,v])=>v&&v!=='—');
+    const hasExtra=fisa.medical_diagnosis||fisa.medication||fisa.previous_therapy;
+    const completionStatus=c.fisa_complete?'Completată':'Incompletă';
+
+    html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px">
+      <div onclick="cdToggleFisa()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;font-weight:600;color:var(--text)">Fișă personală</span>
+          <span style="font-size:9px;font-weight:500;color:${c.fisa_complete?'var(--success)':'var(--warn)'}">${completionStatus}</span>
+        </div>
+        <svg id="fisa-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="fisa-body" style="display:none;padding:0 13px 12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+          ${basicFields.map(([l,v])=>`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">${l}</div><div style="font-size:12px;color:var(--text)">${v}</div></div>`).join('')}
+        </div>
+        ${fisa.medical_diagnosis?`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">${fisa.medical_diagnosis}</div></div>`:''}
+        ${fisa.medication?`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicație</div><div style="font-size:12px;color:var(--text)">${fisa.medication}</div></div>`:''}
+        ${fisa.previous_therapy?`<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Terapie anterioară</div><div style="font-size:12px;color:var(--text)">${fisa.previous_therapy}</div></div>`:''}
+      </div>
     </div>`;
   }
 
   // Documente
-  html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Documente</div>
-  <div style="display:flex;flex-direction:column;gap:6px">
-    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sage-light);border-radius:8px;padding:9px 11px">
-      <div style="font-size:12px;color:var(--text)">GDPR</div>
-      <span style="font-size:11px;font-weight:600;color:${c.gdpr_signed?'var(--success)':'var(--warn)'}">${c.gdpr_signed?'✓ Semnat':'Nesemnat'}</span>
+  html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px">
+    <div style="padding:10px 13px;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;font-weight:600;color:var(--text)">Documente</span>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sage-light);border-radius:8px;padding:9px 11px">
-      <div style="font-size:12px;color:var(--text)">Contract terapeutic</div>
-      <span style="font-size:11px;font-weight:600;color:${c.contract_signed?'var(--success)':'var(--warn)'}">${c.contract_signed?'✓ Semnat':'Nesemnat'}</span>
+    <div style="padding:8px 13px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;color:var(--text)">GDPR</div>
+        <span style="font-size:11px;font-weight:600;color:${c.gdpr_signed?'var(--success)':'var(--warn)'}">${c.gdpr_signed?'✓ Semnat':'Nesemnat'}</span>
+      </div>
+      <div style="height:0.5px;background:var(--border)"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;color:var(--text)">Contract terapeutic</div>
+        <span style="font-size:11px;font-weight:600;color:${c.contract_signed?'var(--success)':'var(--warn)'}">${c.contract_signed?'✓ Semnat':'Nesemnat'}</span>
+      </div>
+      <div style="height:0.5px;background:var(--border)"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;color:var(--text)">Fișă personală</div>
+        <span style="font-size:11px;font-weight:600;color:${c.fisa_complete?'var(--success)':'var(--warn)'}">${c.fisa_complete?'✓ Completată':'Incompletă'}</span>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sage-light);border-radius:8px;padding:9px 11px">
-      <div style="font-size:12px;color:var(--text)">Fișă personală</div>
-      <span style="font-size:11px;font-weight:600;color:${c.fisa_complete?'var(--success)':'var(--warn)'}">${c.fisa_complete?'✓ Completată':'Incompletă'}</span>
+  </div>`;
+
+  // Rezumat AI
+
+  html+=`<div style="background:var(--sage-light);border-radius:10px;padding:13px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">NARA AI · Rezumat client</div>
+      <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateClientSummary('${clientId}')">✦ Generează</button>
+    </div>
+    <div id="cd-client-ai-summary" style="font-size:12px;color:var(--text);line-height:1.65;min-height:40px">
+      ${therapistData?.ai_summary||'<span style="color:var(--text-muted);font-style:italic">Apasă Generează pentru un rezumat AI al clientului bazat pe interviu și notițe.</span>'}
     </div>
   </div>`;
 
   return html;
+}
+
+function cdToggleFisa(){
+  const body=document.getElementById('fisa-body');
+  const arrow=document.getElementById('fisa-arrow');
+  if(!body)return;
+  const open=body.style.display==='block';
+  body.style.display=open?'none':'block';
+  if(arrow)arrow.style.transform=open?'':'rotate(180deg)';
+}
+
+async function generateClientSummary(clientId){
+  const cont=document.getElementById('cd-client-ai-summary');
+  if(!cont)return;
+  cont.innerHTML='<span style="color:var(--text-muted);font-style:italic">Generez rezumat...</span>';
+
+  const c=cachedClients.find(x=>x.id===clientId);
+  const [{data:fisa},{data:sessions},{data:interview},{data:td}]=await Promise.all([
+    sb.from('fise').select('*').eq('client_id',clientId).single(),
+    sb.from('session_notes').select('notes,date').eq('client_id',clientId).order('date',{ascending:false}).limit(5),
+    sb.from('clinical_interviews').select('*').eq('client_id',clientId).single(),
+    sb.from('clients').select('client_objective,case_summary,observations').eq('id',clientId).single()
+  ]);
+
+  const context=`Client: ${c?.first_name} ${c?.last_name}
+Ocupație: ${fisa?.job||'—'} | Stare civilă: ${fisa?.civil_status||'—'}
+Diagnostic: ${fisa?.medical_diagnosis||'niciun diagnostic'}
+Medicație: ${fisa?.medication||'nicio medicație'}
+Terapie anterioară: ${fisa?.previous_therapy||'—'}
+Obiectiv client: ${td?.client_objective||'—'}
+Rezumat parcurs: ${td?.case_summary||'—'}
+Observații clinice: ${td?.observations||'—'}
+Notițe recente: ${(sessions||[]).map(s=>s.notes).filter(Boolean).slice(0,3).join(' | ')||'—'}
+${interview?'Date interviu clinic: '+JSON.stringify(interview):''}`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        messages:[{role:'user',content:`Ești NARA AI, asistent pentru psihoterapeuți. Pe baza acestor date despre client, scrie un rezumat clinic concis (3-4 propoziții) care să ajute terapeutul să înțeleagă rapid profilul clientului, nevoile principale și contextul de viață. Fii factual și clinic, evită speculații.\n\n${context}`}]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'Eroare la generare.';
+    cont.innerHTML=text;
+    // Salvăm rezumatul
+    await sb.from('clients').update({ai_summary:text}).eq('id',clientId);
+  }catch(e){
+    cont.innerHTML='<span style="color:var(--danger)">Eroare la conectare AI.</span>';
+  }
 }
 
 function _renderTabPlan(therapistData,clientId){
