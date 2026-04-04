@@ -1811,13 +1811,10 @@ async function setPriority(clientId,priority){
 }
 
 async function navigateToClient(clientId){
-  // Use tNav to switch properly
   tNav('clients', null, true);
-  // Wait for clients to load if needed
   if(!cachedClients.length) await loadClients();
   renderClientList();
-  // Small delay to ensure DOM is ready
-  requestAnimationFrame(()=>showClientDetail(clientId));
+  setTimeout(()=>showClientDetail(clientId), 50);
 }
 
 async function toggleClientStatus(clientId, currentStatus){
