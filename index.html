@@ -1767,50 +1767,34 @@ async function showClientDetail(id){
   const prevOrs=orsMeas[orsMeas.length-2];
   const orsTrend=lastOrs&&prevOrs?(lastOrs.total>prevOrs.total?' ↑':lastOrs.total<prevOrs.total?' ↓':''):'';
 
-  det.innerHTML=`
-    <div style="padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:var(--card)">
-      <button onclick="document.getElementById('clients-list-view').style.display='';document.getElementById('client-detail-view').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--sage);padding:0">← Înapoi</button>
-    </div>
+  var orsBadge='';
+  if(lastOrs){
+    var orsText=firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend;
+    orsBadge='<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">'+orsText+'</span>';
+  }
 
-    <!-- HEADER CLIENT -->
-    <div style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 14px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:38px;height:38px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sage-dark);flex-shrink:0">${ini(c.first_name,c.last_name)}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:700;color:var(--text)">${c.first_name} ${c.last_name}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #${appointments?.length||0} · ${c.status==='active'?'Activ':'În așteptare'}</div>
-        </div>
-        "+(lastOrs?'<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">'+( firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend)+'</span>':'')+"
-      </div>
-    </div>
-
-    <!-- TAB-URI -->
-    <div style="display:flex;background:var(--card);border-bottom:1px solid var(--border)">
-      <div class="cd-tab active" id="cdtab-azi" onclick="cdTab('azi')">Azi</div>
-      <div class="cd-tab" id="cdtab-istoric" onclick="cdTab('istoric')">Istoric</div>
-      <div class="cd-tab" id="cdtab-client" onclick="cdTab('client')">Client</div>
-      <div class="cd-tab" id="cdtab-plan" onclick="cdTab('plan')">Plan</div>
-    </div>
-
-    <!-- TAB AZI -->
-    <div id="cdcontent-azi" style="padding:12px 14px">
-      ${_renderTabAzi(c,appointments,journalEntries,id)}
-    </div>
-
-    <!-- TAB ISTORIC -->
-    <div id="cdcontent-istoric" style="display:none;padding:12px 14px">
-      ${_renderTabIstoric(sessions,appointments,orsMeas,srsMeas)}
-    </div>
-
-    <!-- TAB CLIENT -->
-    <div id="cdcontent-client" style="display:none;padding:12px 14px">
-      ${_renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,id)}
-    </div>
-
-    <!-- TAB PLAN -->
-    <div id="cdcontent-plan" style="display:none;padding:12px 14px">
-      ${_renderTabPlan(therapistData,id)}
-    </div>`;
+  var detHtml='';
+  detHtml+='<div style="padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:var(--card)">';
+  detHtml+='<button onclick="document.getElementById(\'clients-list-view\').style.display=\'\';document.getElementById(\'client-detail-view\').style.display=\'none\'" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--sage);padding:0">← Înapoi</button>';
+  detHtml+='</div>';
+  detHtml+='<div style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 14px">';
+  detHtml+='<div style="display:flex;align-items:center;gap:10px">';
+  detHtml+='<div style="width:38px;height:38px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sage-dark);flex-shrink:0">'+ini(c.first_name,c.last_name)+'</div>';
+  detHtml+='<div style="flex:1;min-width:0">';
+  detHtml+='<div style="font-size:15px;font-weight:700;color:var(--text)">'+c.first_name+' '+c.last_name+'</div>';
+  detHtml+='<div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #'+(appointments?appointments.length:0)+' · '+(c.status==='active'?'Activ':'În așteptare')+'</div>';
+  detHtml+='</div>'+orsBadge+'</div></div>';
+  detHtml+='<div style="display:flex;background:var(--card);border-bottom:1px solid var(--border)">';
+  detHtml+='<div class="cd-tab active" id="cdtab-azi" onclick="cdTab(\'azi\')">Azi</div>';
+  detHtml+='<div class="cd-tab" id="cdtab-istoric" onclick="cdTab(\'istoric\')">Istoric</div>';
+  detHtml+='<div class="cd-tab" id="cdtab-client" onclick="cdTab(\'client\')">Client</div>';
+  detHtml+='<div class="cd-tab" id="cdtab-plan" onclick="cdTab(\'plan\')">Plan</div>';
+  detHtml+='</div>';
+  detHtml+='<div id="cdcontent-azi" style="padding:12px 14px">'+_renderTabAzi(c,appointments,journalEntries,id)+'</div>';
+  detHtml+='<div id="cdcontent-istoric" style="display:none;padding:12px 14px">'+_renderTabIstoric(sessions,appointments,orsMeas,srsMeas)+'</div>';
+  detHtml+='<div id="cdcontent-client" style="display:none;padding:12px 14px">'+_renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,id)+'</div>';
+  detHtml+='<div id="cdcontent-plan" style="display:none;padding:12px 14px">'+_renderTabPlan(therapistData,id)+'</div>';
+  det.innerHTML=detHtml;
 
   // Attach global functions
   window.cdTab=function(t){
@@ -1898,178 +1882,176 @@ function _renderTabAzi(c,appointments,journalEntries,clientId){
 }
 
 function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
-  let html='';
+  var html='';
 
-  // ── GRAFIC ORS + SRS ──
-  if(orsMeas?.length){
-    const orsVals=orsMeas.map(m=>parseFloat(m.total));
-    const srsVals=(srsMeas||[]).map(m=>parseFloat(m.total));
-    const maxSess=Math.max(orsMeas.length,(srsMeas||[]).length);
-    const w=300,h=80,pad=20,refY=24; // prag referință ORS=24
-    const xStep=(w-pad*2)/Math.max(maxSess-1,1);
+  // Grafic ORS/SRS
+  if(orsMeas&&orsMeas.length){
+    var orsVals=orsMeas.map(function(m){return parseFloat(m.total);});
+    var srsVals=(srsMeas||[]).map(function(m){return parseFloat(m.total);});
+    var maxSess=Math.max(orsMeas.length,(srsMeas||[]).length);
+    var w=300,h=80,pad=20,refY=24;
+    var xStep=(w-pad*2)/Math.max(maxSess-1,1);
 
-    const mkPath=(vals,color)=>{
+    var mkPath=function(vals,color){
       if(!vals.length)return'';
-      const pts=vals.map((v,i)=>{
-        const x=pad+i*xStep;
-        const y=h-pad-(v/40)*(h-pad*2);
-        return`${x},${y}`;
+      var pts=vals.map(function(v,i){
+        var x=pad+i*xStep;
+        var y=h-pad-(v/40)*(h-pad*2);
+        return x+','+y;
       });
-      const circles=vals.map((v,i)=>{
-        const x=pad+i*xStep;
-        const y=h-pad-(v/40)*(h-pad*2);
-        return`<circle cx="${x}" cy="${y}" r="4" fill="${color}" stroke="#fff" stroke-width="1.5"/>`;
+      var circles=vals.map(function(v,i){
+        var x=pad+i*xStep;
+        var y=h-pad-(v/40)*(h-pad*2);
+        return'<circle cx="'+x+'" cy="'+y+'" r="4" fill="'+color+'" stroke="#fff" stroke-width="1.5"/>';
       }).join('');
-      return`<polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>${circles}`;
+      return'<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round"/>'+circles;
     };
 
-    const refYpx=h-pad-(refY/40)*(h-pad*2);
-    html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px">
-      <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Evoluție ORS / SRS</div>
-      <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto">
-        <line x1="${pad}" y1="${refYpx}" x2="${w-pad}" y2="${refYpx}" stroke="#aaa" stroke-width="1" stroke-dasharray="4,3"/>
-        <text x="${w-pad+3}" y="${refYpx+4}" font-size="7" fill="#aaa" font-family="system-ui">24</text>
-        ${mkPath(orsVals,'var(--sage)')}
-        ${srsVals.length?mkPath(srsVals,'#8b5cf6'):''}
-      </svg>
-      <div style="display:flex;gap:12px;margin-top:4px">
-        <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:var(--sage);border-radius:2px"></div>ORS</div>
-        ${srsVals.length?'<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#8b5cf6;border-radius:2px"></div>SRS</div>':''}
-        <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#aaa"><div style="width:8px;height:1px;background:#aaa;border-radius:2px"></div>Prag referință (24)</div>
-      </div>
-    </div>`;
+    var refYpx=h-pad-(refY/40)*(h-pad*2);
+    html+='<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px">';
+    html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Evoluție ORS / SRS</div>';
+    html+='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto">';
+    html+='<line x1="'+pad+'" y1="'+refYpx+'" x2="'+(w-pad)+'" y2="'+refYpx+'" stroke="#aaa" stroke-width="1" stroke-dasharray="4,3"/>';
+    html+='<text x="'+(w-pad+3)+'" y="'+(refYpx+4)+'" font-size="7" fill="#aaa" font-family="system-ui">24</text>';
+    html+=mkPath(orsVals,'var(--sage)');
+    if(srsVals.length)html+=mkPath(srsVals,'#8b5cf6');
+    html+='</svg>';
+    html+='<div style="display:flex;gap:12px;margin-top:4px">';
+    html+='<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:var(--sage);border-radius:2px"></div>ORS</div>';
+    if(srsVals.length)html+='<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted)"><div style="width:8px;height:2px;background:#8b5cf6;border-radius:2px"></div>SRS</div>';
+    html+='<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#aaa"><div style="width:8px;height:1px;background:#aaa;border-radius:2px"></div>Prag referință (24)</div>';
+    html+='</div></div>';
   }
 
-  if(!sessions?.length)return html+'<div style="font-size:13px;color:var(--text-muted);padding:10px 0">Nicio ședință înregistrată.</div>';
+  if(!sessions||!sessions.length)return html+'<div style="font-size:13px;color:var(--text-muted);padding:10px 0">Nicio ședință înregistrată.</div>';
 
-  html+=(sessions||[]).map((s,i)=>{
-    const sessNum=(sessions.length-i);
-    const ors=orsMeas?.find(m=>m.session_number===sessNum);
-    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden">
-      <div style="padding:11px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="cdToggleSession('sess-${s.id}')">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">Ședința #${sessNum}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px">${fmtDate(s.date)} · ${s.type||'Individuală'}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          "+(ors?'<span style="font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS '+ors.total+'</span>':'')+"
-          <svg id="arrow-${s.id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-      </div>
-      <div id="sess-${s.id}" style="display:none;border-top:1px solid var(--border);padding:11px 13px">
-        "+(s.notes?'<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">'+s.notes+'</div>':'<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>')+" 
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn btn-ghost btn-sm" onclick="generateAiSummary('${s.id}','${s.notes?.replace(/'/g,"\\'").replace(/\n/g,' ')||''}')">✦ Rezumat AI</button>
-          <button class="btn btn-ghost btn-sm" onclick="openFullSession('${s.id}','${s.date}',${sessNum},window.currentClientId)">Vezi fișa completă →</button>
-        </div>
-        <div id="ai-summary-${s.id}" style="margin-top:8px"></div>
-      </div>
-    </div>`;
-  }).join('');
+  sessions.forEach(function(s,i){
+    var sessNum=sessions.length-i;
+    var ors=orsMeas?orsMeas.find(function(m){return m.session_number===sessNum;}):null;
+    html+='<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden">';
+    html+='<div style="padding:11px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="cdToggleSession(\'sess-'+s.id+'\')">';
+    html+='<div>';
+    html+='<div style="font-size:13px;font-weight:600;color:var(--text)">Ședința #'+sessNum+'</div>';
+    html+='<div style="font-size:11px;color:var(--text-muted);margin-top:1px">'+fmtDate(s.date)+' · '+(s.type||'Individuală')+'</div>';
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px">';
+    if(ors)html+='<span style="font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS '+ors.total+'</span>';
+    html+='<svg id="arrow-'+s.id+'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+    html+='</div></div>';
+    html+='<div id="sess-'+s.id+'" style="display:none;border-top:1px solid var(--border);padding:11px 13px">';
+    if(s.notes){html+='<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">'+s.notes+'</div>';}
+    else{html+='<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>';}
+    var notesEsc=(s.notes||'').split("'").join('').split('\n').join(' ');
+    html+='<div style="display:flex;gap:8px;align-items:center">';
+    html+='<button class="btn btn-ghost btn-sm" onclick="generateAiSummary(\''+s.id+'\',\''+notesEsc+'\')">✦ Rezumat AI</button>';
+    html+='<button class="btn btn-ghost btn-sm" onclick="openFullSession(\''+s.id+'\',\''+s.date+'\','+sessNum+',window.currentClientId)">Vezi fișa completă →</button>';
+    html+='</div>';
+    html+='<div id="ai-summary-'+s.id+'" style="margin-top:8px"></div>';
+    html+='</div></div>';
+  });
   return html;
 }
+
 
 function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,clientId){
-  let html='';
+  var html='';
 
   // Obiective
-  html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv client</div>
-  <textarea id="cd-client-obj" style="width:100%;min-height:55px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.client_objective?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:10px;transition:background 0.3s" placeholder="Ce doreste clientul sa obtina..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.client_objective||''}</textarea>
+  var bgObj=therapistData&&therapistData.client_objective?'var(--sage-light)':'var(--warm)';
+  var bgTher=therapistData&&therapistData.therapist_objective?'var(--sage-light)':'var(--warm)';
+  html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv client</div>';
+  html+='<textarea id="cd-client-obj" style="width:100%;min-height:55px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:'+bgObj+';outline:none;margin-bottom:10px;transition:background 0.3s" placeholder="Ce doreste clientul..." oninput="cdSaveTherapistData(&quot;'+clientId+'&quot;)">'+((therapistData&&therapistData.client_objective)||'')+'</textarea>';
+  html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv terapeutic</div>';
+  html+='<textarea id="cd-therap-obj" style="width:100%;min-height:55px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:'+bgTher+';outline:none;margin-bottom:14px;transition:background 0.3s" placeholder="Obiectivul terapeutic..." oninput="cdSaveTherapistData(&quot;'+clientId+'&quot;)">'+((therapistData&&therapistData.therapist_objective)||'')+'</textarea>';
 
-  <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px">Obiectiv terapeutic</div>
-  <textarea id="cd-therap-obj" style="width:100%;min-height:55px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;color:var(--text);background:${therapistData?.therapist_objective?'var(--sage-light)':'var(--warm)'};outline:none;margin-bottom:14px;transition:background 0.3s" placeholder="Obiectivul terapeutic..." oninput="cdSaveTherapistData('${clientId}')">${therapistData?.therapist_objective||''}</textarea>`;
+  // Rezumat AI
+  var aiSummary=(therapistData&&therapistData.ai_summary)||'';
+  html+='<div style="background:var(--sage-light);border-radius:10px;padding:13px;margin-bottom:14px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+  html+='<div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">NARA AI - Rezumat client</div>';
+  html+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateClientSummary(&apos;"+clientId+"&apos;)">Genereaza</button>';
+  html+='</div>';
+  html+='<div id="cd-client-ai-summary" style="font-size:12px;color:var(--text);line-height:1.65;min-height:36px">';
+  html+=aiSummary||'<span style="color:var(--text-muted);font-style:italic">Apasa Genereaza - AI citeste notitele si obiectivele si scrie un rezumat clinic.</span>';
+  html+='</div></div>';
 
-  // Rezumat NARA AI
-  html+=`<div style="background:var(--sage-light);border-radius:10px;padding:13px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">NARA AI - Rezumat client</div>
-      <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateClientSummary('${clientId}')">Genereaza</button>
-    </div>
-    <div id="cd-client-ai-summary" style="font-size:12px;color:var(--text);line-height:1.65;min-height:36px">
-      ${therapistData?.ai_summary||'<span style="color:var(--text-muted);font-style:italic">Apasa Genereaza - AI citeste notitele, interviul si obiectivele si scrie un rezumat clinic.</span>'}
-    </div>
-  </div>`;
-
-  // Helper colapsabil
-  const mkSect=(id,title,badge,badgeOk,body)=>`
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px">
-      <div onclick="cdToggleSection('${id}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;font-weight:600;color:var(--text)">${title}</span>
-          "+(badge?('<span style="font-size:9px;font-weight:500;color:'+(badgeOk?'var(--success)':'var(--warn)')+'">'+badge+'</span>'):'')+"
-        </div>
-        <svg id="arrow-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div id="body-${id}" style="display:none;border-top:0.5px solid var(--border);padding:12px 13px">${body}</div>
-    </div>`;
+  // Sectiune colapsabila helper
+  var mkSect=function(id,title,badge,badgeOk,body){
+    var badgeHtml=badge?'<span style="font-size:9px;font-weight:500;color:'+(badgeOk?'var(--success)':'var(--warn)')+'">'+badge+'</span>':'';
+    var s='<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px">';
+    s+='<div onclick="cdToggleSection(&apos;"+id+"&apos;)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer">';
+    s+='<div style="display:flex;align-items:center;gap:8px">';
+    s+='<span style="font-size:11px;font-weight:600;color:var(--text)">'+title+'</span>'+badgeHtml;
+    s+='</div>';
+    s+='<svg id="arrow-'+id+'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="transition:transform 0.2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>';
+    s+='</div>';
+    s+='<div id="body-'+id+'" style="display:none;border-top:0.5px solid var(--border);padding:12px 13px">'+body+'</div>';
+    s+='</div>';
+    return s;
+  };
 
   // Documente
-  html+=mkSect('docs','Documente',null,true,`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--border)">
-      <span style="font-size:12px;color:var(--text)">GDPR</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;font-weight:600;color:${c.gdpr_signed?'var(--success)':'var(--warn)'}">${c.gdpr_signed?'✓ Semnat':'Nesemnat'}</span>
-        "+(c.gdpr_signed?'<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewGdprContent(\''+clientId+'\')">' +'Vezi</button>':'')+"
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0">
-      <span style="font-size:12px;color:var(--text)">Contract terapeutic</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;font-weight:600;color:${c.contract_signed?'var(--success)':'var(--warn)'}">${c.contract_signed?'✓ Semnat':'Nesemnat'}</span>
-        "+(c.contract_signed?'<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewContractContent(\''+clientId+'\')">'+'Vezi</button>':'')+"
-      </div>
-    </div>`);
+  var docsHtml='';
+  docsHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--border)">';
+  docsHtml+='<span style="font-size:12px;color:var(--text)">GDPR</span>';
+  docsHtml+='<div style="display:flex;align-items:center;gap:8px">';
+  docsHtml+='<span style="font-size:11px;font-weight:600;color:'+(c.gdpr_signed?'var(--success)':'var(--warn)')+'">'+( c.gdpr_signed?'✓ Semnat':'Nesemnat')+'</span>';
+  if(c.gdpr_signed)docsHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewGdprContent(&apos;"+clientId+"&apos;)">Vezi</button>';
+  docsHtml+='</div></div>';
+  docsHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0">';
+  docsHtml+='<span style="font-size:12px;color:var(--text)">Contract terapeutic</span>';
+  docsHtml+='<div style="display:flex;align-items:center;gap:8px">';
+  docsHtml+='<span style="font-size:11px;font-weight:600;color:'+(c.contract_signed?'var(--success)':'var(--warn)')+'">'+( c.contract_signed?'✓ Semnat':'Nesemnat')+'</span>';
+  if(c.contract_signed)docsHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewContractContent(&apos;"+clientId+"&apos;)">Vezi</button>';
+  docsHtml+='</div></div>';
+  html+=mkSect('docs','Documente',null,true,docsHtml);
 
   // Date personale
-  const fisaBody=fisa?`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-      "+(([["Data nasterii",fmtDate(fisa.dob)],["Telefon",c.phone||"-"],["Ocupatie",fisa.job||"-"],["Stare civila",fisa.civil_status||"-"]]).map(([lbl,val])=>'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">'+lbl+'</div><div style="font-size:12px;color:var(--text)">'+val+'</div></div>').join(''))+"
-    </div>
-    "+(fisa.medical_diagnosis?'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">'+fisa.medical_diagnosis+'</div></div>':'')+"
-    "+(fisa.medication?'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicatie</div><div style="font-size:12px;color:var(--text)">'+fisa.medication+'</div></div>':'')+"
-    "+(fisa.previous_therapy?'<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Terapie anterioara</div><div style="font-size:12px;color:var(--text)">'+fisa.previous_therapy+'</div></div>':'')+"
-  `:'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fisa nu a fost completata de client.</div>';
-  html+=mkSect('personal','Date personale',c.fisa_complete?'Complete':'Incomplete',c.fisa_complete,fisaBody);
+  var fisaHtml='';
+  if(fisa){
+    fisaHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">';
+    var fields=[['Data nasterii',fmtDate(fisa.dob)],['Telefon',c.phone||'-'],['Ocupatie',fisa.job||'-'],['Stare civila',fisa.civil_status||'-']];
+    fields.forEach(function(f){
+      fisaHtml+='<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">'+f[0]+'</div><div style="font-size:12px;color:var(--text)">'+f[1]+'</div></div>';
+    });
+    fisaHtml+='</div>';
+    if(fisa.medical_diagnosis)fisaHtml+='<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Diagnostic</div><div style="font-size:12px;color:var(--text)">'+fisa.medical_diagnosis+'</div></div>';
+    if(fisa.medication)fisaHtml+='<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px;margin-bottom:6px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Medicatie</div><div style="font-size:12px;color:var(--text)">'+fisa.medication+'</div></div>';
+    if(fisa.previous_therapy)fisaHtml+='<div style="background:var(--sage-light);border-radius:7px;padding:7px 9px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Terapie anterioara</div><div style="font-size:12px;color:var(--text)">'+fisa.previous_therapy+'</div></div>';
+  } else {
+    fisaHtml='<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fisa nu a fost completata de client.</div>';
+  }
+  html+=mkSect('personal','Date personale',c.fisa_complete?'Complete':'Incomplete',c.fisa_complete,fisaHtml);
 
   // Evaluari clinice
-  const lazarusFields=[
-    ['reason','Motivul prezentării'],
-    ['duration','Durata problemei'],
-    ['past_episodes','Episoade anterioare'],
-    ['symptoms','Simptome'],
-    ['impact','Impact în viața de zi cu zi'],
-    ['factors','Factori declanșatori / menținători'],
-    ['goals','Obiectivele clientului'],
-    ['behavior','Comportamente (B)'],
-    ['behavior_excess','Comportamente în exces / deficit'],
-    ['affect','Afect / emoții (A)'],
-    ['affect_triggers','Declanșatori emoționali'],
-    ['sensation','Senzații fizice (S)'],
-    ['imagery','Imagini mentale (I)'],
-    ['cognition','Cogniții / gânduri (C)'],
-    ['interpersonal','Relații interpersonale (I)'],
-    ['substances','Substanțe / medicație (D)'],
-    ['sleep_appetite','Somn și apetit']
-  ];
-
-  const intBody=clinicalInterview?
-    lazarusFields.filter(([k])=>clinicalInterview[k]).map(([k,label])=>`
-      <div style="margin-bottom:10px">
-        <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">${label}</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;background:var(--sage-light);border-radius:7px;padding:8px 10px">${clinicalInterview[k]}</div>
-      </div>`).join('')+`
-      <div style="margin-top:4px;border-top:0.5px solid var(--border);padding-top:12px">
-        <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Interpretare NARA AI</div>
-        <div id="cd-interview-ai" style="font-size:12px;color:var(--text);line-height:1.65;min-height:36px;margin-bottom:8px">
-          <span style="color:var(--text-muted);font-style:italic">Apasă pentru o interpretare clinică bazată pe profilul BASIC ID.</span>
-        </div>
-        <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateInterviewInterpretation('${clientId}','${encodeURIComponent(JSON.stringify(clinicalInterview))}')">✦ Generează interpretare</button>
-      </div>`
-    :'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Niciun interviu clinic completat.</div>';
-  html+=mkSect('evaluari','Evaluări clinice · Lazarus BASIC ID',clinicalInterview?'Completat':'Fără evaluări',!!clinicalInterview,intBody);
+  var lazarusFields=[['reason','Motivul prezentarii'],['duration','Durata problemei'],['past_episodes','Episoade anterioare'],['symptoms','Simptome'],['impact','Impact'],['factors','Factori'],['goals','Obiectivele clientului'],['behavior','Comportamente (B)'],['behavior_excess','Comportamente exces/deficit'],['affect','Afect / emotii (A)'],['affect_triggers','Declansatori emotionali'],['sensation','Senzatii fizice (S)'],['imagery','Imagini mentale (I)'],['cognition','Cognitii / ganduri (C)'],['interpersonal','Relatii interpersonale (I)'],['substances','Substante / medicatie (D)'],['sleep_appetite','Somn si apetit']];
+  var intHtml='';
+  if(clinicalInterview){
+    lazarusFields.forEach(function(f){
+      if(clinicalInterview[f[0]]){
+        intHtml+='<div style="margin-bottom:10px">';
+        intHtml+='<div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">'+f[1]+'</div>';
+        intHtml+='<div style="font-size:12px;color:var(--text);line-height:1.6;background:var(--sage-light);border-radius:7px;padding:8px 10px">'+clinicalInterview[f[0]]+'</div>';
+        intHtml+='</div>';
+      }
+    });
+    intHtml+='<div style="border-top:0.5px solid var(--border);padding-top:12px;margin-top:4px">';
+    intHtml+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+    intHtml+='<div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em">Interpretare NARA AI</div>';
+    var intEnc=encodeURIComponent(JSON.stringify(clinicalInterview));
+    intHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateInterviewInterpretation(&apos;"+clientId+"&apos;,&apos;"+intEnc+"&apos;)">✦ Genereaza</button>';
+    intHtml+='</div>';
+    intHtml+='<div id="cd-interview-ai" style="font-size:12px;color:var(--text-muted);font-style:italic">Apasa pentru o interpretare clinica bazata pe profilul BASIC ID.</div>';
+    intHtml+='</div>';
+    if(!intHtml.trim())intHtml='<div style="font-size:12px;color:var(--text-muted);font-style:italic">Interviu fara raspunsuri completate.</div>';
+  } else {
+    intHtml='<div style="font-size:12px;color:var(--text-muted);font-style:italic">Niciun interviu clinic completat.</div>';
+  }
+  html+=mkSect('evaluari','Evaluari clinice - Lazarus BASIC ID',clinicalInterview?'Completat':'Fara evaluari',!!clinicalInterview,intHtml);
 
   return html;
 }
+
 
 function cdToggleSection(id){
   const body=document.getElementById('body-'+id);
