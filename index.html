@@ -1735,6 +1735,7 @@ async function toggleClientStatus(clientId, currentStatus){
 async function showClientDetail(id){
   const c=cachedClients.find(x=>x.id===id);
   if(!c)return;
+  window.currentClientId=id;
   document.getElementById('clients-list-view').style.display='none';
   const det=document.getElementById('client-detail-view');det.style.display='block';
 
@@ -1947,8 +1948,9 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
       </div>
       <div id="sess-${s.id}" style="display:none;border-top:1px solid var(--border);padding:11px 13px">
         ${s.notes?`<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">${s.notes}</div>`:'<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>'}
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center">
           <button class="btn btn-ghost btn-sm" onclick="generateAiSummary('${s.id}','${s.notes?.replace(/'/g,"\\'").replace(/\n/g,' ')||''}')">✦ Rezumat AI</button>
+          <button class="btn btn-ghost btn-sm" onclick="openFullSession('${s.id}','${s.date}',${sessNum},'${currentClientId}')">Vezi fișa completă →</button>
         </div>
         <div id="ai-summary-${s.id}" style="margin-top:8px"></div>
       </div>
@@ -2272,6 +2274,103 @@ async function cdAutoSaveNote(clientId,sessNum){
     if(existing){await sb.from('session_notes').update({notes,updated_at:new Date().toISOString()}).eq('id',existing.id);}
     else{await sb.from('session_notes').insert({client_id:clientId,date:today,type:'Ședință individuală',notes,session_number:sessNum});}
   },1500);
+}
+
+async function openFullSession(sessionId, date, sessNum, clientId){
+  const c=cachedClients.find(x=>x.id===clientId);
+  // Fetch toate datele ședinței
+  const [{data:note},{data:entries},{data:measurements}]=await Promise.all([
+    sb.from('session_notes').select('*').eq('id',sessionId).single(),
+    sb.from('journal_entries').select('*').eq('client_id',clientId).eq('session_number',sessNum).order('created_at',{ascending:true}),
+    sb.from('measurements').select('*').eq('client_id',clientId).eq('session_number',sessNum)
+  ]);
+
+  const ors=measurements?.find(m=>m.type==='ors');
+  const srs=measurements?.find(m=>m.type==='srs');
+  const clientNotes=(entries||[]).filter(e=>e.type==='note');
+  const agendaItems=(entries||[]).filter(e=>e.type==='agenda');
+  const hwGoal=(entries||[]).find(e=>e.type==='homework_goal');
+  const hwItems=(entries||[]).filter(e=>e.type==='homework');
+
+  const div=document.createElement('div');
+  div.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target===this)this.remove()">
+    <div style="background:var(--card);border-radius:14px 14px 0 0;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+
+      <!-- Header -->
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:1">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Ședința #${sessNum}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px">${fmtDate(date)} · ${c?.first_name} ${c?.last_name}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${ors?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${ors.total}</span>`:''}
+          ${srs?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:#ede9fe;color:#4c1d95">SRS ${srs.total}</span>`:''}
+          <button onclick="this.closest('[style*=\"position:fixed\"]').remove()" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
+        </div>
+      </div>
+
+      <div style="padding:14px 16px">
+
+        <!-- De discutat -->
+        ${agendaItems.length?`<div style="margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">De discutat — notat de client</div>
+          ${agendaItems.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px;font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>`).join('')}
+        </div>`:''}
+
+        <!-- Notițele terapeutului -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Notițele terapeutului</div>
+          ${note?.notes?`<div style="background:var(--sage-light);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.7">${note.notes.replace(/\n/g,'<br>')}</div>`:'<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fără notițe.</div>'}
+        </div>
+
+        <!-- Notițele clientului -->
+        ${clientNotes.length?`<div style="margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Notițele clientului</div>
+          ${clientNotes.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}${e.shared?' · Partajat':' · Privat'}</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>
+          </div>`).join('')}
+        </div>`:''}
+
+        <!-- Tema -->
+        ${hwGoal||hwItems.length?`<div style="margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Temă</div>
+          ${hwGoal?`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:6px">
+            <div style="font-size:10px;color:var(--sage);margin-bottom:3px">Cerința</div>
+            <div style="font-size:12px;color:var(--text)">${hwGoal.text}</div>
+          </div>`:''}
+          ${hwItems.length?`<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Completări client</div>`:''}
+          ${hwItems.map(e=>`<div style="background:var(--sage-light);border-radius:8px;padding:8px 11px;margin-bottom:5px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">${fmtDate(e.created_at?.slice(0,10))}</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5">${e.text}</div>
+          </div>`).join('')}
+        </div>`:''}
+
+        <!-- Rezumat AI -->
+        <div style="border-top:1px solid var(--border);padding-top:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">Rezumat NARA AI</div>
+            <button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateAiSummaryModal('${sessionId}','${(note?.notes||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">✦ Generează</button>
+          </div>
+          <div id="full-sess-ai-${sessionId}" style="font-size:12px;color:var(--text-muted);font-style:italic">Apasă Generează pentru un rezumat al acestei ședințe.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(div.firstElementChild);
+}
+
+async function generateAiSummaryModal(sessionId, notes){
+  const cont=document.getElementById('full-sess-ai-'+sessionId);
+  if(!cont||!notes.trim()){if(cont)cont.textContent='Nu există notițe pentru această ședință.';return;}
+  cont.textContent='Se generează...';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Ești un asistent pentru psihoterapeuți. Pe baza acestor notițe de ședință, scrie un rezumat clinic concis de 2-3 propoziții:\n\n${notes}`}]})});
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'Eroare.';
+    cont.innerHTML=`<div style="background:var(--sage-light);border-radius:8px;padding:9px 11px;line-height:1.65;color:var(--text)">${text}</div>`;
+  }catch(e){cont.textContent='Eroare la conectare.';}
 }
 
 async function generateAiSummary(sessionId,notes){
