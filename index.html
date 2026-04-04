@@ -1979,7 +1979,7 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
   var mkSect=function(id,title,badge,badgeOk,body){
     var badgeHtml=badge?'<span style="font-size:9px;font-weight:500;color:'+(badgeOk?'var(--success)':'var(--warn)')+'">'+badge+'</span>':'';
     var s='<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px">';
-    s+='<div onclick="cdToggleSection(&apos;"+id+"&apos;)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer">';
+    s+='<div onclick="cdToggleSection(\''+id+'\')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer">';
     s+='<div style="display:flex;align-items:center;gap:8px">';
     s+='<span style="font-size:11px;font-weight:600;color:var(--text)">'+title+'</span>'+badgeHtml;
     s+='</div>';
@@ -2076,7 +2076,7 @@ async function viewGdprContent(clientId){
       </div>
       <div style="background:var(--sage-light);border-radius:8px;padding:10px 12px;margin-bottom:10px">
         <div style="font-size:12px;color:var(--text)">✓ GDPR semnat de client</div>
-        "+(gdpr?.ip_address?'<div style="font-size:10px;color:var(--text-muted);margin-top:3px">IP: '+gdpr.ip_address+'</div>':'')+"
+        ${gdpr?.ip_address?`<div style="font-size:10px;color:var(--text-muted);margin-top:3px">IP: ${gdpr.ip_address}</div>`:''}
       </div>
       <div style="font-size:12px;color:var(--text);line-height:1.7">Clientul a citit și acceptat politica de prelucrare a datelor cu caracter personal conform GDPR, inclusiv prelucrarea datelor sensibile privind sănătatea psihologică în scopul furnizării serviciilor terapeutice.</div>
     </div>
@@ -2435,7 +2435,7 @@ async function openHomeworkModal(clientId,sessNum){
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:10px 12px;margin-bottom:14px">
       <div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Cerința</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6">${cerintaText}</div>
-      "+(therapistHw?.description?'<div style="font-size:11px;color:var(--text-muted);margin-top:4px">'+therapistHw.description+'</div>':'')+"
+      ${therapistHw?.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${therapistHw.description}</div>`:''}
       <div style="font-size:10px;color:var(--sage);margin-top:5px">${therapistHw?'De la terapeut':'Notată de client'}</div>
     </div>`;
   } else {
@@ -2917,15 +2917,16 @@ async function cpLoadSessions(){
       const uid='og'+Math.random().toString(36).slice(2,6);
       // Area path — só com 2+ pontos
       const areaPath=vals.length>1?`M${pts[0]} L${pts.join(' L')} L${pad+(vals.length-1)*xStep},${h-2} L${pad},${h-2} Z`:'';
-      graphEl.innerHTML=`<svg width="100%" height="74" viewBox="0 0 240 74" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="${uid}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f;stop-opacity:0.15"/><stop offset="100%" style="stop-color:#4a7c6f;stop-opacity:0"/></linearGradient></defs>
-        <line x1="0" y1="${prag}" x2="240" y2="${prag}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
-        <text x="4" y="${prag-2}" font-size="7" fill="#94a3b8" font-family="system-ui">25</text>
-        "+(areaPath?'<path d="'+areaPath+'" fill="url(#'+uid+')"/>':'')+"
-        "+(vals.length>1?'<polyline points="'+pts.join(' ')+'" fill="none" stroke="#4a7c6f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>':'')+"
-        "+pts.map((p,i)=>'<circle cx="'+p.split(',')[0]+'" cy="'+p.split(',')[1]+'" r="5" fill="#4a7c6f" stroke="#fff" stroke-width="2"/>').join('')+"
-        "+vals.map((v,i)=>'<text x="'+pts[i].split(',')[0]+'" y="72" font-size="7" fill="#4a7c6f" font-family="system-ui" text-anchor="middle" font-weight="700">Ș'+orsMeas[i].session_number+'</text>').join('')+"
-      </svg>`;
+      var svgHtml='<svg width="100%" height="74" viewBox="0 0 240 74" xmlns="http://www.w3.org/2000/svg">';
+      svgHtml+='<defs><linearGradient id="'+uid+'" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4a7c6f;stop-opacity:0.15"/><stop offset="100%" style="stop-color:#4a7c6f;stop-opacity:0"/></linearGradient></defs>';
+      svgHtml+='<line x1="0" y1="'+prag+'" x2="240" y2="'+prag+'" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>';
+      svgHtml+='<text x="4" y="'+(prag-2)+'" font-size="7" fill="#94a3b8" font-family="system-ui">25</text>';
+      if(areaPath)svgHtml+='<path d="'+areaPath+'" fill="url(#'+uid+')"/>';
+      if(vals.length>1)svgHtml+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#4a7c6f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+      pts.forEach(function(p,i){svgHtml+='<circle cx="'+p.split(',')[0]+'" cy="'+p.split(',')[1]+'" r="5" fill="#4a7c6f" stroke="#fff" stroke-width="2"/>';});
+      vals.forEach(function(v,i){svgHtml+='<text x="'+pts[i].split(',')[0]+'" y="72" font-size="7" fill="#4a7c6f" font-family="system-ui" text-anchor="middle" font-weight="700">Ș'+orsMeas[i].session_number+'</text>';});
+      svgHtml+='</svg>';
+      graphEl.innerHTML=svgHtml;
     }
   } else {
     if(trendEl)trendEl.innerHTML='';
@@ -3297,7 +3298,7 @@ async function openSessionJournal(hint,origin){
 
       <!-- TAB DE DISCUTAT -->
       <div id="ftab-content-agenda" style="padding:12px">
-        "+(therapistEntries.length?'<div style="background:var(--sage-light);border-left:2.5px solid var(--sage);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:10px">'+therapistEntries.map(e=>'<div style="font-size:12px;color:var(--text);line-height:1.6">'+e.text+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:3px">'+fmtDate(e.created_at?.slice(0,10))+' · Mesaj terapeut</div>').join('')+'</div>':'')+\"
+        ${therapistEntries.length?'<div style="background:var(--sage-light);border-left:2.5px solid var(--sage);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:10px">'+therapistEntries.map(e=>'<div style="font-size:12px;color:var(--text);line-height:1.6">'+e.text+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:3px">'+fmtDate(e.created_at?.slice(0,10))+' · Mesaj terapeut</div>').join('')+'</div>':''}
         <textarea id="j-agenda-new" style="width:100%;min-height:65px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;font-family:inherit;resize:none;color:var(--text);background:var(--warm);outline:none" placeholder="Ce vrei să aduci în ședință?"></textarea>
         <div style="display:flex;justify-content:flex-end;margin-top:7px;margin-bottom:${agendaCount?'10px':'0'}">
           <button class="btn btn-primary btn-sm" onclick="saveFisaTabEntry('agenda')">Salvează</button>
@@ -3431,7 +3432,7 @@ async function loadHomework(date,sessNum){
     html+=`<div style="background:var(--sage-light);border-radius:9px;padding:11px 13px;margin-bottom:12px">
       <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px">Cerința</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px">${therapistHw.title}</div>
-      "+(therapistHw.description?'<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">'+therapistHw.description+'</div>':'')+"
+      ${therapistHw.description?`<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px">${therapistHw.description}</div>`:''}
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:10px;color:var(--text-muted)">De la terapeut${therapistHw.due_date?' · Termen: '+fmtDate(therapistHw.due_date):''}</div>
         ${!isCompleted
@@ -3699,7 +3700,7 @@ async function loadFacturiPage(){
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:12px;color:var(--text-muted)">${fmtDate(f.date)||'—'}${f.period?' · '+f.period:''}</div>
-          "+(f.description?'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+f.description+'</div>':'')+"
+          ${f.description?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${f.description}</div>`:''}
         </div>
         <div style="font-size:15px;font-weight:700;color:var(--text)">${parseFloat(f.amount||0).toFixed(2)} RON</div>
       </div>
