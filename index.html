@@ -1686,7 +1686,7 @@ async function renderDash(){
   const da=document.getElementById('dash-appts');
   if(appts?.length){da.innerHTML=appts.map(a=>{
     const c=clients.find(x=>x.id===a.client_id);
-    const prioColors={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
+    const prioColors={'orange':'#fed7aa','red':'#fecaca'};
     const borderCol=c?.priority?prioColors[c.priority]:'var(--sage-light)';
     return`<div onclick="if(cachedClients.find(x=>x.id==='${a.client_id}'))showClientDetail('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?`<div style="width:8px;height:8px;border-radius:50%;background:${prioColors[c.priority]};flex-shrink:0"></div>`:''}</div>`;
   }).join('');}
@@ -1712,8 +1712,8 @@ function renderClientList(){
   const active=clients.filter(c=>c.status==='active'||c.status==='waiting');
   const inactive=clients.filter(c=>c.status!=='active'&&c.status!=='waiting');
 
-  const priorityColor={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
-  const priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
+  const priorityColor={'orange':'#fed7aa','red':'#fecaca'};
+  const priorityLabel={'orange':'De urmărit','red':'Necesită atenție'};
 
   const mkPriorityDot=(c)=>{
     const col=c.priority?priorityColor[c.priority]:'#ddd';
@@ -1725,17 +1725,19 @@ function renderClientList(){
   };
 
   const mkRow=(c,isInactive)=>{
-    const bg=isInactive?'var(--border)':'var(--sage-light)';
+    const priorityBg={'orange':'#fed7aa','red':'#fecaca'};
+    const bg=isInactive?'var(--border)':(c.priority&&priorityBg[c.priority]?priorityBg[c.priority]:'var(--sage-light)');
     const col=isInactive?'var(--text-muted)':'var(--sage-dark)';
     const toggleBg=isInactive?'#ccc':'var(--sage)';
     const togglePos=isInactive?'left:3px':'right:3px';
     const op=isInactive?'opacity:0.55':'';
     return '<div style="display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--border);'+op+'">'
       +'<div onclick="showClientDetail(\''+c.id+'\')" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent">'
-      +'<div style="width:38px;height:38px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+col+';flex-shrink:0">'+ini(c.first_name,c.last_name)+'</div>'
+      +'<div style="position:relative;flex-shrink:0" onclick="event.stopPropagation();openPrioPicker(this,\''+c.id+'\',\''+( c.priority||'')+'\')">'
+      +'<div style="width:38px;height:38px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+col+'">'+ini(c.first_name,c.last_name)+'</div>'
+      +'</div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;color:var(--text)">'+c.first_name+' '+c.last_name+'</div></div>'
       +'</div>'
-      +mkPriorityDot(c)
       +'<div onclick="toggleClientStatus(\''+c.id+'\',\''+c.status+'\')" style="cursor:pointer;flex-shrink:0">'
       +'<div style="width:42px;height:24px;border-radius:12px;background:'+toggleBg+';position:relative;transition:background 0.2s">'
       +'<div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;'+togglePos+';transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>'
@@ -1757,8 +1759,8 @@ function openPrioPicker(dotEl, clientId, currentPriority){
     if(existing.dataset.clientId===clientId){existing.remove();return;}
     existing.remove();
   }
-  const priorityColor={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
-  const priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
+  const priorityColor={'orange':'#fed7aa','red':'#fecaca'};
+  const priorityLabel={'orange':'De urmărit','red':'Necesită atenție'};
   const picker=document.createElement('div');
   picker.id='global-prio-picker';
   picker.dataset.clientId=clientId;
@@ -1768,7 +1770,7 @@ function openPrioPicker(dotEl, clientId, currentPriority){
   picker.style.top=(rect.bottom+6)+'px';
   picker.style.right=(window.innerWidth-rect.right+8)+'px';
   let html='';
-  ['green','orange','red'].forEach(p=>{
+  ['orange','red'].forEach(p=>{
     const isActive=currentPriority===p;
     html+='<div onclick="event.stopPropagation();setPriority(\''+clientId+'\',\''+(isActive?'':p)+'\')" '
       +'style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer">'
@@ -1792,13 +1794,18 @@ function openPrioPicker(dotEl, clientId, currentPriority){
 
 async function setPriority(clientId,priority){
   await sb.from('clients').update({priority:priority||null}).eq('id',clientId);
-  // Update local cache
   const c=cachedClients.find(x=>x.id===clientId);
   if(c)c.priority=priority||null;
-  // Close picker and re-render
-  const picker=document.getElementById('prio-picker-'+clientId);
-  if(picker)picker.style.display='none';
+  // Close picker
+  const picker=document.getElementById('global-prio-picker');
+  if(picker)picker.remove();
+  // Re-render list
   renderClientList();
+  // If detail view is open for this client, refresh it
+  const det=document.getElementById('client-detail-view');
+  if(det&&det.style.display!=='none'&&window.currentClientId===clientId){
+    showClientDetail(clientId);
+  }
 }
 
 async function toggleClientStatus(clientId, currentStatus){
@@ -1834,19 +1841,6 @@ async function showClientDetail(id){
   const prevOrs=orsMeas[orsMeas.length-2];
   const orsTrend=lastOrs&&prevOrs?(lastOrs.total>prevOrs.total?' ↑':lastOrs.total<prevOrs.total?' ↓':''):'';
 
-  var priorityColor={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
-  var priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
-  var prioCol=c.priority?priorityColor[c.priority]:'var(--border)';
-  var prioBorder=c.priority?'border:2px solid '+priorityColor[c.priority]:' border:1.5px solid var(--text-muted)';
-  var prioTitle=c.priority?priorityLabel[c.priority]:'Setează prioritate';
-  var prioPickerOpts=['green','orange','red'].map(function(p){
-    return '<div onclick="setPriority(\''+c.id+'\',\''+(c.priority===p?'':p)+'\');document.getElementById(\'hdr-prio-picker\').style.display=\'none\'" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer">'
-      +'<div style="width:12px;height:12px;border-radius:50%;background:'+priorityColor[p]+';'+(c.priority===p?'box-shadow:0 0 0 2px #fff,0 0 0 3px '+priorityColor[p]:'')+';"></div>'
-      +'<span style="font-size:12px;color:var(--text)">'+priorityLabel[p]+'</span>'
-      +(c.priority===p?'<span style="font-size:10px;color:var(--text-muted);margin-left:auto">✓ activ</span>':'')
-      +'</div>';
-  }).join('');
-
   var orsBadge='';
   if(lastOrs){
     var orsText=firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend;
@@ -1859,18 +1853,17 @@ async function showClientDetail(id){
   detHtml+='</div>';
   detHtml+='<div style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 14px">';
   detHtml+='<div style="display:flex;align-items:center;gap:10px">';
-  detHtml+='<div style="width:38px;height:38px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sage-dark);flex-shrink:0">'+ini(c.first_name,c.last_name)+'</div>';
+  // Avatar cu priority indicator
+  var prioCol=c.priority?priorityColor[c.priority]:'#ddd';
+  var prioBdr=c.priority?'2px solid '+priorityColor[c.priority]:'1.5px solid #bbb';
+  detHtml+='<div style="position:relative;flex-shrink:0" onclick="event.stopPropagation();openPrioPicker(this.querySelector(\'[data-prio]\'),\''+c.id+'\',\''+(c.priority||'')+'\''+')">';
+  detHtml+='<div style="width:38px;height:38px;border-radius:50%;background:'+(c.priority?({'orange':'#fed7aa','red':'#fecaca'}[c.priority]||'var(--sage-light)'):'var(--sage-light)')+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sage-dark)">'+ini(c.first_name,c.last_name)+'</div>';
+  detHtml+='<div data-prio="1" style="position:absolute;bottom:0;right:0;width:13px;height:13px;border-radius:50%;background:'+prioCol+';border:2px solid var(--card);cursor:pointer" title="'+(c.priority?priorityLabel[c.priority]:'Setează prioritate')+'"></div>';
+  detHtml+='</div>';
   detHtml+='<div style="flex:1;min-width:0">';
   detHtml+='<div style="font-size:15px;font-weight:700;color:var(--text)">'+c.first_name+' '+c.last_name+'</div>';
   detHtml+='<div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #'+(appointments?appointments.length:0)+' · '+(c.status==='active'?'Activ':'În așteptare')+'</div>';
   detHtml+='</div>';
-  // Priority dot in header
-  detHtml+='<div style="position:relative">';
-  detHtml+='<div onclick="togglePriorityPicker(\'hdr-'+c.id+'\')" title="'+prioTitle+'" style="width:16px;height:16px;border-radius:50%;background:'+prioCol+';cursor:pointer;'+prioBorder+';flex-shrink:0"></div>';
-  detHtml+='<div id="prio-picker-hdr-'+c.id+'" style="display:none;position:absolute;right:0;top:22px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:160px;flex-direction:column;gap:4px">';
-  detHtml+=prioPickerOpts;
-  if(c.priority)detHtml+='<div onclick="setPriority(\''+c.id+'\',\'\');document.getElementById(\'prio-picker-hdr-'+c.id+'\').style.display=\'none\'" style="font-size:10px;color:var(--text-muted);margin-top:6px;cursor:pointer;text-align:center">Elimină prioritatea</div>';
-  detHtml+='</div></div>';
   detHtml+=orsBadge+'</div></div>';
   detHtml+='<div style="display:flex;background:var(--card);border-bottom:1px solid var(--border)">';
   detHtml+='<div class="cd-tab active" id="cdtab-azi" onclick="cdTab(\'azi\')">Azi</div>';
