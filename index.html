@@ -1684,7 +1684,12 @@ async function renderDash(){
     wl.innerHTML=waiting.map(c=>`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email} · GDPR: ${c.gdpr_signed?'✓':'—'} · Fișă: ${c.fisa_complete?'✓':'—'}</div></div><button class="btn btn-primary btn-sm" onclick="activateClient('${c.id}')">Activează</button></div>`).join('');
   } else ws.classList.add('hidden');
   const da=document.getElementById('dash-appts');
-  if(appts?.length){da.innerHTML=appts.map(a=>{const c=clients.find(x=>x.id===a.client_id);return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div></div>`;}).join('');}
+  if(appts?.length){da.innerHTML=appts.map(a=>{
+    const c=clients.find(x=>x.id===a.client_id);
+    const prioColors={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
+    const borderCol=c?.priority?prioColors[c.priority]:'var(--sage-light)';
+    return`<div onclick="if(cachedClients.find(x=>x.id==='${a.client_id}'))showClientDetail('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?`<div style="width:8px;height:8px;border-radius:50%;background:${prioColors[c.priority]};flex-shrink:0"></div>`:''}</div>`;
+  }).join('');}
   else da.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div>';
   const ds=document.getElementById('dash-scales');
   if(scales?.length){ds.innerHTML=scales.slice(0,5).map(m=>{const c=clients.find(x=>x.id===m.client_id);const isOrs=m.type==='ors';return`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light)"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:${isOrs?'#dbeafe':'#ede9fe'};color:${isOrs?'#1d4ed8':'#6d28d9'}">${isOrs?'ORS':'SRS'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div></div><div style="font-size:15px;font-weight:600;color:${isOrs?'var(--ors)':'var(--srs)'}">${m.total}</div></div>`;}).join('');}
@@ -1707,31 +1712,74 @@ function renderClientList(){
   const active=clients.filter(c=>c.status==='active'||c.status==='waiting');
   const inactive=clients.filter(c=>c.status!=='active'&&c.status!=='waiting');
 
+  const priorityColor={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
+  const priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
+
+  const mkPriorityDot=(c)=>{
+    const col=c.priority?priorityColor[c.priority]:'var(--border)';
+    const opts=['green','orange','red'].map(p=>
+      '<div onclick="event.stopPropagation();setPriority(\''+c.id+'\',\''+(c.priority===p?'':p)+'\')" title="'+(p===c.priority?'Elimină':'Setează: ')+priorityLabel[p]+'" style="width:14px;height:14px;border-radius:50%;background:'+priorityColor[p]+';cursor:pointer;flex-shrink:0;'+(c.priority===p?'box-shadow:0 0 0 2px #fff,0 0 0 3px '+priorityColor[p]:'')+';"></div>'
+    ).join('');
+    return '<div style="position:relative;flex-shrink:0" onclick="event.stopPropagation()">'
+      +'<div id="prio-dot-'+c.id+'" onclick="togglePriorityPicker(\''+c.id+'\')" style="width:14px;height:14px;border-radius:50%;background:'+col+';cursor:pointer;border:1.5px solid '+(c.priority?col:'var(--text-muted)')+';"></div>'
+      +'<div id="prio-picker-'+c.id+'" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;display:none;gap:6px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);flex-direction:column;min-width:140px">'
+      +opts.map((o,i)=>'<div style="display:flex;align-items:center;gap:8px">'+o+'<span style="font-size:11px;color:var(--text)">'+priorityLabel[['green','orange','red'][i]]+'</span></div>').join('')
+      +'</div></div>';
+  };
+
   const mkRow=(c,isInactive)=>{
     const bg=isInactive?'var(--border)':'var(--sage-light)';
     const col=isInactive?'var(--text-muted)':'var(--sage-dark)';
     const toggleBg=isInactive?'#ccc':'var(--sage)';
     const togglePos=isInactive?'left:3px':'right:3px';
     const op=isInactive?'opacity:0.55':'';
-    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);'+op+'">'
-      +'<div onclick="showClientDetail(\'' +c.id+ '\')" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent">'
+    return '<div style="display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--border);'+op+'">'
+      +'<div onclick="showClientDetail(\''+c.id+'\')" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent">'
       +'<div style="width:38px;height:38px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:'+col+';flex-shrink:0">'+ini(c.first_name,c.last_name)+'</div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;color:var(--text)">'+c.first_name+' '+c.last_name+'</div></div>'
       +'</div>'
-      +'<div onclick="toggleClientStatus(\'' +c.id+ '\',\'' +c.status+ '\')" style="cursor:pointer;flex-shrink:0">'
+      +mkPriorityDot(c)
+      +'<div onclick="toggleClientStatus(\''+c.id+'\',\''+c.status+'\')" style="cursor:pointer;flex-shrink:0">'
       +'<div style="width:42px;height:24px;border-radius:12px;background:'+toggleBg+';position:relative;transition:background 0.2s">'
       +'<div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;'+togglePos+';transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>'
       +'</div></div></div>';
   };
 
   let html=active.map(c=>mkRow(c,false)).join('');
-
   if(inactive.length){
-    html+=`<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:16px;margin-bottom:8px;padding-top:8px;border-top:1px solid var(--border)">Inactivi</div>`;
+    html+='<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:16px;margin-bottom:8px;padding-top:8px;border-top:1px solid var(--border)">Inactivi</div>';
     html+=inactive.map(c=>mkRow(c,true)).join('');
   }
-
   tb.innerHTML=html;
+}
+
+function togglePriorityPicker(clientId){
+  // Close all other pickers first
+  document.querySelectorAll('[id^="prio-picker-"]').forEach(el=>{
+    if(el.id!=='prio-picker-'+clientId)el.style.display='none';
+  });
+  const picker=document.getElementById('prio-picker-'+clientId);
+  if(!picker)return;
+  const isOpen=picker.style.display==='flex';
+  picker.style.display=isOpen?'none':'flex';
+  if(!isOpen){
+    // Close on outside click
+    setTimeout(()=>{
+      const close=()=>{picker.style.display='none';document.removeEventListener('click',close);};
+      document.addEventListener('click',close);
+    },10);
+  }
+}
+
+async function setPriority(clientId,priority){
+  await sb.from('clients').update({priority:priority||null}).eq('id',clientId);
+  // Update local cache
+  const c=cachedClients.find(x=>x.id===clientId);
+  if(c)c.priority=priority||null;
+  // Close picker and re-render
+  const picker=document.getElementById('prio-picker-'+clientId);
+  if(picker)picker.style.display='none';
+  renderClientList();
 }
 
 async function toggleClientStatus(clientId, currentStatus){
@@ -1767,6 +1815,19 @@ async function showClientDetail(id){
   const prevOrs=orsMeas[orsMeas.length-2];
   const orsTrend=lastOrs&&prevOrs?(lastOrs.total>prevOrs.total?' ↑':lastOrs.total<prevOrs.total?' ↓':''):'';
 
+  var priorityColor={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
+  var priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
+  var prioCol=c.priority?priorityColor[c.priority]:'var(--border)';
+  var prioBorder=c.priority?'border:2px solid '+priorityColor[c.priority]:' border:1.5px solid var(--text-muted)';
+  var prioTitle=c.priority?priorityLabel[c.priority]:'Setează prioritate';
+  var prioPickerOpts=['green','orange','red'].map(function(p){
+    return '<div onclick="setPriority(\''+c.id+'\',\''+(c.priority===p?'':p)+'\');document.getElementById(\'hdr-prio-picker\').style.display=\'none\'" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer">'
+      +'<div style="width:12px;height:12px;border-radius:50%;background:'+priorityColor[p]+';'+(c.priority===p?'box-shadow:0 0 0 2px #fff,0 0 0 3px '+priorityColor[p]:'')+';"></div>'
+      +'<span style="font-size:12px;color:var(--text)">'+priorityLabel[p]+'</span>'
+      +(c.priority===p?'<span style="font-size:10px;color:var(--text-muted);margin-left:auto">✓ activ</span>':'')
+      +'</div>';
+  }).join('');
+
   var orsBadge='';
   if(lastOrs){
     var orsText=firstOrs&&firstOrs.session_number!==lastOrs.session_number?'ORS '+firstOrs.total+' → '+lastOrs.total+orsTrend:'ORS '+lastOrs.total+orsTrend;
@@ -1783,7 +1844,15 @@ async function showClientDetail(id){
   detHtml+='<div style="flex:1;min-width:0">';
   detHtml+='<div style="font-size:15px;font-weight:700;color:var(--text)">'+c.first_name+' '+c.last_name+'</div>';
   detHtml+='<div style="font-size:11px;color:var(--text-muted);margin-top:1px">Ședința #'+(appointments?appointments.length:0)+' · '+(c.status==='active'?'Activ':'În așteptare')+'</div>';
-  detHtml+='</div>'+orsBadge+'</div></div>';
+  detHtml+='</div>';
+  // Priority dot in header
+  detHtml+='<div style="position:relative">';
+  detHtml+='<div onclick="togglePriorityPicker(\'hdr-'+c.id+'\')" title="'+prioTitle+'" style="width:16px;height:16px;border-radius:50%;background:'+prioCol+';cursor:pointer;'+prioBorder+';flex-shrink:0"></div>';
+  detHtml+='<div id="prio-picker-hdr-'+c.id+'" style="display:none;position:absolute;right:0;top:22px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:160px;flex-direction:column;gap:4px">';
+  detHtml+=prioPickerOpts;
+  if(c.priority)detHtml+='<div onclick="setPriority(\''+c.id+'\',\'\');document.getElementById(\'prio-picker-hdr-'+c.id+'\').style.display=\'none\'" style="font-size:10px;color:var(--text-muted);margin-top:6px;cursor:pointer;text-align:center">Elimină prioritatea</div>';
+  detHtml+='</div></div>';
+  detHtml+=orsBadge+'</div></div>';
   detHtml+='<div style="display:flex;background:var(--card);border-bottom:1px solid var(--border)">';
   detHtml+='<div class="cd-tab active" id="cdtab-azi" onclick="cdTab(\'azi\')">Azi</div>';
   detHtml+='<div class="cd-tab" id="cdtab-istoric" onclick="cdTab(\'istoric\')">Istoric</div>';
