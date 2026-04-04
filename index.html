@@ -1809,12 +1809,20 @@ async function setPriority(clientId,priority){
 }
 
 async function navigateToClient(clientId){
-  // Switch to clients panel
-  tNav('clients',null,true);
-  // Wait for panel to be visible and clients loaded
-  await loadClients();
+  // First switch to clients panel via mobile nav (works on both mobile and desktop)
+  document.querySelectorAll('.panel').forEach(x=>{x.style.display='none';x.classList.remove('active');});
+  const panel=document.getElementById('t-clients');
+  if(panel){panel.style.display='block';panel.classList.add('active');}
+  // Update nav indicators
+  ['dashboard','calendar','clients','notes'].forEach(t=>{
+    const el=document.getElementById('tnav-'+t);
+    if(el)el.classList.toggle('active',t==='clients');
+  });
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  // Make sure clients are loaded
+  if(!cachedClients.length)await loadClients();
   renderClientList();
-  // Then open client detail
+  // Show detail
   showClientDetail(clientId);
 }
 
