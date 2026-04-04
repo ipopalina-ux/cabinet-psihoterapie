@@ -2293,7 +2293,7 @@ async function openFullSession(sessionId, date, sessNum, clientId){
   const hwItems=(entries||[]).filter(e=>e.type==='homework');
 
   const div=document.createElement('div');
-  div.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target===this)this.remove()">
+  div.innerHTML=`<div id="full-sess-modal-${sessionId}" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target.id==='full-sess-modal-${sessionId}')document.getElementById('full-sess-modal-${sessionId}').remove()">
     <div style="background:var(--card);border-radius:14px 14px 0 0;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
 
       <!-- Header -->
@@ -2305,7 +2305,7 @@ async function openFullSession(sessionId, date, sessNum, clientId){
         <div style="display:flex;align-items:center;gap:8px">
           ${ors?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${ors.total}</span>`:''}
           ${srs?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:#ede9fe;color:#4c1d95">SRS ${srs.total}</span>`:''}
-          <button onclick="this.closest('[style*=\"position:fixed\"]').remove()" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
+          <button onclick="document.getElementById('full-sess-modal-${sessionId}').remove()" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
         </div>
       </div>
 
