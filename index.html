@@ -1888,7 +1888,7 @@ async function showClientDetail(id){
   var prioBdr=c.priority?'2px solid '+PRIORITY_COLOR[c.priority]:'1.5px solid #bbb';
   detHtml+='<div style="position:relative;flex-shrink:0" onclick="event.stopPropagation();openPrioPicker(this.querySelector(\'[data-prio]\'),\''+c.id+'\',\''+(c.priority||'')+'\''+')">';
   detHtml+='<div style="width:38px;height:38px;border-radius:50%;background:'+(c.priority?({'orange':'#fed7aa','red':'#fecaca'}[c.priority]||'var(--sage-light)'):'var(--sage-light)')+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sage-dark)">'+ini(c.first_name,c.last_name)+'</div>';
-  detHtml+='<div data-prio="1" style="position:absolute;bottom:0;right:0;width:13px;height:13px;border-radius:50%;background:'+prioCol+';border:2px solid var(--card);cursor:pointer" title="'+(c.priority?priorityLabel[c.priority]:'Setează prioritate')+'"></div>';
+  detHtml+='<div data-prio="1" style="position:absolute;bottom:0;right:0;width:13px;height:13px;border-radius:50%;background:'+prioCol+';border:2px solid var(--card);cursor:pointer" title="'+(c.priority?PRIORITY_LABEL[c.priority]:'Setează prioritate')+'"></div>';
   detHtml+='</div>';
   detHtml+='<div style="flex:1;min-width:0">';
   detHtml+='<div style="font-size:15px;font-weight:700;color:var(--text)">'+c.first_name+' '+c.last_name+'</div>';
