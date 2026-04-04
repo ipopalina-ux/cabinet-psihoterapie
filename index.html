@@ -1487,6 +1487,8 @@ function openModal(id){
 function closeModal(id){document.getElementById('modal-'+id)?.classList.remove('open')}
 
 let cachedClients=[];
+const PRIORITY_COLOR={'orange':'#fed7aa','red':'#fecaca'};
+const PRIORITY_LABEL={'orange':'De urmărit','red':'Necesită atenție'};
 let currentClientUser=null;
 let calDate=new Date();
 let selDate=new Date();
@@ -1686,7 +1688,7 @@ async function renderDash(){
   const da=document.getElementById('dash-appts');
   if(appts?.length){da.innerHTML=appts.map(a=>{
     const c=clients.find(x=>x.id===a.client_id);
-    const prioColors={'orange':'#fed7aa','red':'#fecaca'};
+    const prioColors=PRIORITY_COLOR;
     const borderCol=c?.priority?prioColors[c.priority]:'var(--sage-light)';
     return`<div onclick="navigateToClient('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?('<div style="width:8px;height:8px;border-radius:50%;background:'+prioColors[c.priority]+';flex-shrink:0"></div>'):''}</div>`;
   }).join('');}
@@ -1712,8 +1714,8 @@ function renderClientList(){
   const active=clients.filter(c=>c.status==='active'||c.status==='waiting');
   const inactive=clients.filter(c=>c.status!=='active'&&c.status!=='waiting');
 
-  const priorityColor={'orange':'#fed7aa','red':'#fecaca'};
-  const priorityLabel={'orange':'De urmărit','red':'Necesită atenție'};
+  const priorityColor=PRIORITY_COLOR;
+  const priorityLabel=PRIORITY_LABEL;
 
   const mkPriorityDot=(c)=>{
     const col=c.priority?priorityColor[c.priority]:'#ddd';
@@ -1759,8 +1761,8 @@ function openPrioPicker(dotEl, clientId, currentPriority){
     if(existing.dataset.clientId===clientId){existing.remove();return;}
     existing.remove();
   }
-  const priorityColor={'orange':'#fed7aa','red':'#fecaca'};
-  const priorityLabel={'orange':'De urmărit','red':'Necesită atenție'};
+  const priorityColor=PRIORITY_COLOR;
+  const priorityLabel=PRIORITY_LABEL;
   const picker=document.createElement('div');
   picker.id='global-prio-picker';
   picker.dataset.clientId=clientId;
