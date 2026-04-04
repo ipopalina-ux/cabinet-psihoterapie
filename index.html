@@ -1688,7 +1688,7 @@ async function renderDash(){
     const c=clients.find(x=>x.id===a.client_id);
     const prioColors={'orange':'#fed7aa','red':'#fecaca'};
     const borderCol=c?.priority?prioColors[c.priority]:'var(--sage-light)';
-    return`<div onclick="if(cachedClients.find(x=>x.id==='${a.client_id}'))showClientDetail('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?`<div style="width:8px;height:8px;border-radius:50%;background:${prioColors[c.priority]};flex-shrink:0"></div>`:''}</div>`;
+    return`<div onclick="navigateToClient('${a.client_id}')" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--sage-light);cursor:pointer;border-left:3px solid ${borderCol}"><span style="font-size:12px;font-weight:600;color:var(--sage);min-width:38px">${a.time}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>${c?.priority?`<div style="width:8px;height:8px;border-radius:50%;background:${prioColors[c.priority]};flex-shrink:0"></div>`:''}</div>`;
   }).join('');}
   else da.innerHTML='<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-muted)">Nicio programare astăzi.</div>';
   const ds=document.getElementById('dash-scales');
@@ -1806,6 +1806,16 @@ async function setPriority(clientId,priority){
   if(det&&det.style.display!=='none'&&window.currentClientId===clientId){
     showClientDetail(clientId);
   }
+}
+
+async function navigateToClient(clientId){
+  // Switch to clients panel
+  tNav('clients',null,true);
+  // Wait for panel to be visible and clients loaded
+  await loadClients();
+  renderClientList();
+  // Then open client detail
+  showClientDetail(clientId);
 }
 
 async function toggleClientStatus(clientId, currentStatus){
@@ -2578,7 +2588,13 @@ async function renderCalDay(ds){
   document.getElementById('cal-day-label').textContent=ds===toDS(new Date())?'Azi':fmtDate(ds);
   const cont=document.getElementById('cal-day-appts');
   if(!appts?.length){cont.innerHTML='<div style="font-size:13px;color:var(--text-muted)">Nicio programare</div>';return}
-  cont.innerHTML=appts.map(a=>{const c=cachedClients.find(x=>x.id===a.client_id);return`<div class="appt-block"><div style="font-size:11px;font-weight:600;color:var(--sage);margin-bottom:2px">${a.time} · ${a.duration}min</div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>`;}).join('');
+  cont.innerHTML=appts.map(a=>{
+    const c=cachedClients.find(x=>x.id===a.client_id);
+    const prioBg={'orange':'#fed7aa','red':'#fecaca'};
+    const bg=c?.priority&&prioBg[c.priority]?prioBg[c.priority]:'var(--sage-light)';
+    const border=c?.priority&&prioBg[c.priority]?({'orange':'#f97316','red':'#ef4444'}[c.priority]):'var(--sage)';
+    return`<div class="appt-block" style="background:${bg};border-left-color:${border};cursor:pointer" onclick="navigateToClient('${a.client_id}')"><div style="font-size:11px;font-weight:600;color:var(--sage-dark);margin-bottom:2px">${a.time} · ${a.duration}min</div><div style="font-size:13px;font-weight:500">${c?c.first_name+' '+c.last_name:'—'}</div><div style="font-size:11px;color:var(--text-muted)">${a.type}</div></div>`;
+  }).join('');
 }
 
 async function saveAppt(){
