@@ -1716,15 +1716,12 @@ function renderClientList(){
   const priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
 
   const mkPriorityDot=(c)=>{
-    const col=c.priority?priorityColor[c.priority]:'var(--border)';
-    const opts=['green','orange','red'].map(p=>
-      '<div onclick="event.stopPropagation();setPriority(\''+c.id+'\',\''+(c.priority===p?'':p)+'\')" title="'+(p===c.priority?'Elimină':'Setează: ')+priorityLabel[p]+'" style="width:14px;height:14px;border-radius:50%;background:'+priorityColor[p]+';cursor:pointer;flex-shrink:0;'+(c.priority===p?'box-shadow:0 0 0 2px #fff,0 0 0 3px '+priorityColor[p]:'')+';"></div>'
-    ).join('');
-    return '<div style="position:relative;flex-shrink:0" onclick="event.stopPropagation()">'
-      +'<div id="prio-dot-'+c.id+'" onclick="togglePriorityPicker(\''+c.id+'\')" style="width:14px;height:14px;border-radius:50%;background:'+col+';cursor:pointer;border:1.5px solid '+(c.priority?col:'var(--text-muted)')+';"></div>'
-      +'<div id="prio-picker-'+c.id+'" style="display:none;position:absolute;right:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;display:none;gap:6px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);flex-direction:column;min-width:140px">'
-      +opts.map((o,i)=>'<div style="display:flex;align-items:center;gap:8px">'+o+'<span style="font-size:11px;color:var(--text)">'+priorityLabel[['green','orange','red'][i]]+'</span></div>').join('')
-      +'</div></div>';
+    const col=c.priority?priorityColor[c.priority]:'#ddd';
+    const border=c.priority?'2px solid '+priorityColor[c.priority]:'1.5px solid #bbb';
+    return '<div style="position:relative;flex-shrink:0">'
+      +'<div onclick="event.stopPropagation();openPrioPicker(this,\''+c.id+'\',\''+( c.priority||'')+'\''+')" '
+      +'style="width:14px;height:14px;border-radius:50%;background:'+col+';cursor:pointer;border:'+border+'"></div>'
+      +'</div>';
   };
 
   const mkRow=(c,isInactive)=>{
@@ -1753,22 +1750,44 @@ function renderClientList(){
   tb.innerHTML=html;
 }
 
-function togglePriorityPicker(clientId){
-  // Close all other pickers first
-  document.querySelectorAll('[id^="prio-picker-"]').forEach(el=>{
-    if(el.id!=='prio-picker-'+clientId)el.style.display='none';
-  });
-  const picker=document.getElementById('prio-picker-'+clientId);
-  if(!picker)return;
-  const isOpen=picker.style.display==='flex';
-  picker.style.display=isOpen?'none':'flex';
-  if(!isOpen){
-    // Close on outside click
-    setTimeout(()=>{
-      const close=()=>{picker.style.display='none';document.removeEventListener('click',close);};
-      document.addEventListener('click',close);
-    },10);
+function openPrioPicker(dotEl, clientId, currentPriority){
+  // Remove any existing picker
+  const existing=document.getElementById('global-prio-picker');
+  if(existing){
+    if(existing.dataset.clientId===clientId){existing.remove();return;}
+    existing.remove();
   }
+  const priorityColor={'green':'#4a7c6f','orange':'#f97316','red':'#ef4444'};
+  const priorityLabel={'green':'Progres bun','orange':'De urmărit','red':'Necesită atenție'};
+  const picker=document.createElement('div');
+  picker.id='global-prio-picker';
+  picker.dataset.clientId=clientId;
+  picker.style.cssText='position:fixed;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:160px';
+  // Position near dot
+  const rect=dotEl.getBoundingClientRect();
+  picker.style.top=(rect.bottom+6)+'px';
+  picker.style.right=(window.innerWidth-rect.right+8)+'px';
+  let html='';
+  ['green','orange','red'].forEach(p=>{
+    const isActive=currentPriority===p;
+    html+='<div onclick="event.stopPropagation();setPriority(\''+clientId+'\',\''+(isActive?'':p)+'\')" '
+      +'style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer">'
+      +'<div style="width:12px;height:12px;border-radius:50%;background:'+priorityColor[p]+';flex-shrink:0;'+(isActive?'box-shadow:0 0 0 2px #fff,0 0 0 3px '+priorityColor[p]:'')+'">'
+      +'</div><span style="font-size:12px;color:var(--text)">'+priorityLabel[p]+'</span>'
+      +(isActive?'<span style="font-size:10px;color:var(--text-muted);margin-left:auto">✓</span>':'')
+      +'</div>';
+  });
+  if(currentPriority){
+    html+='<div onclick="event.stopPropagation();setPriority(\''+clientId+'\',\'\')" '
+      +'style="font-size:10px;color:var(--text-muted);margin-top:6px;cursor:pointer;text-align:center;padding-top:6px;border-top:1px solid var(--border)">Elimină prioritatea</div>';
+  }
+  picker.innerHTML=html;
+  document.body.appendChild(picker);
+  // Close on outside click
+  setTimeout(()=>{
+    const close=(e)=>{if(!picker.contains(e.target)){picker.remove();document.removeEventListener('click',close);}};
+    document.addEventListener('click',close);
+  },10);
 }
 
 async function setPriority(clientId,priority){
