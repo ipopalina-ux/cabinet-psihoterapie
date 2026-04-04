@@ -3286,10 +3286,10 @@ async function openSessionJournal(hint,origin){
     <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:12px">
       <div style="display:flex;border-bottom:1px solid var(--sage-light)">
         <div id="ftab-agenda" onclick="switchFisaTab('agenda')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--sage);border-bottom:2px solid var(--sage);display:flex;align-items:center;justify-content:center;gap:4px">
-          'De discutat'+(agendaCount?'<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">'+agendaCount+'</span>':'')
+          De discutat${agendaCount?`<span style="background:var(--sage);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">${agendaCount}</span>`:''}
         </div>
         <div id="ftab-note" onclick="switchFisaTab('note')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px">
-          'Notițe'+(noteCount?'<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">'+noteCount+'</span>':'')
+          Notițe${noteCount?`<span style="background:var(--sage-light);color:var(--sage);font-size:9px;padding:1px 5px;border-radius:8px">${noteCount}</span>`:''}
         </div>
         <div id="ftab-tema" onclick="switchFisaTab('tema')" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">
           Temă
