@@ -1603,6 +1603,14 @@ function switchMode(m,el){
 }
 
 async function init(){
+  // Safety timeout — ascunde loading după max 5 secunde
+  setTimeout(()=>{
+    const el=document.getElementById('app-loading');
+    if(el&&!el.classList.contains('hidden')){
+      el.classList.add('hidden');
+      document.getElementById('app-shell')?.classList.remove('hidden');
+    }
+  },5000);
   loadSettings();
   initDobSelects();
   const params=new URLSearchParams(window.location.search);
@@ -1950,7 +1958,7 @@ function _renderTabIstoric(sessions,appointments,orsMeas,srsMeas){
         ${s.notes?`<div style="font-size:12px;color:var(--text);line-height:1.65;margin-bottom:10px">${s.notes}</div>`:'<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:10px">Fără notițe.</div>'}
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn btn-ghost btn-sm" onclick="generateAiSummary('${s.id}','${s.notes?.replace(/'/g,"\\'").replace(/\n/g,' ')||''}')">✦ Rezumat AI</button>
-          <button class="btn btn-ghost btn-sm" onclick="openFullSession('${s.id}','${s.date}',${sessNum},'${currentClientId}')">Vezi fișa completă →</button>
+          <button class="btn btn-ghost btn-sm" onclick="openFullSession('${s.id}','${s.date}',${sessNum},window.currentClientId)">Vezi fișa completă →</button>
         </div>
         <div id="ai-summary-${s.id}" style="margin-top:8px"></div>
       </div>
@@ -2276,6 +2284,11 @@ async function cdAutoSaveNote(clientId,sessNum){
   },1500);
 }
 
+function closeFullSessModal(id){
+  const el=document.getElementById('full-sess-modal-'+id);
+  if(el)el.remove();
+}
+
 async function openFullSession(sessionId, date, sessNum, clientId){
   const c=cachedClients.find(x=>x.id===clientId);
   // Fetch toate datele ședinței
@@ -2293,7 +2306,7 @@ async function openFullSession(sessionId, date, sessNum, clientId){
   const hwItems=(entries||[]).filter(e=>e.type==='homework');
 
   const div=document.createElement('div');
-  div.innerHTML=`<div id="full-sess-modal-${sessionId}" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target.id==='full-sess-modal-${sessionId}')document.getElementById('full-sess-modal-${sessionId}').remove()">
+  div.innerHTML=`<div id="full-sess-modal-${sessionId}" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:flex;align-items:flex-end" onclick="if(event.target===this)closeFullSessModal('${sessionId}')">
     <div style="background:var(--card);border-radius:14px 14px 0 0;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
 
       <!-- Header -->
@@ -2305,7 +2318,7 @@ async function openFullSession(sessionId, date, sessNum, clientId){
         <div style="display:flex;align-items:center;gap:8px">
           ${ors?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:var(--sage-light);color:var(--sage-dark)">ORS ${ors.total}</span>`:''}
           ${srs?`<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:#ede9fe;color:#4c1d95">SRS ${srs.total}</span>`:''}
-          <button onclick="document.getElementById('full-sess-modal-${sessionId}').remove()" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
+          <button onclick="closeFullSessModal('${sessionId}')" style="width:26px;height:26px;border-radius:50%;background:var(--sage-light);border:none;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
         </div>
       </div>
 
