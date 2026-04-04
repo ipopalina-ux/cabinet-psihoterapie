@@ -1830,8 +1830,17 @@ async function showClientDetail(id){
   const c=cachedClients.find(x=>x.id===id);
   if(!c)return;
   window.currentClientId=id;
+  // Ensure clients panel is active
+  const panel=document.getElementById('t-clients');
+  if(panel&&!panel.classList.contains('active')){
+    document.querySelectorAll('.panel').forEach(x=>{x.style.display='none';x.classList.remove('active');});
+    panel.style.display='flex';panel.classList.add('active');
+  }
   document.getElementById('clients-list-view').style.display='none';
-  const det=document.getElementById('client-detail-view');det.style.display='block';
+  const det=document.getElementById('client-detail-view');
+  det.style.display='block';
+  det.style.flex='1';
+  det.style.overflowY='auto';
 
   // Fetch all data in parallel
   const [{data:sessions},{data:measurements},{data:fisa},{data:appointments},{data:journalEntries},{data:therapistData},{data:clinicalInterview}]=await Promise.all([
