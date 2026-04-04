@@ -1969,7 +1969,7 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
   html+='<div style="background:var(--sage-light);border-radius:10px;padding:13px;margin-bottom:14px">';
   html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
   html+='<div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.07em">NARA AI - Rezumat client</div>';
-  html+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateClientSummary(&apos;"+clientId+"&apos;)">Genereaza</button>';
+  html+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateClientSummary(window.currentClientId)">Genereaza</button>';
   html+='</div>';
   html+='<div id="cd-client-ai-summary" style="font-size:12px;color:var(--text);line-height:1.65;min-height:36px">';
   html+=aiSummary||'<span style="color:var(--text-muted);font-style:italic">Apasa Genereaza - AI citeste notitele si obiectivele si scrie un rezumat clinic.</span>';
@@ -1996,13 +1996,13 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
   docsHtml+='<span style="font-size:12px;color:var(--text)">GDPR</span>';
   docsHtml+='<div style="display:flex;align-items:center;gap:8px">';
   docsHtml+='<span style="font-size:11px;font-weight:600;color:'+(c.gdpr_signed?'var(--success)':'var(--warn)')+'">'+( c.gdpr_signed?'✓ Semnat':'Nesemnat')+'</span>';
-  if(c.gdpr_signed)docsHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewGdprContent(&apos;"+clientId+"&apos;)">Vezi</button>';
+  if(c.gdpr_signed)docsHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewGdprContent(\''+clientId+'\')">Vezi</button>';
   docsHtml+='</div></div>';
   docsHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0">';
   docsHtml+='<span style="font-size:12px;color:var(--text)">Contract terapeutic</span>';
   docsHtml+='<div style="display:flex;align-items:center;gap:8px">';
   docsHtml+='<span style="font-size:11px;font-weight:600;color:'+(c.contract_signed?'var(--success)':'var(--warn)')+'">'+( c.contract_signed?'✓ Semnat':'Nesemnat')+'</span>';
-  if(c.contract_signed)docsHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewContractContent(&apos;"+clientId+"&apos;)">Vezi</button>';
+  if(c.contract_signed)docsHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="viewContractContent(\''+clientId+'\')">Vezi</button>';
   docsHtml+='</div></div>';
   html+=mkSect('docs','Documente',null,true,docsHtml);
 
@@ -2038,8 +2038,8 @@ function _renderTabClient(c,fisa,therapistData,clinicalInterview,sessions,client
     intHtml+='<div style="border-top:0.5px solid var(--border);padding-top:12px;margin-top:4px">';
     intHtml+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
     intHtml+='<div style="font-size:9px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.06em">Interpretare NARA AI</div>';
-    var intEnc=encodeURIComponent(JSON.stringify(clinicalInterview));
-    intHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateInterviewInterpretation(&apos;"+clientId+"&apos;,&apos;"+intEnc+"&apos;)">✦ Genereaza</button>';
+    var intEnc=encodeURIComponent(JSON.stringify(clinicalInterview));window.currentInterviewEnc=intEnc;
+    intHtml+='<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="generateInterviewInterpretation(window.currentClientId,window.currentInterviewEnc)">✦ Genereaza</button>';
     intHtml+='</div>';
     intHtml+='<div id="cd-interview-ai" style="font-size:12px;color:var(--text-muted);font-style:italic">Apasa pentru o interpretare clinica bazata pe profilul BASIC ID.</div>';
     intHtml+='</div>';
